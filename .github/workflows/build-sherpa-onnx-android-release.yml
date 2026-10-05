@@ -1,21 +1,21 @@
-# Build sherpa-onnx for Android (all ABIs, with QNN); produce zip + AAR; publish as GitHub Release and to Maven.
+﻿# Build sherpa-onnx for Android (all ABIs, with QNN); produce zip + AAR; publish as GitHub Release and to Maven.
 # Release tag is read from third_party/sherpa-onnx-prebuilt/ANDROID_RELEASE_TAG.
 # Zip layout: arm64-v8a/, armeabi-v7a/, x86/, x86_64/ (.so); c-api/ (C headers); java/classes.jar.
 # AAR is published to GitHub Pages Maven as com.xdcobra.sherpa:sherpa-onnx (POM depends on com.xdcobra.sherpa:onnxruntime).
 # If MAVEN_REPO_PAT is set, the AAR is also published to XDcobra/maven with MD5/SHA1 checksums.
 
 # 
-# ──────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 1. Build sherpa-onnx (Android, all ABIs, with QNN)
-# ──────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 2. Package sherpa-onnx layout zip (from build output)
-# ──────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 3. Prepare AAR for release asset
-# ──────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 4. Create GitHub Release (AAR + zip)
-# ──────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # 5. Publish sherpa-onnx AAR to GitHub Pages Maven (XDcobra/maven)
-# ──────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #
 # When to run manually (Actions --> Prebuilt - Sherpa-onnx (Android) Release --> Run workflow):
 # 1. After a new ONNX Runtime Android release exists (run "Prebuilt - ONNX Runtime (Android) Release" first).
@@ -90,7 +90,7 @@ jobs:
           local-cache: false  # disable local cache to avoid linking errors: https://github.com/nttld/setup-ndk/issues/518#event-16541651206
 
       - name: Set up Android SDK (for Kotlin API build; needs android.jar)
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Get sherpa-onnx submodule version
         id: submodules
@@ -218,10 +218,10 @@ jobs:
           name: Sherpa-onnx Android ${{ steps.tag.outputs.release_tag }}
           make_latest: false  # do not set this release as GitHub's "latest" (e.g. to keep app/npm release as latest)
           body: |
-            Prebuilt sherpa-onnx for Android (arm64-v8a, armeabi-v7a, x86, x86_64) with QNN-linked native libs. **ONNX Runtime** (`libonnxruntime.so`, JNI, Java API, headers) is provided by `com.xdcobra.sherpa:onnxruntime` — not bundled in this zip/AAR.
-            - **sherpa-onnx-android.zip** – Layout: `arm64-v8a/`, `armeabi-v7a/`, `x86/`, `x86_64/` (Sherpa `.so` only), `c-api/` (C headers), `java/classes.jar` (Kotlin API).
-            - **sherpa-onnx-${{ steps.tag.outputs.maven_version }}.aar** – Android library (Kotlin API: data classes, `WaveReader.readWave()`, etc.). Also on Maven as default artifact; depends on `com.xdcobra.sherpa:onnxruntime`.
-            - **sherpa-onnx-${{ steps.tag.outputs.maven_version }}-java.aar** – Same library with **Java API** (Builder pattern). Use Maven classifier `java` or this file for Java projects.
+            Prebuilt sherpa-onnx for Android (arm64-v8a, armeabi-v7a, x86, x86_64) with QNN-linked native libs. **ONNX Runtime** (`libonnxruntime.so`, JNI, Java API, headers) is provided by `com.xdcobra.sherpa:onnxruntime` â€” not bundled in this zip/AAR.
+            - **sherpa-onnx-android.zip** â€“ Layout: `arm64-v8a/`, `armeabi-v7a/`, `x86/`, `x86_64/` (Sherpa `.so` only), `c-api/` (C headers), `java/classes.jar` (Kotlin API).
+            - **sherpa-onnx-${{ steps.tag.outputs.maven_version }}.aar** â€“ Android library (Kotlin API: data classes, `WaveReader.readWave()`, etc.). Also on Maven as default artifact; depends on `com.xdcobra.sherpa:onnxruntime`.
+            - **sherpa-onnx-${{ steps.tag.outputs.maven_version }}-java.aar** â€“ Same library with **Java API** (Builder pattern). Use Maven classifier `java` or this file for Java projects.
 
             **Maven:** The AAR is published to [GitHub Pages Maven](https://xdcobra.github.io/maven/) as `com.xdcobra.sherpa:sherpa-onnx`. Add `com.xdcobra.sherpa:onnxruntime` to your repo if not already present (sherpa-onnx POM declares it as dependency).
 
