@@ -152,6 +152,7 @@ jobs:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
           QNN_SDK_ROOT: ${{ steps.qnn.outputs.root }}
+          ORT_RELEASE_REPOSITORY: XDcobra/react-native-sherpa-onnx
 
       - name: Package jniLibs layout (sherpa-onnx + onnxruntime + C API headers + Java/Kotlin classes)
         run: |

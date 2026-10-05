@@ -159,7 +159,7 @@ if [ -z "$ORT_PREBUILT_ANDROID_BASE" ] && [ -z "$ORT_PREBUILT_ROOT" ]; then
         RELEASE_TAG="ort-android-qnn-v${ONNXRUNTIME_VERSION}-qnn${QNN_SDK_VERSION}-${ORT_BN}"
     fi
     if [ -n "$RELEASE_TAG" ]; then
-        REPO_SLUG="${GITHUB_REPOSITORY:-}"
+        REPO_SLUG="${ORT_RELEASE_REPOSITORY:-${GITHUB_REPOSITORY:-}}"
         if [ -z "$REPO_SLUG" ]; then
             REPO_SLUG=$(git -C "$REPO_ROOT" remote get-url origin 2>/dev/null | sed -E 's|.*github\.com[:/]([^/]+/[^/]+)(\.git)?$|\1|' || true)
         fi
