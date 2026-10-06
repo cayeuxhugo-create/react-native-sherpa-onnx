@@ -244,6 +244,13 @@ build_abi() {
 
     echo "===== Building sherpa-onnx for $ABI ====="
 
+    # Force sherpa-onnx upstream scripts to use the exact ORT version
+    # pinned by Guardian. This prevents upstream defaults from drifting
+    # (for example 1.28.2 while Guardian ships 1.28.1).
+    if [ -n "$ONNXRUNTIME_VERSION" ]; then
+            export SHERPA_ONNX_ONNXRUNTIME_VERSION="$ONNXRUNTIME_VERSION"
+        fi
+
     # Lay out ONNX Runtime so sherpa-onnx finds it (no onnxruntime-libs download).
     if [ -n "$ONNXRUNTIME_VERSION" ]; then
         mkdir -p "$SHERPA_SRC/$BUILD_DIR/$ONNXRUNTIME_VERSION/jni/$ABI"
