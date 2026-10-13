@@ -1,4 +1,4 @@
-name: Nemotron V9 - Windows wheel (lab only)
+name: Nemotron V9 - Beam score tracing (lab only)
 
 on:
   workflow_dispatch:
@@ -119,6 +119,46 @@ jobs:
           }
           Write-Host 'TTS-off Python placeholders inserted; ASR decoder unchanged.'
 
+      - name: Instrument NeMo Modified Beam hypothesis scores (CI-only)
+        shell: pwsh
+        working-directory: third_party/sherpa-onnx
+        run: |
+          # This only modifies a temporary GitHub runner checkout.
+          # No decoding scores, pruning, ranking, or Android artifacts are modified.
+          $path = 'sherpa-onnx/csrc/online-transducer-modified-beam-search-nemo-decoder.cc'
+          $file = (Resolve-Path $path).Path
+          $source = [System.IO.File]::ReadAllText($file)
+          $includeAnchor = '#include <algorithm>'
+          if (([regex]::Matches($source, [regex]::Escape($includeAnchor))).Count -ne 1) {
+            throw 'Trace instrumentation: C++ include anchor not unique.'
+          }
+          $source = $source.Replace($includeAnchor, $includeAnchor + "`n#include <cstdio>`n#include <cstdlib>")
+          $anchor = '  Hypothesis best = hyps.GetMostProbable(false /*length_norm*/);'
+          if (([regex]::Matches($source, [regex]::Escape($anchor))).Count -ne 1) {
+            throw 'Trace instrumentation: GetMostProbable anchor not unique.'
+          }
+          $trace = @'
+            // Guardian V9 lab-only logging, enabled by environment variable at replay.
+            if (std::getenv("GUARDIAN_NEMO_BEAM_TRACE") != nullptr) {
+              const auto top3 = hyps.GetTopK(3, false /*length_norm*/);
+              for (size_t rank = 0; rank < top3.size(); ++rank) {
+                const auto &h = top3[rank];
+                std::fprintf(stderr,
+                   "GV_BEAM_TRACE,beam=%d,frame=%d,rank=%zu,total=%d,tokens=%zu,score=%.12f,trailing_blanks=%d,key=%s\n",
+                   max_active_paths, frame_offset + num_rows, rank + 1,
+                   hyps.Size(), h.ys.size(), h.log_prob,
+                   h.num_trailing_blanks, h.Key().c_str());
+              }
+              std::fflush(stderr);
+            }
+          '@
+          $source = $source.Replace($anchor, $trace + "`n" + $anchor)
+          [System.IO.File]::WriteAllText($file, $source, [System.Text.UTF8Encoding]::new($false))
+          if (-not ($source.Contains('GV_BEAM_TRACE'))) {
+            throw 'Trace instrumentation was not applied.'
+          }
+          Write-Host 'Diagnostic trace inserted into temporary Windows runner; decoding unchanged.'
+
       - name: Build a monolithic wheel from pinned sources
         shell: pwsh
         working-directory: third_party/sherpa-onnx
@@ -144,7 +184,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: nemotron-v9-sherpa-3df7adac-win-x64-python-${{ inputs.python_version || '3.12' }}
+          name: nemotron-v9-BEAM-TRACE-3df7adac-win-x64-python-${{ inputs.python_version || '3.12' }}
           path: third_party/sherpa-onnx/dist/*.whl
           if-no-files-found: error
           retention-days: 14
