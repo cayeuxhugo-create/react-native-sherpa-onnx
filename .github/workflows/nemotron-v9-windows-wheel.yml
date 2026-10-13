@@ -73,6 +73,26 @@ jobs:
           python --version
           python -m pip install --upgrade pip setuptools wheel numpy
 
+      - name: Fix Windows wheel staging directory (CI-only)
+        shell: pwsh
+        working-directory: third_party/sherpa-onnx
+        run: |
+          # Sherpa 3df7adac omits mkdir for out_bin_dir in monolithic Windows wheel.
+          # Patch only this runner's Python packaging helper; do not alter NeMo decoding.
+          $path = 'cmake/cmake_extension.py'
+          $source = [System.IO.File]::ReadAllText((Resolve-Path $path).Path)
+          $needle = '        out_bin_dir = Path(self.build_lib).resolve().parent / "sherpa_onnx" / "bin"'
+          if (([regex]::Matches($source, [regex]::Escape($needle))).Count -ne 1) {
+            throw 'Unexpected Sherpa version: expected one out_bin_dir declaration; refusing patch.'
+          }
+          $replacement = $needle + "`n        out_bin_dir.mkdir(parents=True, exist_ok=True)"
+          $updated = $source.Replace($needle, $replacement)
+          [System.IO.File]::WriteAllText((Resolve-Path $path).Path, $updated, [System.Text.UTF8Encoding]::new($false))
+          if (-not ($updated.Contains('out_bin_dir.mkdir(parents=True, exist_ok=True)'))) {
+            throw 'Wheel staging fix was not applied.'
+          }
+          Write-Host 'Windows wheel staging directory fix applied to CI runner.'
+
       - name: Build a monolithic wheel from pinned sources
         shell: pwsh
         working-directory: third_party/sherpa-onnx
