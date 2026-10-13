@@ -1,0 +1,103 @@
+name: Nemotron V9 - Windows wheel (lab only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      python_version:
+        description: "Version de Python Windows utilisee pour V9-Replay (ex: 3.12)"
+        type: choice
+        required: true
+        default: '3.12'
+        options:
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+  push:
+    branches:
+      - audit/nemotron-v9-replay
+    paths:
+      - .github/workflows/nemotron-v9-windows-wheel.yml
+
+permissions:
+  contents: read
+
+jobs:
+  windows-wheel:
+    name: Windows x64 - Python ${{ inputs.python_version || '3.12' }}
+    runs-on: windows-2022
+    timeout-minutes: 120
+    env:
+      SHERPA_ONNX_CMAKE_ARGS: >-
+        -DCMAKE_BUILD_TYPE=Release
+        -DSHERPA_ONNX_ENABLE_TTS=OFF
+        -DSHERPA_ONNX_ENABLE_BINARY=OFF
+        -DSHERPA_ONNX_ENABLE_WEBSOCKET=OFF
+        -DSHERPA_ONNX_ENABLE_PORTAUDIO=OFF
+        -DSHERPA_ONNX_ENABLE_C_API=OFF
+        -DSHERPA_ONNX_BUILD_C_API_EXAMPLES=OFF
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned sherpa-onnx only
+        shell: pwsh
+        run: |
+          git submodule update --init third_party/sherpa-onnx
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify pinned NeMo beam-search source
+        shell: pwsh
+        run: |
+          $expected = '3df7adacc0d5f140e4e81b746dac0fbeeac16fab'
+          $actual = (git -C third_party/sherpa-onnx rev-parse HEAD).Trim()
+          Write-Host "Sherpa revision: $actual"
+          if ($actual -ne $expected) {
+            throw "Refus de compiler : commit inattendu. Attendu=$expected, obtenu=$actual"
+          }
+          $source = 'third_party/sherpa-onnx/sherpa-onnx/csrc/online-transducer-modified-beam-search-nemo-decoder.cc'
+          if (!(Test-Path $source)) {
+            throw "Decodeur Modified Beam Nemo introuvable : $source"
+          }
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version || '3.12' }}
+          architecture: x64
+
+      - name: Confirm CMake and Python
+        shell: pwsh
+        run: |
+          cmake --version
+          python --version
+          python -m pip install --upgrade pip setuptools wheel numpy
+
+      - name: Build a monolithic wheel from pinned sources
+        shell: pwsh
+        working-directory: third_party/sherpa-onnx
+        run: |
+          # IMPORTANT : ne pas definir SHERPA_ONNX_SPLIT_PYTHON_PACKAGE,
+          # car sa simple presence activerait le paquet separe.
+          Remove-Item Env:SHERPA_ONNX_SPLIT_PYTHON_PACKAGE -ErrorAction SilentlyContinue
+          python setup.py bdist_wheel
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-ChildItem dist -Filter '*.whl' | Select-Object Name, Length
+
+      - name: Smoke test installed package
+        shell: pwsh
+        run: |
+          $wheel = Get-ChildItem 'third_party/sherpa-onnx/dist/*.whl' | Select-Object -First 1
+          if (!$wheel) { throw 'Wheel non produit' }
+          python -m pip install --no-deps --force-reinstall $wheel.FullName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import sherpa_onnx; print('Sherpa:', sherpa_onnx.__version__, sherpa_onnx.__file__)"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload lab wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: nemotron-v9-sherpa-3df7adac-win-x64-python-${{ inputs.python_version || '3.12' }}
+          path: third_party/sherpa-onnx/dist/*.whl
+          if-no-files-found: error
+          retention-days: 14
