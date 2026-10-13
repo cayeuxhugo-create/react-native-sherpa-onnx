@@ -93,6 +93,32 @@ jobs:
           }
           Write-Host 'Windows wheel staging directory fix applied to CI runner.'
 
+      - name: Fix Python import stubs when TTS is disabled (CI-only)
+        shell: pwsh
+        working-directory: third_party/sherpa-onnx
+        run: |
+          # Source 3df7adac unconditionally imports GenerationConfig and
+          # OfflineTtsSupertonicModelConfig from Python __init__.py, but
+          # its TTS-off pybind branch does not export them. Add explicit
+          # None placeholders, like the other unavailable TTS symbols.
+          # This patch is only applied to the CI runner, not to Android.
+          $path = 'sherpa-onnx/python/csrc/sherpa-onnx.cc'
+          $source = [System.IO.File]::ReadAllText((Resolve-Path $path).Path)
+          $needle = '  m.attr("GeneratedAudio") = py::none();'
+          if (([regex]::Matches($source, [regex]::Escape($needle))).Count -ne 1) {
+            throw 'Unexpected Sherpa source: TTS-off placeholder anchor not unique.'
+          }
+          $replacement = '  m.attr("GenerationConfig") = py::none();' + "`n" +
+                         '  m.attr("OfflineTtsSupertonicModelConfig") = py::none();' + "`n" + $needle
+          $source = $source.Replace($needle, $replacement)
+          [System.IO.File]::WriteAllText((Resolve-Path $path).Path, $source, [System.Text.UTF8Encoding]::new($false))
+          foreach ($symbol in @('GenerationConfig', 'OfflineTtsSupertonicModelConfig')) {
+            if (-not ($source.Contains('m.attr("' + $symbol + '") = py::none();'))) {
+              throw "Missing CI-only TTS placeholder: $symbol"
+            }
+          }
+          Write-Host 'TTS-off Python placeholders inserted; ASR decoder unchanged.'
+
       - name: Build a monolithic wheel from pinned sources
         shell: pwsh
         working-directory: third_party/sherpa-onnx
@@ -111,10 +137,11 @@ jobs:
           if (!$wheel) { throw 'Wheel non produit' }
           python -m pip install --no-deps --force-reinstall $wheel.FullName
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -c "import sherpa_onnx; print('Sherpa:', sherpa_onnx.__version__, sherpa_onnx.__file__)"
+          python -c "import sherpa_onnx; print('Sherpa import OK:', sherpa_onnx.__file__); print('OnlineRecognizer:', sherpa_onnx.OnlineRecognizer)"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Upload lab wheel
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: nemotron-v9-sherpa-3df7adac-win-x64-python-${{ inputs.python_version || '3.12' }}
