@@ -1,4 +1,4 @@
-name: Nemotron V9 - Beam score tracing (lab only)
+name: Nemotron V9 - N-best selection laboratory (lab only)
 
 on:
   workflow_dispatch:
@@ -159,6 +159,61 @@ jobs:
           }
           Write-Host 'Diagnostic trace inserted into temporary Windows runner; decoding unchanged.'
 
+      - name: Add opt-in N-best LAB-only output selector (CI-only)
+        shell: pwsh
+        working-directory: third_party/sherpa-onnx
+        run: |
+          # Default decoding is bit-for-bit unchanged unless the explicit
+          # GUARDIAN_NEMO_NBEST_OVERRIDE env variable is set during a lab replay.
+          # Do not carry this code into the Android app.
+          $path = 'sherpa-onnx/csrc/online-transducer-modified-beam-search-nemo-decoder.cc'
+          $file = (Resolve-Path $path).Path
+          $source = [System.IO.File]::ReadAllText($file)
+          $anchor = '  Hypothesis best = hyps.GetMostProbable(false /*length_norm*/);'
+          if (([regex]::Matches($source, [regex]::Escape($anchor))).Count -ne 1) {
+            throw 'N-best laboratory anchor is missing or ambiguous.'
+          }
+          $extra = @'
+            // Guardian Voice V9 - opt-in N-best experiment. Never enabled in builds
+            // without the lab variable. Pruned hypotheses are NOT resurrected.
+            // Gate 0.15 is intentionally exploratory, tuned to *this* tiny sample;
+            // it does not establish safety or generalization to emergencies.
+            const bool gv_shadow =
+                std::getenv("GUARDIAN_NEMO_NBEST_SHADOW") != nullptr;
+            const bool gv_override =
+                std::getenv("GUARDIAN_NEMO_NBEST_OVERRIDE") != nullptr;
+            if ((gv_shadow || gv_override) && best.ys.empty()) {
+              auto nbest = hyps.GetTopK(max_active_paths, false /*length_norm*/);
+              for (const auto &candidate : nbest) {
+                if (candidate.ys.empty()) {
+                  continue;
+                }
+                const double gap = best.log_prob - candidate.log_prob;
+                const bool gated = gap >= 0.0 && gap <= 0.15 &&
+                                   candidate.ys.size() >= 3;
+                std::fprintf(stderr,
+                             "GV_NBEST_LAB,mode=%s,beam=%d,frame=%d,raw_tokens=0,"
+                             "candidate_tokens=%zu,raw_score=%.12f,"
+                             "candidate_score=%.12f,gap=%.12f,gate=%d,key=%s\n",
+                             gv_override ? "override" : "shadow", max_active_paths,
+                             frame_offset + num_rows, candidate.ys.size(),
+                             best.log_prob, candidate.log_prob, gap,
+                             gated ? 1 : 0, candidate.Key().c_str());
+                std::fflush(stderr);
+                if (gv_override && gated) {
+                  best = candidate;
+                }
+                break;
+              }
+            }
+          '@
+          $source = $source.Replace($anchor, $anchor + "`n" + $extra)
+          [System.IO.File]::WriteAllText($file, $source, [System.Text.UTF8Encoding]::new($false))
+          if (-not ($source.Contains('GV_NBEST_LAB'))) {
+            throw 'N-best laboratory code was not applied.'
+          }
+          Write-Host 'N-best lab-only selector inserted, disabled by default.'
+
       - name: Build a monolithic wheel from pinned sources
         shell: pwsh
         working-directory: third_party/sherpa-onnx
@@ -184,7 +239,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: nemotron-v9-BEAM-TRACE-3df7adac-win-x64-python-${{ inputs.python_version || '3.12' }}
+          name: nemotron-v9-NBEST-LAB-3df7adac-win-x64-python-${{ inputs.python_version || '3.12' }}
           path: third_party/sherpa-onnx/dist/*.whl
           if-no-files-found: error
           retention-days: 14
