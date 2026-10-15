@@ -5,6 +5,7 @@ param(
     [string]$DeviceId = "",
     [string]$OutputDirectory = "",
     [switch]$IncludeWav,
+    [switch]$Full,
     [ValidatePattern('^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+$')]
     [string]$PackageName = ""
 )
@@ -63,7 +64,7 @@ function Get-GuardianWavHeader {
     $channels = [BitConverter]::ToUInt16($data,22)
     $bits = [BitConverter]::ToUInt16($data,34)
     $declaredBytes = [BitConverter]::ToUInt32($data,40)
-    $valid = $riff -eq "RIFF" -and $wave -eq "WAVE" -and $channels -eq 2 -and $bits -eq 16 -and $rate -gt 0 -and $declaredBytes -eq ($data.Length-44)
+    $valid = $riff -eq "RIFF" -and $wave -eq "WAVE" -and $channels -in @(1,2) -and $bits -eq 16 -and $rate -gt 0 -and $declaredBytes -eq ($data.Length-44)
     $duration = 0
     if ($rate -gt 0 -and $channels -gt 0 -and $bits -gt 0) {
         $duration = ($data.Length-44) / ($rate*$channels*$bits/8)
@@ -81,7 +82,7 @@ function Collect-GuardianWavs {
     }
     foreach ($name in ($listing -split "\r?\n")) {
         $name = $name.Trim()
-        if ($name -notmatch '^guardian-multimic-(\d{13})-[A-Za-z0-9_-]+\.wav$') { continue }
+        if ($name -notmatch '^guardian-(?:multimic|voice)-(\d{13})-[A-Za-z0-9_-]+\.(?:wav|tsv)$') { continue }
         # Only sessions started during this collection, not older recordings.
         if ([long]$Matches[1] -lt ($deviceStartMs-1000)) { continue }
         $wavDirectory = Join-Path $OutputDirectory "wav"
@@ -95,7 +96,7 @@ function Collect-GuardianWavs {
             $method = "run-as binary stream"
             Copy-GuardianBinaryWithRunAs $remoteFile $localFile
         }
-        $header = Get-GuardianWavHeader $localFile
+        $header = if ($name.EndsWith(".wav")) { Get-GuardianWavHeader $localFile } else { @{ valid=$true; kind="alignment-index" } }
         $records.Add([pscustomobject]@{
             file=$name; method=$method; header=$header
             sha256=(Get-FileHash -LiteralPath $localFile -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -105,7 +106,7 @@ function Collect-GuardianWavs {
     ConvertTo-Json -InputObject @($records.ToArray()) -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputDirectory "wav-manifest.json") -Encoding UTF8
     $metadata["audioFilesCollected"] = $records.Count
     if ($records.Count -eq 0) {
-        Write-Warning "Aucun nouveau WAV trouve. Le code existant n'enregistre que le diagnostic stereo explicite."
+        Write-Warning "Aucun nouveau WAV trouve : verifier le module diagnostic r2 et le fichier guardian-record-wav.txt."
     }
 }
 
@@ -114,7 +115,7 @@ if ((Invoke-GuardianAdb @("get-state")) -ne "device") {
     throw "Connect and authorize one Android phone. With multiple devices, use -DeviceId."
 }
 $deviceStartMs = [long](Invoke-GuardianAdb @("shell", "date", "+%s")) * 1000
-if ($IncludeWav -and -not $PackageName) {
+if (-not $PackageName) {
     try {
         $installed = Invoke-GuardianAdb @("shell", "pm", "list", "packages")
         $candidates = @($installed -split "\r?\n" | ForEach-Object { $_.Trim() -replace '^package:', '' } | Where-Object { $_ -match 'guardian' })
@@ -137,7 +138,7 @@ $logPath = Join-Path $OutputDirectory "guardian.log"
 $casesPath = Join-Path $OutputDirectory "cases.csv"
 $rows = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion = 1
+    collectorVersion = 2
     startUtc = [DateTime]::UtcNow.ToString("o")
     manufacturer = Invoke-GuardianAdb @("shell", "getprop", "ro.product.manufacturer")
     model = Invoke-GuardianAdb @("shell", "getprop", "ro.product.model")
@@ -162,15 +163,58 @@ $cases = @(
     [pscustomobject]@{ id="N5_VOICE"; profile="NOISY"; distance=5; noise="background"; spoken=$true; instructions="Avec le meme bruit, relire les trois phrases doucement a 5 metres." }
 )
 Write-Host ""
-Write-Host "Les transcriptions seront dans le ZIP. Le script ne lance aucun enregistrement audio."
-if ($IncludeWav) { Write-Host "Les nouveaux WAV du diagnostic stereo existant seront aussi recuperes." }
-Write-Host "Ce script ne change pas le profil dans l'application."
-Write-Host "Activer voiceDiagnosticsEnabled=true dans le module diagnostic puis reconstruire Android."
-Write-Host "Au changement de profil, arreter completement puis redemarrer la protection."
+Write-Host "Le ZIP contiendra les transcriptions et, avec -IncludeWav, les voix enregistrees."
+Write-Host "Installer le module diagnostic r2, reconstruire Android et activer voiceDiagnosticsEnabled=true."
+Write-Host "Le script prepare des fichiers de test temporaires ; les fichiers existants seront restaures."
+Write-Host "Il faudra arreter puis redemarrer la protection a chaque changement de profil."
 Write-Host "Choisir un bruit sans voix pour ce premier essai (ventilateur, par exemple)."
 Write-Host "Le niveau de bruit doit rester identique entre N0, N1, N3 et N5."
 Write-Host ("Dossier : " + $OutputDirectory)
+if (-not $Full) { $cases = @($cases | Where-Object { $_.id -in @("D0_SILENCE","D5_VOICE","N0_NOISE","N5_VOICE") }) }
 $process = $null
+$controlBackups = New-Object 'System.Collections.Generic.List[object]'
+function Set-GuardianTestControl {
+    param([string]$Name, [string]$Value)
+    $remote = "/sdcard/Android/data/$PackageName/files/$Name"
+    $existing = @($controlBackups | Where-Object { $_.name -eq $Name })
+    if ($existing.Count -eq 0) {
+        # A failed read is never interpreted as an absent file.
+        $listing = Invoke-GuardianAdb @("shell", "ls", "-1", "/sdcard/Android/data/$PackageName/files")
+        $exists = @($listing -split "\r?\n" | Where-Object { $_.Trim() -eq $Name }).Count -gt 0
+        $backup = Join-Path $OutputDirectory ("backup-" + $Name)
+        if ($exists) {
+            try { [void](Invoke-GuardianAdb @("pull", $remote, $backup)) }
+            catch { Copy-GuardianBinaryWithRunAs $remote $backup }
+        }
+        $controlBackups.Add([pscustomobject]@{ name=$Name; remote=$remote; existed=$exists; backup=$backup })
+    }
+    $local = Join-Path $OutputDirectory ("test-" + $Name)
+    [IO.File]::WriteAllText($local, $Value, (New-Object Text.UTF8Encoding($false)))
+    [void](Invoke-GuardianAdb @("push", $local, $remote))
+}
+function Confirm-GuardianSession {
+    param([string]$Profile, [int]$SkipLines)
+    $deadline = [DateTime]::UtcNow.AddSeconds(12)
+    do {
+        $events = @(Get-Content -LiteralPath $logPath -Encoding UTF8 | Select-Object -Skip $SkipLines | ForEach-Object {
+            if ($_ -match 'GuardianVoiceDiag.*?(\{.*\})') {
+                try { $Matches[1] | ConvertFrom-Json } catch { }
+            }
+        })
+        $sessions = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.profile -eq $Profile })
+        foreach ($session in $sessions) {
+            $same = @($events | Where-Object { $_.session -eq $session.session -and $_.profile -eq $Profile })
+            $frames = @($same | Where-Object { $_.event -eq "AUDIO_FRAME" })
+            $ready = @($same | Where-Object { $_.event -eq "WAV_READY" })
+            if ($frames.Count -gt 0 -and (-not $IncludeWav -or $ready.Count -gt 0)) {
+                Write-Host ("Session verifiee : " + $Profile + ", audio actif, WAV=" + [bool]$ready.Count)
+                return
+            }
+        }
+        Start-Sleep -Milliseconds 400
+    } while ([DateTime]::UtcNow -lt $deadline)
+    throw "Session non verifiee : le profil demande ou les diagnostics WAV sont absents. Installer le module r2, activer voiceDiagnosticsEnabled=true, puis arreter/redemarrer la protection. Les logs sont conserves."
+}
 try {
     $logArguments = @($deviceArguments) + @(
         "logcat", "-v", "threadtime", "-T", "1",
@@ -187,12 +231,16 @@ try {
     $process = Start-Process @startParameters
     Start-Sleep -Milliseconds 300
     if ($process.HasExited) { throw "logcat stopped. Check adb-errors.log." }
+    Set-GuardianTestControl "guardian-record-wav.txt" $(if ($IncludeWav) { "ON" } else { "OFF" })
     $previousProfile = ""
     foreach ($case in $cases) {
         if ($case.profile -ne $previousProfile) {
             Write-Host ""
-            Write-Host ("Choisir le profil " + $case.profile + " dans l'application, diagnostics actives.")
-            Write-Host "Attendre l'arret complet puis redemarrer la protection."
+            Set-GuardianTestControl "guardian-voice-profile.txt" $case.profile
+            $skipLines = @(Get-Content -LiteralPath $logPath -Encoding UTF8).Count
+            Write-Host ("Profil demande : " + $case.profile)
+            [void](Read-Host "Arreter COMPLETEMENT puis redemarrer la protection, puis Entree")
+            Confirm-GuardianSession $case.profile $skipLines
             $previousProfile = $case.profile
         }
         Write-Host ""
@@ -205,6 +253,9 @@ try {
         [void](Read-Host "Effectuer le test, attendre 8 secondes apres la derniere phrase, puis Entree")
         [void](Invoke-GuardianAdb @("shell", "log", "-p", "i", "-t", "GuardianTest", ("END_" + $case.id)))
         $ended = [DateTime]::UtcNow.ToString("o")
+        if (([DateTime]::Parse($ended)-[DateTime]::Parse($started)).TotalSeconds -lt 8) {
+            Write-Warning "Cas trop court : il ne permettra pas de juger le moteur."
+        }
         $notes = Read-Host "Notes : type de bruit, orientation, resultat visible, phrase differente si besoin"
         $rows.Add([pscustomobject]@{
             caseId=$case.id; expectedProfile=$case.profile; distanceMeters=$case.distance
@@ -221,6 +272,12 @@ try {
         }
     }
 } finally {
+    foreach ($control in $controlBackups) {
+        try {
+            if ($control.existed) { [void](Invoke-GuardianAdb @("push", $control.backup, $control.remote)) }
+            else { [void](Invoke-GuardianAdb @("shell", "rm", "-f", $control.remote)) }
+        } catch { Write-Warning ("Restaurer le fichier de test : " + $control.remote + ". " + $_.Exception.Message) }
+    }
     if ($process -and -not $process.HasExited) {
         Start-Sleep -Milliseconds 300
         Stop-Process -Id $process.Id -ErrorAction SilentlyContinue
@@ -236,8 +293,8 @@ try {
     @(
         ("Completed cases: " + $rows.Count)
         ("Structured diagnostic records: " + $structured)
-        "Profile markers describe the requested profile. Actual profile is in each GuardianVoiceDiag record."
-        "This collector does not set app configuration, clear logcat, record audio or upload files."
+        "Profiles are verified from fresh SESSION_START and AUDIO_FRAME records before each group."
+        "Temporary test files request the profile and optional mono WAV recording. No uploads and no logcat clearing."
     ) | Set-Content -LiteralPath (Join-Path $OutputDirectory "collection-summary.txt") -Encoding UTF8
     if ($structured -eq 0) {
         Write-Warning "Aucun log structure : verifier le nouveau module natif et voiceDiagnosticsEnabled=true."

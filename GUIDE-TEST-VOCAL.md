@@ -1,134 +1,95 @@
-# Test réel : logs et WAV existants
+# Test vocal : diagnostic r2
 
-Le collecteur fonctionne déjà avec les logs habituels du module v2. Pour
-obtenir aussi les mesures structurées détaillées, installer le module de
-l'archive **diagnostic**, ajouter `voiceDiagnosticsEnabled: true` à l'appel
-`configureProtection`, puis reconstruire l'application Android.
-Aucun réglage de reconnaissance n'est modifié par cette version diagnostic.
+Cette version ajoute des enregistrements mono facultatifs et une verification du
+profil reel. Les algorithmes de reconnaissance sont ceux du moteur v2 ; ce
+paquet sert a comprendre les pertes de parole avant de les regler.
+
+## Installation obligatoire
+
+Copier `modules/guardian-native-protection` de cette archive dans votre projet,
+a la place du module precedent. Conserver une sauvegarde de votre projet.
+Dans votre appel existant a `configureProtection`, ajouter :
 
 ```ts
-await GuardianNativeProtection.configureProtection({
-  ...configurationExistante,
-  voiceEnabled: true,
-  voiceProfile: 'DISTANT', // puis NOISY pour la deuxième série
-  voiceDiagnosticsEnabled: true,
-});
+voiceDiagnosticsEnabled: true,
 ```
 
-Les paramètres sont appliqués au prochain démarrage complet de la protection.
-Le script ne pilote pas la configuration de l'application. Il demande de
-changer de profil au bon moment ; les logs indiquent le profil réellement
-exécuté. Réutiliser la procédure d'arrêt/configuration/démarrage existante.
+Reconstruire et reinstaller l'application Android avec votre commande habituelle.
+Un rechargement JavaScript seul ne suffit pas : le code natif a change.
+Ce paquet contient les sources du module, pas un APK pret a installer.
 
-## PowerShell et adb
+## Test PowerShell
 
-Télécharger `collect-guardian-logs.ps1` depuis la branche GitHub diagnostic.
-Dans PowerShell, téléphone connecté et débogage USB autorisé :
+Telephone branche, adb autorise, lancer le nouveau script :
 
 ```powershell
 .\collect-guardian-logs.ps1 -IncludeWav
 ```
 
-Le script essaie de reconnaître l'application dont l'identifiant contient
-`guardian`. Sinon, il demande son identifiant Android. Pour l'indiquer :
+Le script detecte le package Guardian ou le demande. On peut preciser
+`-PackageName 'com.exemple.guardian'`. Avec plusieurs telephones, ajouter
+`-DeviceId`. Il utilise quatre cas par defaut : calme sans aucune personne qui
+parle, voix douce a 5 m dans le calme, bruit sans parole, voix douce a 5 m avec
+le meme bruit. Ajouter `-Full` pour inclure aussi les distances 1 m et 3 m.
 
-```powershell
-.\collect-guardian-logs.ps1 -IncludeWav -PackageName 'com.exemple.guardian'
-```
+Le script prepare `guardian-voice-profile.txt` (DISTANT puis NOISY) et
+`guardian-record-wav.txt` (ON avec -IncludeWav) dans le dossier externe de
+l'application. Ces fichiers sont lus uniquement au demarrage du moteur et
+uniquement si `voiceDiagnosticsEnabled` est vrai. A chaque demande, arreter
+completement puis redemarrer la protection. Le script attend une nouvelle
+SESSION_START au bon profil et des AUDIO_FRAME ; avec -IncludeWav il exige
+WAV_READY. Sans ces preuves il s'arrete et conserve les logs dans un ZIP.
 
-L'identifiant réel se trouve dans `android/app/build.gradle` (`applicationId`)
-ou dans les résultats de :
+Les fichiers de controle presents sont sauvegardes puis restaures ; les fichiers
+crees uniquement pour le test sont retires a la fin. Les WAV ne sont pas effaces.
+Si une restauration echoue, le script affiche le chemin a restaurer. Ne pas
+fermer brutalement PowerShell pendant le test. Apres le test, remettre
+`voiceDiagnosticsEnabled: false` et arreter/redemarrer la protection.
 
-```powershell
-adb shell pm list packages | Select-String guardian
-```
+## Consignes de parole
 
-Avec plusieurs appareils, ajouter `-DeviceId` et l'identifiant vu dans
-`adb devices`. Aucun service adb n'est arrêté et aucun log système n'est effacé.
+Chaque cas sans parole dure 30 secondes. Personne ne doit parler, meme loin,
+et aucune television ou radio ne doit diffuser de voix. Utiliser par exemple
+un ventilateur pour le bruit. Pour les cas avec parole, lire les trois phrases
+affichees doucement, sans chuchoter, avec trois secondes entre elles. Attendre
+huit secondes apres la derniere phrase avant de terminer le cas. Noter toute
+phrase differente, personne qui parle ou changement de bruit/orientation.
+Un cas termine en moins de huit secondes est signale comme trop court.
 
-Le protocole comprend 8 cas : calme sans parole ; voix douce à 1, 3 et 5 m
-en DISTANT ; bruit sans parole ; puis voix douce aux mêmes distances en NOISY.
-Parler doucement, sans chuchoter pour cette première série. Garder le même
-bruit de fond (sans voix) et l'orientation du téléphone ; noter tout changement.
-Trois phrases sont affichées. Laisser trois secondes entre elles, puis huit
-secondes après la dernière avant de terminer le cas. Si une phrase est dite
-autrement, l'indiquer dans les notes. Les cas sans parole durent 30 secondes.
+## Audio recupere
 
-## Les WAV déjà présents dans votre code
+Arreter la protection a la fin pour finaliser les en-tetes WAV. Le collecteur
+copie les nouveaux fichiers de `files/guardian-diagnostics`, par adb pull ou
+run-as binaire si l'APK est debogable. Il ne force pas la capture stereo.
 
-`GuardianAudioEngine.startStereoDiagnosticCaptureIfNeeded()` enregistre :
+Trois voies PCM16 mono 16 kHz, limitees chacune a 180 secondes par session :
 
-```
-/sdcard/Android/data/<package>/files/guardian-diagnostics/
-  guardian-multimic-<date_en_millisecondes>-<selection>.wav
-```
+- `pregain.wav` : copie du tampon detectorSamples fourni par le moteur audio ;
+- `truth.wav` : copie du tampon principal avec son gain actuel ;
+- `asr.wav` : signal retenu par le routeur, avant VAD et decoupage Qwen.
 
-Il s'agit du **PCM16 stéréo brut**, avant prétraitement mono. Ce n'est pas une
-copie de la sortie GTCRN ou du signal exact décodé par Qwen.
-L'enregistrement existe seulement si :
+Le fichier `index.tsv` associe chaque bloc au numero de trame, a l'horloge de
+capture et a sa position dans le WAV. Des pertes de trames peuvent raccourcir
+le fichier ; utiliser cet index, pas seulement la duree du WAV. Le PCM16 est
+une conversion du signal flottant ; il est borne a [-1,1] sans modifier le
+signal transmis au moteur. La copie disque peut ajouter une charge ; les logs
+permettent de surveiller files d'attente et pertes. Pour -Full, garder chaque
+profil sous trois minutes ou les enregistrements seront limites.
+Les anciens WAV stereo restent recuperables sans modifier guardian-multimic.txt.
 
-- la capture est stéréo ;
-- le mode diagnostic multi-micro est activé explicitement.
+Le ZIP sur le Bureau contient logs, cas, informations du telephone, WAV et
+index disponibles, en-tetes et sommes SHA-256. Il contient les voix et les
+transcriptions du test. Rien n'est envoye automatiquement.
 
-Le service v2 l'active quand `selectedMultiMic.enabled` et
-`selectedMultiMic.explicitOverride` sont vrais. `guardian-multimic.txt` permet
-déjà les overrides LEFT/RIGHT/MIX/etc. Le collecteur **ne crée et ne modifie
-pas ce fichier**, afin de préserver votre route de capture. Ne pas imposer un
-mode différent uniquement pour produire un WAV sans noter ce changement.
-Si le mode actuel n'enregistre pas, les logs seuls sont conservés et le
-collecteur le signale. Un ancien APK qui enregistrait déjà des WAV peut être
-utilisé pour une première collecte, même sans les nouveaux logs structurés.
+## Validation realisee ici
 
-Démarrer le collecteur avant de démarrer la protection. Il ne récupère que
-les WAV dont la session a commencé pendant la collecte. En fin de test,
-**arrêter la protection avant la copie**, pour que le code finalise l'en-tête
-RIFF. Le script copie par `adb pull` ; si nécessaire, il essaie `run-as` (APK
-débogable requis), en conservant les octets binaires. Ne pas utiliser
-`adb exec-out ... > fichier.wav` sous Windows PowerShell 5 : cela peut altérer
-les octets.
-
-Pour copier séparément des WAV plus anciens, après arrêt de la protection :
-
-```powershell
-$pkg = 'com.exemple.guardian' # votre identifiant réel
-adb pull "/sdcard/Android/data/$pkg/files/guardian-diagnostics" '.\guardian-wav'
-```
-
-Aucune suppression de fichier sur le téléphone n'est effectuée.
-
-## Ce que vous me renverrez
-
-Un dossier et un ZIP `GuardianVoiceTest-...` sont créés sur le Bureau :
-
-- `guardian.log` : logs sélectionnés et marqueurs BEGIN/END des cas ;
-- `cases.csv` : phrase attendue, profil demandé, distance, horaires et notes ;
-- `phone.json` : modèle, Android, architecture et horaires ;
-- `wav/` et `wav-manifest.json` : WAV disponibles, validité de l'en-tête et SHA-256 ;
-- `collection-summary.txt`, `adb-errors.log` et éventuellement `wav-errors.txt`.
-
-Joindre ce ZIP dans la conversation. Le script n'envoie rien automatiquement.
-Les logs contiennent les transcriptions ; les WAV peuvent contenir les sons
-alentour. Utiliser la séance de test prévue, puis remettre
-`voiceDiagnosticsEnabled: false` après les essais et arrêter tout diagnostic
-WAV activé auparavant. Le script ne désactive pas vos overrides de capture.
-
-## Mesures et limites
-
-Tag `GuardianVoiceDiag`, JSON schéma 1 : session et profil, horloge UTC et
-monotone, niveau avant gain, estimation du plancher de bruit, gain, niveau et
-pic de la voie retenue, transitions VAD, retard d'entrée, pertes, GTCRN
-réellement utilisé, segments, attentes/durées Qwen, résultats admissibles,
-publications réelles, texte après timeline et réinitialisations.
-
-Les mesures audio sont échantillonnées toutes les 250 ms et à chaque
-transition VAD ; les transitions et segments sont toujours tracés. Le
-`estimatedSnrDb` est l'estimation du code à partir du plancher de bruit,
-pas une mesure acoustique étalonnée. Les textes sont limités à 512 caractères.
-Un `QWEN_RESULT` n'implique pas une publication : chercher `QWEN_PUBLISH`, puis
-`PRODUCT_TEXT`. Le script compte les nouveaux logs et avertit s'ils manquent.
-Il ne conclut pas automatiquement à une reconnaissance correcte.
-
-Le collecteur a été testé sous PowerShell 7 sur Linux avec adb simulé : 8 cas,
-16 marqueurs, exclusion d'un ancien WAV, repli run-as binaire identique et
-ZIP valide. Sa syntaxe reste compatible PowerShell 5.1. Aucun téléphone
-Windows/Android n'était connecté ici ; le test réel reste nécessaire.
+Tests Kotlin du routeur/decoupage : 14 ; concurrence du decodeur : 4 ; traces : 4.
+Le test WAV verifie trois voies, format PCM, bornage, limite, invalides,
+index temporel, integrite du tampon source et finalisation.
+Compilation des adaptateurs avec API Sherpa v1.13.8 et stubs Android reussie.
+Collecteur execute sous PowerShell 7 avec adb simule : profils verifies,
+4 cas, copie binaire et index, exclusion des anciens WAV, restauration des
+fichiers de controle, ZIP valide. Un essai sans diagnostics doit s'arreter
+avant les cas et restaurer les fichiers. Syntaxe prevue pour PowerShell 5.1 ;
+pas de test sur un vrai telephone ou sous Windows ici. Pas de compilation
+complete de l'application Android : le projet applicatif complet est requis.
