@@ -1,95 +1,102 @@
-# Test vocal : diagnostic r2
+# Moteur vocal v3 — installation et test à 1 m
 
-Cette version ajoute des enregistrements mono facultatifs et une verification du
-profil reel. Les algorithmes de reconnaissance sont ceux du moteur v2 ; ce
-paquet sert a comprendre les pertes de parole avant de les regler.
+Cette version contient des corrections du moteur et le diagnostic mono.
+Commencer par vérifier la voix douce à **1 m**, dans le calme puis avec bruit.
+Les essais à 3 m et 5 m viennent après cette première validation.
 
-## Installation obligatoire
+## Installation
 
-Copier `modules/guardian-native-protection` de cette archive dans votre projet,
-a la place du module precedent. Conserver une sauvegarde de votre projet.
-Dans votre appel existant a `configureProtection`, ajouter :
+1. Sauvegarder le projet puis remplacer `modules/guardian-native-protection`
+   par le dossier de cette archive. Les dossiers `android/build` ne sont pas
+   fournis : ils seront recréés par la compilation.
+2. Conserver les modèles Qwen, Firebase et l'AAR Sherpa de l'application.
+   Le module référence toujours
+   `android/app/libs/sherpa-onnx-1.13.8-gv3895-2.aar`.
+   Les modèles Silero VAD et GTCRN et leurs licences sont inclus dans le module.
+3. Ajouter `voiceDiagnosticsEnabled: true` à votre appel existant de
+   `configureProtection` pendant les essais :
 
 ```ts
-voiceDiagnosticsEnabled: true,
+await GuardianNativeProtection.configureProtection({
+  ...configurationExistante,
+  voiceEnabled: true,
+  voiceProfile: 'DISTANT',
+  voiceDiagnosticsEnabled: true,
+});
 ```
 
-Reconstruire et reinstaller l'application Android avec votre commande habituelle.
-Un rechargement JavaScript seul ne suffit pas : le code natif a change.
-Ce paquet contient les sources du module, pas un APK pret a installer.
+4. Reconstruire et réinstaller l'application Android avec votre commande
+   Expo/Gradle habituelle. Un rechargement JavaScript seul ne suffit pas.
+   Ce ZIP contient les sources du module, pas un APK prêt à installer.
 
-## Test PowerShell
+## Lancer le test
 
-Telephone branche, adb autorise, lancer le nouveau script :
+Téléphone branché, débogage USB et adb autorisés, lancer le script du ZIP :
 
 ```powershell
 .\collect-guardian-logs.ps1 -IncludeWav
 ```
 
-Le script detecte le package Guardian ou le demande. On peut preciser
-`-PackageName 'com.exemple.guardian'`. Avec plusieurs telephones, ajouter
-`-DeviceId`. Il utilise quatre cas par defaut : calme sans aucune personne qui
-parle, voix douce a 5 m dans le calme, bruit sans parole, voix douce a 5 m avec
-le meme bruit. Ajouter `-Full` pour inclure aussi les distances 1 m et 3 m.
+Le script détecte le package Guardian ou le demande. On peut préciser
+`-PackageName 'com.exemple.guardian'`. Avec plusieurs téléphones, ajouter
+`-DeviceId`. Il propose quatre cas :
 
-Le script prepare `guardian-voice-profile.txt` (DISTANT puis NOISY) et
+- calme sans aucune personne qui parle, pendant 30 secondes ;
+- trois phrases en voix douce à 1 m dans le calme ;
+- bruit sans parole, pendant 30 secondes ;
+- les mêmes phrases à 1 m avec le même bruit.
+
+Lire les phrases affichées sans chuchoter, avec trois secondes entre elles.
+Attendre huit secondes après la dernière phrase avant de terminer le cas.
+Noter tout changement de phrase, bruit, orientation ou personne qui parle.
+Un ventilateur convient mieux qu'une télévision pour le premier bruit de test.
+Le script signale les cas terminés en moins de huit secondes.
+
+À chaque changement de profil, le script prépare les réglages du test et
+vous demande d'arrêter complètement puis de redémarrer la protection.
+Il vérifie la révision native `guardian-voice-v3`, le profil demandé, une
+nouvelle session et des trames audio. Avec -IncludeWav, il exige également
+l'ouverture du diagnostic WAV et refuse les erreurs d'enregistrement connues.
+Un ancien APK ou des diagnostics désactivés arrêtent le protocole avant les cas.
+
+En fin de test, arrêter la protection pour finaliser les WAV, puis valider
+la copie. Le ZIP `GuardianVoiceTest-...` sur le Bureau contient les résultats
+à renvoyer dans la conversation. Rien n'est envoyé automatiquement.
+Ajouter `-Full` pour retrouver les huit cas à 1, 3 et 5 m une fois le test
+court satisfaisant. Les WAV sont limités à trois minutes par profil/session.
+
+## Réglages temporaires et enregistrements
+
+Le script prépare `guardian-voice-profile.txt` (DISTANT puis NOISY) et
 `guardian-record-wav.txt` (ON avec -IncludeWav) dans le dossier externe de
-l'application. Ces fichiers sont lus uniquement au demarrage du moteur et
-uniquement si `voiceDiagnosticsEnabled` est vrai. A chaque demande, arreter
-completement puis redemarrer la protection. Le script attend une nouvelle
-SESSION_START au bon profil et des AUDIO_FRAME ; avec -IncludeWav il exige
-WAV_READY. Sans ces preuves il s'arrete et conserve les logs dans un ZIP.
+l'application. Le module ne les lit qu'au démarrage et uniquement lorsque
+`voiceDiagnosticsEnabled` est vrai. Les fichiers préexistants sont sauvegardés
+puis restaurés ; les fichiers créés uniquement pour le test sont retirés.
+Ne pas fermer brutalement PowerShell pendant le test. Toute erreur de
+restauration affiche le chemin concerné. Les WAV ne sont pas supprimés.
 
-Les fichiers de controle presents sont sauvegardes puis restaures ; les fichiers
-crees uniquement pour le test sont retires a la fin. Les WAV ne sont pas effaces.
-Si une restauration echoue, le script affiche le chemin a restaurer. Ne pas
-fermer brutalement PowerShell pendant le test. Apres le test, remettre
-`voiceDiagnosticsEnabled: false` et arreter/redemarrer la protection.
+Les nouveaux exports fonctionnent en mono sans imposer une capture stéréo :
 
-## Consignes de parole
+- `pregain.wav` : tampon detectorSamples avant gain ;
+- `truth.wav` : tampon principal après gain ;
+- `asr.wav` : signal original retenu pour les fenêtres Qwen ;
+- `vad.wav` : seconde vue disponible pour le soutien VAD en NOISY ;
+- `index.tsv` : numéros de trames, temps de capture et positions des blocs.
 
-Chaque cas sans parole dure 30 secondes. Personne ne doit parler, meme loin,
-et aucune television ou radio ne doit diffuser de voix. Utiliser par exemple
-un ventilateur pour le bruit. Pour les cas avec parole, lire les trois phrases
-affichees doucement, sans chuchoter, avec trois secondes entre elles. Attendre
-huit secondes apres la derniere phrase avant de terminer le cas. Noter toute
-phrase differente, personne qui parle ou changement de bruit/orientation.
-Un cas termine en moins de huit secondes est signale comme trop court.
+Les WAV sont PCM16 mono 16 kHz. La conversion borne les valeurs à [-1,1]
+sans modifier les tableaux flottants du moteur. L'index permet de repérer
+les trames manquantes : la durée seule du fichier ne suffit pas.
+Dans DISTANT, les voies asr et vad coïncident. La vue vad est enregistrée
+avant l'amplification réservée au modèle VAD.
+La copie disque ajoute une charge facultative, surveillée dans les logs.
 
-## Audio recupere
+Les fichiers récents de `files/guardian-diagnostics` sont copiés par adb pull,
+ou par flux binaire run-as si l'APK est débogable. Les anciens exports stéréo
+restent récupérables. Le script ne change pas `guardian-multimic.txt`.
+Les en-têtes et sommes SHA-256 sont enregistrés dans le manifeste.
+Le ZIP contient les voix et transcriptions du test : utiliser une séance
+prévue à cet effet. Après les essais, remettre `voiceDiagnosticsEnabled: false`
+et arrêter/redémarrer la protection.
 
-Arreter la protection a la fin pour finaliser les en-tetes WAV. Le collecteur
-copie les nouveaux fichiers de `files/guardian-diagnostics`, par adb pull ou
-run-as binaire si l'APK est debogable. Il ne force pas la capture stereo.
-
-Trois voies PCM16 mono 16 kHz, limitees chacune a 180 secondes par session :
-
-- `pregain.wav` : copie du tampon detectorSamples fourni par le moteur audio ;
-- `truth.wav` : copie du tampon principal avec son gain actuel ;
-- `asr.wav` : signal retenu par le routeur, avant VAD et decoupage Qwen.
-
-Le fichier `index.tsv` associe chaque bloc au numero de trame, a l'horloge de
-capture et a sa position dans le WAV. Des pertes de trames peuvent raccourcir
-le fichier ; utiliser cet index, pas seulement la duree du WAV. Le PCM16 est
-une conversion du signal flottant ; il est borne a [-1,1] sans modifier le
-signal transmis au moteur. La copie disque peut ajouter une charge ; les logs
-permettent de surveiller files d'attente et pertes. Pour -Full, garder chaque
-profil sous trois minutes ou les enregistrements seront limites.
-Les anciens WAV stereo restent recuperables sans modifier guardian-multimic.txt.
-
-Le ZIP sur le Bureau contient logs, cas, informations du telephone, WAV et
-index disponibles, en-tetes et sommes SHA-256. Il contient les voix et les
-transcriptions du test. Rien n'est envoye automatiquement.
-
-## Validation realisee ici
-
-Tests Kotlin du routeur/decoupage : 14 ; concurrence du decodeur : 4 ; traces : 4.
-Le test WAV verifie trois voies, format PCM, bornage, limite, invalides,
-index temporel, integrite du tampon source et finalisation.
-Compilation des adaptateurs avec API Sherpa v1.13.8 et stubs Android reussie.
-Collecteur execute sous PowerShell 7 avec adb simule : profils verifies,
-4 cas, copie binaire et index, exclusion des anciens WAV, restauration des
-fichiers de controle, ZIP valide. Un essai sans diagnostics doit s'arreter
-avant les cas et restaurer les fichiers. Syntaxe prevue pour PowerShell 5.1 ;
-pas de test sur un vrai telephone ou sous Windows ici. Pas de compilation
-complete de l'application Android : le projet applicatif complet est requis.
+Voir `CORRECTIONS-V3.md` pour les changements et les résultats mesurés.
+Aucun vrai téléphone Android ni Windows n'était disponible dans cet environnement.

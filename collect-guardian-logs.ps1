@@ -106,7 +106,7 @@ function Collect-GuardianWavs {
     ConvertTo-Json -InputObject @($records.ToArray()) -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputDirectory "wav-manifest.json") -Encoding UTF8
     $metadata["audioFilesCollected"] = $records.Count
     if ($records.Count -eq 0) {
-        Write-Warning "Aucun nouveau WAV trouve : verifier le module diagnostic r2 et le fichier guardian-record-wav.txt."
+        Write-Warning "Aucun nouveau WAV trouve : verifier le module vocal v3 et le fichier guardian-record-wav.txt."
     }
 }
 
@@ -138,7 +138,8 @@ $logPath = Join-Path $OutputDirectory "guardian.log"
 $casesPath = Join-Path $OutputDirectory "cases.csv"
 $rows = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion = 2
+    collectorVersion = 3
+    requestedNativeRevision = "guardian-voice-v3"
     startUtc = [DateTime]::UtcNow.ToString("o")
     manufacturer = Invoke-GuardianAdb @("shell", "getprop", "ro.product.manufacturer")
     model = Invoke-GuardianAdb @("shell", "getprop", "ro.product.model")
@@ -164,13 +165,13 @@ $cases = @(
 )
 Write-Host ""
 Write-Host "Le ZIP contiendra les transcriptions et, avec -IncludeWav, les voix enregistrees."
-Write-Host "Installer le module diagnostic r2, reconstruire Android et activer voiceDiagnosticsEnabled=true."
+Write-Host "Installer le module vocal v3, reconstruire Android et activer voiceDiagnosticsEnabled=true."
 Write-Host "Le script prepare des fichiers de test temporaires ; les fichiers existants seront restaures."
 Write-Host "Il faudra arreter puis redemarrer la protection a chaque changement de profil."
 Write-Host "Choisir un bruit sans voix pour ce premier essai (ventilateur, par exemple)."
 Write-Host "Le niveau de bruit doit rester identique entre N0, N1, N3 et N5."
 Write-Host ("Dossier : " + $OutputDirectory)
-if (-not $Full) { $cases = @($cases | Where-Object { $_.id -in @("D0_SILENCE","D5_VOICE","N0_NOISE","N5_VOICE") }) }
+if (-not $Full) { $cases = @($cases | Where-Object { $_.id -in @("D0_SILENCE","D1_VOICE","N0_NOISE","N1_VOICE") }) }
 $process = $null
 $controlBackups = New-Object 'System.Collections.Generic.List[object]'
 function Set-GuardianTestControl {
@@ -201,19 +202,22 @@ function Confirm-GuardianSession {
                 try { $Matches[1] | ConvertFrom-Json } catch { }
             }
         })
-        $sessions = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.profile -eq $Profile })
+        $sessions = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.profile -eq $Profile -and $_.engineRevision -eq "guardian-voice-v3" })
         foreach ($session in $sessions) {
             $same = @($events | Where-Object { $_.session -eq $session.session -and $_.profile -eq $Profile })
             $frames = @($same | Where-Object { $_.event -eq "AUDIO_FRAME" })
             $ready = @($same | Where-Object { $_.event -eq "WAV_READY" })
+            $wavErrors = @($same | Where-Object { $_.event -in @("WAV_ERROR","WAV_UNAVAILABLE","WAV_FINALIZE_ERROR") })
+            if ($IncludeWav -and $wavErrors.Count -gt 0) { throw "Le module signale une erreur d'enregistrement WAV. Verifier guardian.log." }
             if ($frames.Count -gt 0 -and (-not $IncludeWav -or $ready.Count -gt 0)) {
+                $metadata["verified" + $Profile + "Session"] = $session.session
                 Write-Host ("Session verifiee : " + $Profile + ", audio actif, WAV=" + [bool]$ready.Count)
                 return
             }
         }
         Start-Sleep -Milliseconds 400
     } while ([DateTime]::UtcNow -lt $deadline)
-    throw "Session non verifiee : le profil demande ou les diagnostics WAV sont absents. Installer le module r2, activer voiceDiagnosticsEnabled=true, puis arreter/redemarrer la protection. Les logs sont conserves."
+    throw "Session non verifiee : la version v3, le profil demande ou les diagnostics WAV sont absents. Installer le module v3, activer voiceDiagnosticsEnabled=true, puis arreter/redemarrer la protection. Les logs sont conserves."
 }
 try {
     $logArguments = @($deviceArguments) + @(
