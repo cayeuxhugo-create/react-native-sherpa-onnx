@@ -124,7 +124,7 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ("guardian-simple-"+[Guid]::NewGuid
 $backups = New-Object 'System.Collections.Generic.List[object]'
 $records = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion="simple-1"; profile=$Profile; durationRequestedSeconds=$DurationSeconds
+    collectorVersion="simple-2"; profile=$Profile; durationRequestedSeconds=$DurationSeconds
     packageName=$PackageName; startUtc=[DateTime]::UtcNow.ToString("o")
     phoneModel=Invoke-SimpleAdb @("shell","getprop","ro.product.model")
     android=Invoke-SimpleAdb @("shell","getprop","ro.build.version.release")
@@ -141,7 +141,7 @@ try {
         "GuardianQwenRescue:V","GuardianAudioEngine:V","GuardianWordTimeline:V",
         "GuardianVoiceEngine:V","GuardianConversation:V","GuardianAudioProfile:V",
         "GuardianAudioProbe:V","GuardianVoiceFocus:V","GuardianAudioEvidence:V",
-        "GuardianProtectionService:V","AndroidRuntime:E","*:S")
+        "GuardianProtectionService:V","GuardianCore:V","GuardianAudioCapabilities:V","AndroidRuntime:E","*:S")
     $process = Start-Process -FilePath $adbExecutable -ArgumentList $arguments -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError (Join-Path $output "adb-errors.log")
     Start-Sleep -Milliseconds 300
     if ($process.HasExited) { throw "Le lecteur de logs ADB s'est arrêté : voir adb-errors.log." }
@@ -216,6 +216,23 @@ try {
         } catch { $restoreFailed=$true; Write-Warning ("Réglage à restaurer : files/"+$control.name+" ; sauvegarde : "+$work) }
     }
     if ($process -and -not $process.HasExited) { Stop-Process -Id $process.Id -ErrorAction SilentlyContinue; $process.WaitForExit() }
+    # Keep a readable subset of hardware discovery, route decisions and runtime
+    # confirmation alongside the complete log. An empty subset is not evidence
+    # that routing failed: startup logs may be absent or filtered by the device.
+    $routeLines = @()
+    if (Test-Path -LiteralPath $logPath) {
+        $routeLines = @(Get-Content -LiteralPath $logPath -Encoding UTF8 | Where-Object {
+            $_ -match 'GuardianAudio(Capabilities|Probe|Profile|Evidence):' -or
+            ($_ -match 'GuardianAudioEngine:' -and $_ -match 'Runtime Audio Profile|Microphone actif|MULTIMIC|[Rr]out|[Cc]apture|[Dd]irection|[Ff]ocal') -or
+            ($_ -match 'GuardianCore:' -and $_ -match 'MULTIMIC|[Rr]out|[Ss]ource|[Cc]apture|GTCRN') -or
+            ($_ -match 'GuardianVoiceDiag:' -and $_ -match 'CAPTURE_CONFIG|SESSION_START')
+        })
+    }
+    $routeLines | Set-Content -LiteralPath (Join-Path $output "audio-routing.log") -Encoding UTF8
+    $metadata["captureRouteTraceLines"] = $routeLines.Count
+    if ($routeLines.Count -eq 0) {
+        Write-Warning "Aucune trace de sélection audio retrouvée. Cela ne prouve pas un échec de sélection ; vérifier le redémarrage complet de la protection."
+    }
     $metadata["endUtc"] = [DateTime]::UtcNow.ToString("o")
     $metadata["controlsRestored"] = -not $restoreFailed
     if ($restoreFailed) { $metadata["controlBackupDirectory"] = $work }

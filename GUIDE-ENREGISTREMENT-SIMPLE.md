@@ -62,3 +62,17 @@ compilation des adaptateurs contre l'API officielle Sherpa 1.13.8 ; collecte Pow
 avec ADB simulé (succès DISTANT/NOISY, ancien APK refusé, téléchargement corrompu refusé,
 limite WAV détectée, restauration exacte des commandes). Cela ne remplace pas le test
 Android réel demandé ci-dessus. Aucun nouvel essai acoustique réel n'est revendiqué.
+
+## Collecteur simple-2 : contrôle de la sélection audio
+
+La version séparée la plus récente de `enregistrer-guardian.ps1` ajoute les tags
+GuardianAudioCapabilities et GuardianCore au filtre existant. Les autres traces
+matérielles et de traitement étaient déjà collectées : AudioProbe, AudioProfile,
+AudioEvidence, AudioEngine, VoiceFocus. Un fichier `audio-routing.log` rassemble
+l'inventaire et les essais de capture, les décisions de route et la confirmation
+du profil et des microphones actifs. Le journal complet conserve les niveaux,
+le gain, le VAD et Qwen. Un sous-ensemble vide est signalé, sans être interprété
+comme une panne du routage. Ces traces sont déjà émises par le code natif : cette
+mise à jour du collecteur ne nécessite pas un build supplémentaire par rapport
+au module v3.1 requis pour les WAV. Le ZIP module v3.1 reste inchangé et contient
+le collecteur simple-1 ; utiliser le script séparé simple-2 pour le prochain test.
