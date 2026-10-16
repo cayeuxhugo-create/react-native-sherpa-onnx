@@ -1,16 +1,13 @@
-# Installer Qwen dans le stockage privé de Guardian
+# Installer Qwen dans le stockage privé — installateur v3
 
-Si adb voit le modèle externe mais que Guardian indique root=false sur ses
-racines de découverte, copier les fichiers dans le dossier privé que le
-reconnaisseur consulte en premier :
+Le dossier privé lu en premier par Guardian est :
 
 ```
 /data/user/0/<package>/files/models/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25
 ```
 
 Arrêter la protection avant le transfert. L'APK doit autoriser `run-as`
-(APK débogable) ; le script le vérifie avant toute copie. Aucun accès root
-ni changement de permissions générales n'est utilisé.
+(APK débogable) ; le script le vérifie avant toute copie.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\installer-qwen-prive.ps1 -SourceDirectory 'C:\chemin\sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25' -PackageName 'com.exemple.guardian'
@@ -22,40 +19,52 @@ tokenizer_config.json non vides. Les trois ONNX et tous les fichiers du
 tokenizer sont transférés ; les WAV de démonstration ne sont pas nécessaires.
 Ajouter -DeviceId si plusieurs téléphones sont connectés.
 
-La version v2 transfère des blocs de 8 Mio vers l'entrée standard d'adb
-shell -T/run-as/dd via les flux binaires .NET. Le terminal virtuel est
-désactivé. Chaque bloc est vérifié par SHA-256 et peut être renvoyé trois fois
-avant d'être assemblé sur le téléphone à un emplacement précis du fichier.
-Un bloc renvoyé n'est pas ajouté deux fois. Ils ne passent pas par le
-pipeline texte PowerShell 5. Les chemins locaux peuvent contenir des espaces.
-Chaque fichier complet est ensuite comparé par taille et SHA-256 sur le PC
-et dans le stockage privé. Les messages de démarrage du serveur ADB sont
-ignorés lors de la lecture des empreintes ; une seule ligne de checksum
-valide est exigée. Les erreurs affichent tailles et empreintes observées.
-La copie est placée dans un dossier temporaire privé ; elle devient le
-modèle actif seulement après toutes les vérifications. Un ancien modèle
-privé est renommé en sauvegarde, jamais effacé. En cas d'échec de publication,
-le script tente de restaurer cette sauvegarde. Une copie temporaire créée
-par le script est nettoyée à l'échec ; la copie externe existante reste intacte.
+## Méthode vérifiée sur le téléphone pour un premier fichier
 
-Après « Installation privée vérifiée », rouvrir Guardian et redémarrer
-complètement la protection. Le message confirme le transfert et l'intégrité
-par rapport au PC, pas la compatibilité des graphes ONNX avec l'AAR : le
-chargement Qwen doit ensuite être vérifié dans les logs.
+L'installateur v3 utilise le protocole natif `adb push` pour copier chaque
+fichier dans son propre dossier sous /data/local/tmp. Guardian lit cette
+copie via run-as ; sa taille et son SHA-256 doivent correspondre au PC.
+Le fichier est alors copié par `run-as cp` dans un dossier privé provisoire,
+puis sa taille et son SHA-256 sont vérifiés une seconde fois. La copie
+temporaire de ce fichier est supprimée après validation.
+Aucun octet des modèles ne passe par un pipeline texte PowerShell ou par
+l'entrée standard d'un processus .NET. Les chemins locaux avec espaces
+sont pris en charge. Un transfert raté ou une empreinte temporaire incorrecte
+peut être réessayé trois fois. Les erreurs donnent les tailles et empreintes
+observées lorsqu'elles sont disponibles.
 
-La copie approche 1 Go pour le modèle int8. Laisser le téléphone connecté
-jusqu'à la fin du transfert et des vérifications. Les données privées sont
-conservées lors d'une mise à jour de l'APK de même identifiant, mais sont
-supprimées si l'application est désinstallée ou si ses données sont effacées.
+Les permissions de lecture/traversée sont explicitées uniquement dans le
+dossier temporaire créé sous /data/local/tmp. Les permissions du stockage
+privé de l'application ne sont pas élargies. Le dossier temporaire ADB est
+nettoyé à la fin ; aucune autre donnée de /data/local/tmp n'est supprimée.
+Le fichier de test manuel guardian-qwen-probe.json n'est pas touché.
 
-Validation : PowerShell 7/Linux, adb simulé. Installation neuve et remplacement,
-conservation exacte de tous les octets dont valeurs 0 à 255, fichiers tokenizer,
-contrôle SHA-256, sauvegarde d'un ancien modèle. Refus d'un APK non débogable,
-échec de copie, empreinte incorrecte et échec de publication : ancien modèle
-conservé/restauré, copie temporaire nettoyée. Syntaxe prévue pour PowerShell 5.1.
-Les tests v2 comprennent un fichier de plus de 17 Mio avec plusieurs blocs
-et un dernier bloc partiel, des fichiers vides facultatifs, un bloc tronqué
-au premier essai puis retransmis, des messages de démarrage ADB devant le
-checksum et une erreur d'assemblage final. Le modèle d'origine est préservé
-lors de chaque échec. Pas de téléphone Android ou de Windows disponible
-pour exécution réelle ici.
+Le modèle devient actif par renommage du dossier privé seulement après
+vérification de tous les fichiers. Un ancien modèle privé est renommé en
+sauvegarde, jamais effacé. En cas d'échec de publication, le script tente de
+restaurer cette sauvegarde. La copie externe existante reste intacte.
+La connexion doit rester active jusqu'au message « Installation privée vérifiée ».
+Le transfert approche 1 Go, et le stockage doit accueillir le modèle privé
+ainsi qu'un fichier temporaire, dont le décodeur d'environ 756 Mo.
+
+Après ce message, rouvrir Guardian et redémarrer complètement la protection.
+Il confirme le transfert et l'intégrité par rapport au PC, pas la compatibilité
+des graphes ONNX avec l'AAR : vérifier ensuite le chargement Qwen dans les logs.
+Les données privées restent lors d'une mise à jour de même application, mais
+sont supprimées par une désinstallation ou un effacement des données.
+
+## Validation
+
+Sur le téléphone : adb push puis run-as cp a réussi pour tokenizer_config.json ;
+le SHA-256 privé correspond au fichier de référence. Le transfert des gros
+ONNX par cette méthode reste à exécuter sur le téléphone.
+
+Sous PowerShell 7/Linux avec adb simulé : installation neuve et remplacement,
+fichier de plus de 17 Mio, chemins locaux avec espaces, valeurs binaires 0 à
+255, tokenizer et fichier facultatif vide, tailles et SHA-256 aux deux étapes,
+sauvegarde d'un ancien modèle et conservation de la copie externe.
+Une copie temporaire tronquée est renvoyée ; les messages de démarrage ADB
+ne faussent pas le checksum. APK non débogable, accès temporaire refusé,
+échec de push, corruption de la copie privée et échec de publication : modèle
+initial conservé/restauré et dossiers temporaires nettoyés.
+Syntaxe prévue pour PowerShell 5.1 ; pas d'exécution locale Windows ici.
