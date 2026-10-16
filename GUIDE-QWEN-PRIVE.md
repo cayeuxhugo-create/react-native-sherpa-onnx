@@ -22,10 +22,16 @@ tokenizer_config.json non vides. Les trois ONNX et tous les fichiers du
 tokenizer sont transférés ; les WAV de démonstration ne sont pas nécessaires.
 Ajouter -DeviceId si plusieurs téléphones sont connectés.
 
-Les octets passent directement du fichier vers l'entrée standard d'adb
-exec-in/run-as/dd via les flux binaires .NET. Ils ne passent pas par le
+La version v2 transfère des blocs de 8 Mio vers l'entrée standard d'adb
+shell -T/run-as/dd via les flux binaires .NET. Le terminal virtuel est
+désactivé. Chaque bloc est vérifié par SHA-256 et peut être renvoyé trois fois
+avant d'être assemblé sur le téléphone à un emplacement précis du fichier.
+Un bloc renvoyé n'est pas ajouté deux fois. Ils ne passent pas par le
 pipeline texte PowerShell 5. Les chemins locaux peuvent contenir des espaces.
-Chaque fichier est comparé par SHA-256 sur le PC et dans le stockage privé.
+Chaque fichier complet est ensuite comparé par taille et SHA-256 sur le PC
+et dans le stockage privé. Les messages de démarrage du serveur ADB sont
+ignorés lors de la lecture des empreintes ; une seule ligne de checksum
+valide est exigée. Les erreurs affichent tailles et empreintes observées.
 La copie est placée dans un dossier temporaire privé ; elle devient le
 modèle actif seulement après toutes les vérifications. Un ancien modèle
 privé est renommé en sauvegarde, jamais effacé. En cas d'échec de publication,
@@ -47,4 +53,9 @@ conservation exacte de tous les octets dont valeurs 0 à 255, fichiers tokenizer
 contrôle SHA-256, sauvegarde d'un ancien modèle. Refus d'un APK non débogable,
 échec de copie, empreinte incorrecte et échec de publication : ancien modèle
 conservé/restauré, copie temporaire nettoyée. Syntaxe prévue pour PowerShell 5.1.
-Pas de téléphone Android ou de Windows disponible pour exécution réelle ici.
+Les tests v2 comprennent un fichier de plus de 17 Mio avec plusieurs blocs
+et un dernier bloc partiel, des fichiers vides facultatifs, un bloc tronqué
+au premier essai puis retransmis, des messages de démarrage ADB devant le
+checksum et une erreur d'assemblage final. Le modèle d'origine est préservé
+lors de chaque échec. Pas de téléphone Android ou de Windows disponible
+pour exécution réelle ici.
