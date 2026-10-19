@@ -6,6 +6,8 @@ param(
     [ValidatePattern('^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+$')][string]$PackageName,
     [ValidateSet("DISTANT","NOISY")][string]$Profile = "DISTANT",
     [ValidateRange(1,120)][int]$DurationSeconds = 60,
+    [ValidateSet("AUTO","VOICE_RECOGNITION_MONO","MIC_MONO","MIC_STEREO_FOCUS")]
+    [string]$CaptureRoute = "AUTO",
     [ValidatePattern('^[A-Za-z0-9._:-]+$')][string]$DeviceId = ""
 )
 $ErrorActionPreference = "Stop"
@@ -124,7 +126,7 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ("guardian-simple-"+[Guid]::NewGuid
 $backups = New-Object 'System.Collections.Generic.List[object]'
 $records = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion="simple-2"; profile=$Profile; durationRequestedSeconds=$DurationSeconds
+    collectorVersion="simple-3"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
     packageName=$PackageName; startUtc=[DateTime]::UtcNow.ToString("o")
     phoneModel=Invoke-SimpleAdb @("shell","getprop","ro.product.model")
     android=Invoke-SimpleAdb @("shell","getprop","ro.build.version.release")
@@ -145,14 +147,24 @@ try {
     $process = Start-Process -FilePath $adbExecutable -ArgumentList $arguments -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError (Join-Path $output "adb-errors.log")
     Start-Sleep -Milliseconds 300
     if ($process.HasExited) { throw "Le lecteur de logs ADB s'est arrêté : voir adb-errors.log." }
+    $source = "AUTO"; $multiMic = "AUTO"
+    switch ($CaptureRoute) {
+        "VOICE_RECOGNITION_MONO" { $source="VOICE_RECOGNITION"; $multiMic="OFF" }
+        "MIC_MONO" { $source="MIC"; $multiMic="OFF" }
+        "MIC_STEREO_FOCUS" { $source="MIC"; $multiMic="VOICE_FOCUS" }
+    }
+    Set-PrivateControl "guardian-audio-source.txt" $source
+    Set-PrivateControl "guardian-multimic.txt" $multiMic
     Set-PrivateControl "guardian-record-wav.txt" "ON"
     Set-PrivateControl "guardian-voice-profile.txt" $Profile
     [void](Read-Host "Arrêter complètement puis redémarrer la protection dans Guardian, puis Entrée")
     $session = $null; $ready = $null
-    $deadline = [DateTime]::UtcNow.AddSeconds(15)
+    $deadline = [DateTime]::UtcNow.AddSeconds(60)
     do {
         $events = @(Read-DiagnosticEvents)
-        $starts = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.diagnosticControlRevision -eq 2 -and $_.profile -eq $Profile -and $_.diagnosticsEnabledBy -eq "PRIVATE_FILE" })
+        $knownOld = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.diagnosticControlRevision -lt 3 })
+        if ($knownOld.Count -gt 0) { throw "Le moteur a démarré avec une ancienne révision diagnostique. Installer le module v3.2 et son APK pour ce collecteur." }
+        $starts = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.diagnosticControlRevision -ge 3 -and $_.profile -eq $Profile -and $_.diagnosticsEnabledBy -eq "PRIVATE_FILE" })
         foreach ($candidate in $starts) {
             $same = @($events | Where-Object { $_.session -eq $candidate.session })
             if (@($same | Where-Object { $_.event -in @("WAV_ERROR","WAV_UNAVAILABLE") }).Count -gt 0) { throw "Le moteur signale une erreur WAV : voir guardian.log." }
@@ -163,7 +175,22 @@ try {
         }
         if (-not $session) { Start-Sleep -Milliseconds 400 }
     } while (-not $session -and [DateTime]::UtcNow -lt $deadline)
-    if (-not $session) { throw "Enregistrement non démarré. Installer le module diagnostic simple v3.1 puis son nouvel APK ; ce mode n'exige pas voiceDiagnosticsEnabled dans JavaScript." }
+    if (-not $session) {
+        $observed = @(Read-DiagnosticEvents | Where-Object { $_.event -eq "SESSION_START" })
+        if ($observed.Count -gt 0 -and $observed[-1].diagnosticControlRevision -lt 3) {
+            throw "Le moteur a démarré, mais ce collecteur exige le module v3.2 et son nouvel APK. Les logs permettent de vérifier la version installée."
+        }
+        throw "Aucun démarrage complet avec WAV confirmé. Vérifier l'arrêt complet puis la réactivation de la protection ; voir guardian.log et adb-errors.log. Ce message ne prouve pas que le build est incorrect."
+    }
+    $capture = @($events | Where-Object { $_.session -eq $session.session -and $_.event -eq "CAPTURE_CONFIG" })
+    if ($CaptureRoute -ne "AUTO") {
+        $expectedSource = if ($CaptureRoute -eq "VOICE_RECOGNITION_MONO") { 6 } else { 1 }
+        $expectedChannels = if ($CaptureRoute -eq "MIC_STEREO_FOCUS") { 2 } else { 1 }
+        if ($capture.Count -eq 0 -or $capture[-1].audioSource -ne $expectedSource -or $capture[-1].channels -ne $expectedChannels) {
+            throw "La route audio demandée n'a pas été appliquée. Le téléphone a peut-être refusé cette configuration ; voir audio-routing.log."
+        }
+    }
+    if ($capture.Count -gt 0) { $metadata["captureConfig"] = $capture[-1] }
     $prefix = [string]$ready.prefix
     if ($prefix -notmatch '^guardian-voice-\d{13}-(DISTANT|NOISY)-[A-Za-z0-9]{1,8}$') { throw "Nom d'enregistrement invalide dans les logs." }
     $metadata["session"] = $session.session
@@ -187,13 +214,13 @@ try {
     $deadline = [DateTime]::UtcNow.AddSeconds(6)
     do {
         $saved = @(Read-DiagnosticEvents | Where-Object { $_.session -eq $session.session -and $_.event -eq "WAV_SAVED" })
-        if ($saved.Count -ge 4) { break }
+        if ($saved.Count -ge 5) { break }
         Start-Sleep -Milliseconds 300
     } while ([DateTime]::UtcNow -lt $deadline)
-    if ($saved.Count -lt 4) { throw "Les quatre WAV ne sont pas finalisés. Vérifier l'arrêt de la protection ; logs conservés." }
+    if ($saved.Count -lt 5) { throw "Les cinq WAV ne sont pas finalisés. Vérifier l'arrêt de la protection ; logs conservés." }
     $wavDir = Join-Path $output "wav"
     [void][IO.Directory]::CreateDirectory($wavDir)
-    foreach ($suffix in @("pregain.wav","truth.wav","asr.wav","vad.wav","index.tsv")) {
+    foreach ($suffix in @("raw.wav","pregain.wav","truth.wav","asr.wav","vad.wav","index.tsv")) {
         $name = $prefix+"-"+$suffix
         $local = Join-Path $wavDir $name
         Copy-PrivateFile ("files/guardian-diagnostics/"+$name) $local

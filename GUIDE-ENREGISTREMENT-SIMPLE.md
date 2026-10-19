@@ -1,78 +1,52 @@
-# Guardian v3.1 : diagnostic de voix distante
+# Guardian v3.2 : installation et collecte
 
-Cette livraison remplace le module natif entier. Un nouvel APK est nécessaire.
-Installer l'APK comme mise à jour, sans désinstaller Guardian, pour conserver le
-modèle Qwen déjà copié dans les fichiers privés de l'application.
+Cette livraison corrige le chemin de détection observé sur les WAV à 1, 3 et 5 m.
+Lire `ETUDE-MOTEUR-V3.2.md` pour les résultats et leurs limites. Un nouvel APK est
+nécessaire ; le script PowerShell seul ne modifie pas le moteur installé.
 
-Corrections et limites :
-- Les hypothèses intermédiaires Qwen sont limitées aux fenêtres de trois secondes.
-  Les résultats finaux gardent le signal complet, jusqu'à huit secondes. Les finals
-  avaient déjà la priorité dans la file ; un décodage natif en cours reste non interruptible.
-  La réduction du délai sur le téléphone reste à mesurer.
-- Le script active les logs et les WAV grâce à des commandes privées temporaires,
-  même si voiceDiagnosticsEnabled=false dans la configuration JavaScript.
-- Aucun changement du gain, des seuils VAD ou du traitement des voix distantes.
-  Il faut mesurer la régression avant de régler ces paramètres.
-- Les erreurs HTTP 503 vues dans le test concernent le serveur de synchronisation.
-  Cette livraison ne les corrige pas ; les tentatives ont déjà un backoff WorkManager.
+## Installer le module
 
-Après installation du module, reconstruire Android comme habituellement et installer
-le nouvel APK. La compilation APK complète n'a pas pu être exécutée ici : l'application
-Expo et son AAR Sherpa personnalisé ne font pas partie du dépôt fourni.
+Exécuter l'installateur `installer-moteur-v3.2.ps1` avec
+`-ProjectDirectory 'C:\Projets\guardian-voice'`. Il vérifie le ZIP et tous les
+fichiers du manifeste, sauvegarde l'ancien module hors du projet et remplace
+uniquement `modules/guardian-native-protection`. Il ne lance pas EAS.
 
-## Un seul enregistrement
+Reconstruire Android comme habituellement, puis installer l'APK comme mise à jour.
+Ne pas désinstaller l'application : Qwen est déjà dans son stockage privé.
 
-Après mise à jour de l'APK, depuis PowerShell :
+## Un enregistrement
+
+Télécharger la version simple-3 du script `enregistrer-guardian.ps1`, puis :
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$env:TEMP\enregistrer-guardian.ps1" -ProjectDirectory 'C:\Projets\guardian-voice' -PackageName 'com.hugo3154.guardianvoice' -Profile DISTANT -DurationSeconds 90
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:TEMP\enregistrer-guardian.ps1" -ProjectDirectory 'C:\Projets\guardian-voice' -PackageName 'com.hugo3154.guardianvoice' -Profile DISTANT -DurationSeconds 30
 ```
 
-Le script demande des notes facultatives, puis d'arrêter et redémarrer la protection.
-Attendre « ENREGISTREMENT ACTIF ». Dans le calme, prononcer trois fois à chaque
-distance la phrase « Je vais chercher mes chaussures et je reviens. » à voix douce :
-- 0 à 25 secondes : environ un mètre ;
-- 25 à 50 secondes : environ trois mètres ;
-- 50 à 75 secondes : environ cinq mètres ;
-- 75 à 90 secondes : silence, sans autre personne qui parle.
+Le script active temporairement les diagnostics sans modification JavaScript.
+Lorsqu'il le demande, arrêter complètement puis redémarrer la protection et
+attendre « ENREGISTREMENT ACTIF ». À 5 mètres, répéter trois fois à voix douce
+« Je vais chercher mes chaussures et je reviens », avec quelques secondes de pause.
+Garder ensuite le silence, sans autre personne qui parle. Arrêter la protection
+lorsque le script le demande et appuyer sur Entrée pour finaliser les fichiers.
 
-Garder environ trois secondes entre les répétitions. Noter si le téléphone affiche
-une phrase fausse ou ne réagit pas. Arrêter la protection dès que le script le demande,
-puis appuyer sur Entrée pour finaliser et récupérer les WAV. Ne pas laisser le moteur
-tourner plusieurs minutes avant de commencer : plafond de 180 secondes par piste.
+Le dossier `diagnostics-voix/Enregistrement-...` contient les logs, les notes,
+les paramètres, cinq WAV PCM16 mono 16 kHz, l'index de séquences et les empreintes.
+Le ZIP à transmettre est créé à côté du dossier. Les voix et transcriptions y
+figurent. Ne pas publier ce dossier ; un .gitignore local est créé s'il est absent.
 
-Le dossier `diagnostics-voix/Enregistrement-...` dans le projet contient les logs,
-les notes, les paramètres de session, quatre WAV PCM16 mono 16 kHz et l'index TSV
-qui relie les pistes aux séquences de capture. Le ZIP est créé à côté du dossier.
-Les pistes sont : pregain (avant gain de capture), truth (signal de capture après
-gain), asr (signal avant segmentation remis au chemin Qwen), vad (vue choisie avant
-le gain interne du VAD). En DISTANT, certaines pistes sont volontairement identiques.
+Pistes : raw (avant filtre mono, après choix des canaux), pregain (après filtre,
+avant gain), truth (capture après gain), asr (original avant segmentation Qwen),
+vad (vue proposée au VAD avant son conditionnement interne). Certaines pistes
+peuvent être identiques. Le plafond est de 180 secondes par piste ; démarrer le test
+rapidement après la protection et l'arrêter au signal.
 
-Les fichiers de commande présents avant le test sont restaurés à l'identique ;
-les commandes créées pour ce test sont retirées. Les WAV restent aussi sur le téléphone.
-Si une erreur interrompt la collecte, un ZIP partiel est conservé et marqué incomplet.
-Les voix alentour et les transcriptions sont présentes dans le ZIP. Le dossier est
-ignoré par Git via un fichier .gitignore local, sans écraser un .gitignore existant.
+Le script vérifie les SHA-256 et les en-têtes, confirme la révision diagnostique,
+conserve un ZIP partiel en cas d'échec, et restaure les quatre fichiers de commande
+précédents à l'identique. Les WAV restent également sur le téléphone.
+`audio-routing.log` rassemble les traces matérielles et les décisions de route.
 
-Le profil NOISY se teste ensuite avec `-Profile NOISY`, sans reconstruire l'APK.
-Pour le premier test, conserver DISTANT et le calme afin d'isoler la distance.
-
-Validation : tests Kotlin de segmentation, concurrence, gain, diagnostics et WAV ;
-compilation des adaptateurs contre l'API officielle Sherpa 1.13.8 ; collecte PowerShell
-avec ADB simulé (succès DISTANT/NOISY, ancien APK refusé, téléchargement corrompu refusé,
-limite WAV détectée, restauration exacte des commandes). Cela ne remplace pas le test
-Android réel demandé ci-dessus. Aucun nouvel essai acoustique réel n'est revendiqué.
-
-## Collecteur simple-2 : contrôle de la sélection audio
-
-La version séparée la plus récente de `enregistrer-guardian.ps1` ajoute les tags
-GuardianAudioCapabilities et GuardianCore au filtre existant. Les autres traces
-matérielles et de traitement étaient déjà collectées : AudioProbe, AudioProfile,
-AudioEvidence, AudioEngine, VoiceFocus. Un fichier `audio-routing.log` rassemble
-l'inventaire et les essais de capture, les décisions de route et la confirmation
-du profil et des microphones actifs. Le journal complet conserve les niveaux,
-le gain, le VAD et Qwen. Un sous-ensemble vide est signalé, sans être interprété
-comme une panne du routage. Ces traces sont déjà émises par le code natif : cette
-mise à jour du collecteur ne nécessite pas un build supplémentaire par rapport
-au module v3.1 requis pour les WAV. Le ZIP module v3.1 reste inchangé et contient
-le collecteur simple-1 ; utiliser le script séparé simple-2 pour le prochain test.
+Pour une comparaison ultérieure, ajouter `-CaptureRoute MIC_MONO` ou
+`-CaptureRoute MIC_STEREO_FOCUS`. Le script refuse de qualifier un essai si la
+route demandée n'est pas effectivement appliquée. Ne pas changer la route pendant
+la première vérification v3.2 : conserver AUTO pour comparer le moteur.
+`-Profile NOISY` reste disponible pour une session distincte avec bruit.
