@@ -1,0 +1,132 @@
+--- a/modules/guardian-native-protection/android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpeechSegmenter.kt
++++ b/modules/guardian-native-protection/android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpeechSegmenter.kt
+@@ -26,6 +26,7 @@
+     private var active = false
+     private var silenceSamples = 0
+     private var lastSpeechEnd = 0
++    private var pauseCut = 0
+ 
+     fun accept(pcm: FloatArray, speech: Boolean) {
+         require(pcm.all { it.isFinite() }) { "PCM non fini" }
+@@ -39,6 +40,7 @@
+             }
+             silenceSamples = 0
+             lastSpeechEnd = size
++            pauseCut = 0
+             sink.onSpeechStarted()
+         }
+         if (active) {
+@@ -53,19 +55,34 @@
+                     break
+                 }
+                 if (size == maxSamples) {
+-                    sink.onWindow(id, segment.copyOf(size), true, "QWEN_TECHNICAL_ROLLOVER")
++                    // Prefer a completed neural pause already inside the buffer.
++                    // Retain the entire remainder: selecting a boundary must never
++                    // discard the beginning of the following utterance.
++                    val cut = if (pauseCut > 0) pauseCut else size
++                    val reason = if (pauseCut > 0) "QWEN_PAUSE_ALIGNED_ROLLOVER" else "QWEN_TECHNICAL_ROLLOVER"
++                    sink.onWindow(id, segment.copyOf(cut), true, reason)
+                     id++
+-                    // Acoustic overlap preserves a word cut by the technical cap.
+                     val overlap = sampleRate * ROLLOVER_OVERLAP_MS / 1_000
+-                    segment.copyInto(segment, 0, size - overlap, size)
+-                    size = overlap
+-                    lastSpeechEnd = (lastSpeechEnd - (maxSamples - overlap)).coerceAtLeast(0)
++                    val retainedStart = cut - overlap
++                    segment.copyInto(segment, 0, retainedStart, size)
++                    size -= retainedStart
++                    lastSpeechEnd = (lastSpeechEnd - retainedStart).coerceAtLeast(0)
++                    pauseCut = 0
+                 }
+                 val take = minOf(pcm.size - offset, maxSamples - size)
+                 pcm.copyInto(segment, size, offset, offset + take)
+                 size += take
+                 offset += take
+                 if (speech) {
++                    if (silenceSamples >= sampleRate * MIN_ROLLOVER_PAUSE_MS / 1_000) {
++                        val candidate = lastSpeechEnd + minOf(tailSamples, silenceSamples)
++                        // Bound both windows and avoid repeatedly cutting a tiny
++                        // prefix near the start of a technical window.
++                        if (candidate >= sampleRate * MIN_ROLLOVER_PREFIX_MS / 1_000 &&
++                            candidate <= maxSamples - sampleRate * MIN_ROLLOVER_REMAINDER_MS / 1_000) {
++                            pauseCut = candidate
++                        }
++                    }
+                     lastSpeechEnd = size
+                     silenceSamples = 0
+                 } else {
+@@ -103,6 +120,7 @@
+         ringHead = 0
+         silenceSamples = 0
+         lastSpeechEnd = 0
++        pauseCut = 0
+         if (wasActive) sink.onSpeechEnded()
+     }
+     companion object {
+@@ -112,6 +130,9 @@
+         const val TAIL_MS = 800
+         const val END_SILENCE_MS = 1200
+         const val ROLLOVER_OVERLAP_MS = 400
++        const val MIN_ROLLOVER_PAUSE_MS = 900
++        const val MIN_ROLLOVER_PREFIX_MS = 2000
++        const val MIN_ROLLOVER_REMAINDER_MS = 1000
+     }
+ 
+ }
+--- a/modules/guardian-native-protection/android/src/main/java/expo/modules/guardiannativeprotection/GuardianProtectionService.kt
++++ b/modules/guardian-native-protection/android/src/main/java/expo/modules/guardiannativeprotection/GuardianProtectionService.kt
+@@ -1307,7 +1307,7 @@
+     val voiceDiagnostics = if (diagnosticOptions.enabled)
+       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
+     voiceDiagnostics?.event("SESSION_START",
+-      "engineRevision" to "guardian-voice-v3.2",
++      "engineRevision" to "guardian-voice-v3.2.1",
+       "diagnosticControlRevision" to 3,
+       "wavStageCount" to 5,
+       "decoderMode" to "FINAL_ONLY",
+@@ -1320,6 +1320,8 @@
+       "gtcrnMaxModelGain" to 6,
+       "asrInput" to "TRUTH", "gtcrnRole" to "VAD_WITH_RAW_NEURAL_AGREEMENT",
+       "gtcrnMaxWaitMs" to 200, "maxSegmentMs" to 8000,
++      "rolloverStrategy" to "NEURAL_PAUSE_FIRST",
++      "rolloverMinPauseMs" to GuardianSpeechSegmenter.MIN_ROLLOVER_PAUSE_MS,
+       "wavEnabled" to (diagnosticWavDirectory != null),
+       "profileSource" to if (diagnosticOptions.profileFromFile) "TEST_FILE" else "CONFIG")
+     val thisVoiceSessionToken = UUID.randomUUID().toString()
+--- a/modules/guardian-native-protection/tests/host/VoiceCoreTest.kt
++++ b/modules/guardian-native-protection/tests/host/VoiceCoreTest.kt
+@@ -73,6 +73,33 @@
+         val rebuilt = finals[0].pcm.toList() + finals[1].pcm.drop(6400)
+         checkThat(rebuilt.take(source.size) == source.toList(), "PCM discontinuity")
+         checkThat(sink.starts == 1 && sink.ends == 1, "Rollover became a product utterance")
++    }
++    test("technical cap uses an existing pause and preserves the buffered next utterance") {
++        val sink = RecordingSink(); val s = GuardianSpeechSegmenter(sink)
++        val source = FloatArray(160_000) { (it + 1).toFloat() / 200_000f }
++        for (offset in source.indices step frame) {
++            val inPause = offset >= 64_000 && offset < 80_000
++            s.accept(source.copyOfRange(offset, offset + frame), !inPause)
++        }
++        silence(s, 28)
++        val windows = sink.windows
++        checkThat(windows.size == 2, "Pause generated an extra window")
++        checkThat(windows[0].reason == "QWEN_PAUSE_ALIGNED_ROLLOVER", "Known pause was not used")
++        checkThat(windows[0].pcm.size == 76_800, "Pause tail was truncated")
++        checkThat(windows[0].pcm.takeLast(6400) == windows[1].pcm.take(6400), "Overlap lost")
++        val rebuilt = windows[0].pcm.toList() + windows[1].pcm.drop(6400)
++        checkThat(rebuilt.take(source.size) == source.toList(), "Buffered following speech lost or duplicated")
++        checkThat(windows.all { it.pcm.size <= 128_000 && it.final }, "Unbounded or interim window")
++        checkThat(sink.starts == 1 && sink.ends == 1, "Technical pause became a new product utterance")
++    }
++    test("an 850 ms dropout is not used as a technical pause boundary") {
++        val sink = RecordingSink(); val s = GuardianSpeechSegmenter(sink)
++        repeat(80) { s.accept(FloatArray(frame) { 0.02f }, true) }
++        silence(s, 17)
++        repeat(103) { s.accept(FloatArray(frame) { 0.02f }, true) }
++        silence(s, 28)
++        checkThat(sink.windows.first().reason == "QWEN_TECHNICAL_ROLLOVER", "Weak middle split at short dropout")
++        checkThat(sink.windows.first().pcm.size == 128_000, "Technical cap changed")
+     }
+     test("brief VAD dropout keeps the same phrase and its weak consonants") {
+         val sink = RecordingSink(); val s = GuardianSpeechSegmenter(sink)

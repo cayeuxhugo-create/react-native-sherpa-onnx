@@ -1,0 +1,134 @@
+{
+  "referenceAndCandidates": [
+    {
+      "endSilenceMs": 800,
+      "windows": [
+        {
+          "id": 1,
+          "samples": 95200,
+          "audioSeconds": 5.95,
+          "availableAtSeconds": 12.95,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        },
+        {
+          "id": 2,
+          "samples": 52800,
+          "audioSeconds": 3.3,
+          "availableAtSeconds": 14.45,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "systeme"
+        },
+        {
+          "id": 3,
+          "samples": 108800,
+          "audioSeconds": 6.8,
+          "availableAtSeconds": 19.3,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher les chaussures puis je reviens."
+        },
+        {
+          "id": 4,
+          "samples": 108000,
+          "audioSeconds": 6.75,
+          "availableAtSeconds": 25.95,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        }
+      ]
+    },
+    {
+      "endSilenceMs": 1000,
+      "windows": [
+        {
+          "id": 1,
+          "samples": 95200,
+          "audioSeconds": 5.95,
+          "availableAtSeconds": 13.15,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        },
+        {
+          "id": 2,
+          "samples": 128000,
+          "audioSeconds": 8.0,
+          "availableAtSeconds": 19.5,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher les chaussures que je reviens."
+        },
+        {
+          "id": 3,
+          "samples": 108000,
+          "audioSeconds": 6.75,
+          "availableAtSeconds": 26.15,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        }
+      ]
+    },
+    {
+      "endSilenceMs": 1200,
+      "windows": [
+        {
+          "id": 1,
+          "samples": 128000,
+          "audioSeconds": 8.0,
+          "availableAtSeconds": 15.05,
+          "reason": "QWEN_TECHNICAL_ROLLOVER",
+          "text": "Je vais chercher mes chaussures et je reviens. Je vais."
+        },
+        {
+          "id": 2,
+          "samples": 75200,
+          "audioSeconds": 4.7,
+          "availableAtSeconds": 19.7,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "je vais chercher mes chaussures et je reviens"
+        },
+        {
+          "id": 3,
+          "samples": 108000,
+          "audioSeconds": 6.75,
+          "availableAtSeconds": 26.35,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        }
+      ]
+    }
+  ],
+  "pauseAligned": [
+    {
+      "endSilenceMs": 1200,
+      "windows": [
+        {
+          "id": 1,
+          "samples": 95200,
+          "audioSeconds": 5.95,
+          "availableAtSeconds": 15.05,
+          "reason": "QWEN_PAUSE_ALIGNED_ROLLOVER",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        },
+        {
+          "id": 2,
+          "samples": 108000,
+          "audioSeconds": 6.75,
+          "availableAtSeconds": 19.7,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        },
+        {
+          "id": 3,
+          "samples": 108000,
+          "audioSeconds": 6.75,
+          "availableAtSeconds": 26.35,
+          "reason": "QWEN_NEURAL_SILENCE",
+          "text": "Je vais chercher mes chaussures et je reviens."
+        }
+      ]
+    }
+  ],
+  "provenance": "Recorded VAD transitions and aligned ASR WAV; CPU Qwen replay, not new phone execution",
+  "sourceFrames": 1112,
+  "sourceVadTransitions": 9,
+  "phoneValidation": "pending"
+}
