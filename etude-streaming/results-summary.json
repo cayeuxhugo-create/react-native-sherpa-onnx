@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-20",
+  "runtime": "sherpa-onnx 1.13.8, desktop CPU, two ASR threads",
+  "models": {
+    "kroko-2025": {
+      "distanceResults": [
+        {
+          "case": "near-1m",
+          "exactReferencePhrases": 3,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.0,
+          "replayRealTimeFactor": 0.032881876161222554
+        },
+        {
+          "case": "distance-3m",
+          "exactReferencePhrases": 3,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.0,
+          "replayRealTimeFactor": 0.028575855840944523
+        },
+        {
+          "case": "distance-5m-previous",
+          "exactReferencePhrases": 2,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.041666666666666664,
+          "replayRealTimeFactor": 0.03473047913818414
+        },
+        {
+          "case": "distance-5m-latest",
+          "exactReferencePhrases": 1,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.08333333333333333,
+          "replayRealTimeFactor": 0.029796414442545494
+        }
+      ],
+      "hashes": {
+        "encoder.onnx": "e02facae1daf6f1f13da67ea3ace7c722516d0868d1768d78c0580bc22cc0c5b",
+        "decoder.onnx": "6aed547570e3ab5afc05429a017cedd3a056c16df3baa5703f02461cefa25bac",
+        "joiner.onnx": "a51eec759bcdcaae2614686fa2a8b57417b2d420dd55a5a5558b388d35a9b2b6",
+        "tokens.txt": "fedfb9c844bfb2bf14171f8184863e3d617b815a8667bdd9fc9a3149fde73298"
+      },
+      "noiseSeconds": 600.0,
+      "noiseLexicalFinals": 0,
+      "noiseLexicalPartialChanges": 0,
+      "syntheticShortWordsExact": 4,
+      "syntheticShortWordCases": 15
+    },
+    "mobile-2023": {
+      "distanceResults": [
+        {
+          "case": "near-1m",
+          "exactReferencePhrases": 1,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.16666666666666666,
+          "replayRealTimeFactor": 0.06410670375404921
+        },
+        {
+          "case": "distance-3m",
+          "exactReferencePhrases": 1,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.16666666666666666,
+          "replayRealTimeFactor": 0.06546085343730877
+        },
+        {
+          "case": "distance-5m-previous",
+          "exactReferencePhrases": 1,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.375,
+          "replayRealTimeFactor": 0.06331901703052299
+        },
+        {
+          "case": "distance-5m-latest",
+          "exactReferencePhrases": 0,
+          "expectedPhrases": 3,
+          "wordErrorRate": 0.375,
+          "replayRealTimeFactor": 0.0629039992808227
+        }
+      ],
+      "hashes": {
+        "encoder-epoch-29-avg-9-with-averaged-model.int8.onnx": "9a7e83bbb25d627f8c501c6abe91d36bdc7fc106fb7cd6ee8fa5744f316fc6f7",
+        "decoder-epoch-29-avg-9-with-averaged-model.onnx": "3ef2840b684440e26382af87b2174d25732a9f113f1965cd8abba7ffc5d033fb",
+        "joiner-epoch-29-avg-9-with-averaged-model.int8.onnx": "fc2f3bb851a15a532c6f2422d53eecd1ca949f12b0897e07a852021c30481711",
+        "tokens.txt": "37fb3f2a7bcb85e5fff3f1f66be04e6fbb05077a22f56d177fe85704e945fb31"
+      },
+      "noiseSeconds": 600.0,
+      "noiseLexicalFinals": 0,
+      "noiseLexicalPartialChanges": 0,
+      "syntheticShortWordsExact": 0,
+      "syntheticShortWordCases": 15
+    }
+  },
+  "limits": [
+    "No Android streaming integration or latency measurement",
+    "No real keyword corpus",
+    "Hybrid dedicated keyword path not implemented or validated",
+    "Synthetic noise is not ten minutes of recorded phone silence"
+  ],
+  "baselineV32": {
+    "noiseSeconds": 600.0,
+    "noisePositiveVadFrames": 0,
+    "knownSilenceSeconds": 6,
+    "knownSilencePositiveVadFrames": 0,
+    "syntheticShortWordsExact": 7,
+    "syntheticShortWordCases": 15,
+    "syntheticShortWordsDetected": 15
+  }
+}
