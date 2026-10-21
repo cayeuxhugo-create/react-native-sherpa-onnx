@@ -1,0 +1,30 @@
+{
+  "method": "Offline Sherpa1.13.8, GTCRN256 + gain6 peak bound + matched compensation, three Silero views192ms, actual Kotlin segmenter2s pre-roll final-only; Qwen original PCM",
+  "phoneValidation": "pending",
+  "distances": [
+    {
+      "distance": "1m",
+      "expectedUtterances": 3,
+      "originalPhoneExact": 3,
+      "offlineCorrectedDetected": 3,
+      "offlineCorrectedExact": 3,
+      "offlineCorrectedWordErrorRate": 0.0
+    },
+    {
+      "distance": "3m",
+      "expectedUtterances": 3,
+      "originalPhoneExact": 3,
+      "offlineCorrectedDetected": 3,
+      "offlineCorrectedExact": 3,
+      "offlineCorrectedWordErrorRate": 0.0
+    },
+    {
+      "distance": "5m",
+      "expectedUtterances": 3,
+      "originalPhoneExact": 0,
+      "offlineCorrectedDetected": 3,
+      "offlineCorrectedExact": 2,
+      "offlineCorrectedWordErrorRate": 0.041666666666666664
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+PASS 30 seconds of noise classified non-speech never schedules Qwen
+PASS completed utterance schedules one final and no interim offline decodes
+PASS weak accepted speech is preserved without an absolute energy gate
+PASS 1000 ms pre-roll retains a delayed onset exactly once
+PASS two-second pre-roll preserves weak onset before a delayed cleaned VAD decision
+PASS one natural final with 800 ms tail, no partial during silence
+PASS technical rollover overlaps 400 ms without losing source samples
+PASS brief VAD dropout keeps the same phrase and its weak consonants
+PASS silence at the technical cap cannot create a noise-only rollover
+PASS reset discards a broken utterance and does not reuse its pre-roll
+PASS non-finite PCM is rejected
+PASS DISTANT emits unchanged samples immediately and ignores GTCRN
+PASS NOISY handles enhanced-before-primary and copies gain correctly
+PASS asynchronous enhanced frames never reorder capture
+PASS missing GTCRN falls back by deadline without waiting for another frame
+PASS wrong timestamp, wrong size and non-finite enhancement cannot contaminate PCM
+PASS a saturated join queue drains with bounded memory
+PASS profile values validate and normalize
+18 core tests passed
+PASS reset invalidates an in-flight partial
+PASS reset invalidates an in-flight final
+PASS close invalidates an in-flight partial and releases on worker
+PASS close invalidates an in-flight final and releases on worker
+PASS long partial skipped, early decode retained, full eight-second final preserved
+5 decoder concurrency tests passed
+PASS diagnostics disabled by default
+TRACE_VALIDATION {"schema":1, "session":"test-session", "profile":"DISTANT", "utcMs":1792428418976, "elapsedMs":120543507, "event":"QUOTE_TEST", "text":"une \"voix\"\navec\tdu bruit et \\ un emoji \ud83d\ude00", "infinite":null, "value":0.25, "long":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+PASS diagnostic JSON bounded and reserved fields preserved
+PASS diagnostic sink errors do not reach the engine
+PASS PCM summary and dBFS silence handling
+4 diagnostic tests passed
+WAV export passed: five stages including pre-filter capture, PCM format, clipping, limits, timestamps, invalid PCM, immutable input, finalization
+PASS VAD model gain is bounded, preserves the source and never attenuates loud audio
+PASS delayed GTCRN output uses the matching input gain across partial output boundaries
+PASS gain history is bounded, rejects unmatched output and resets across sessions
+PASS cleaned neural VAD admits weak speech; clear raw support requires agreement of two neural views; missing enhancement uses original VAD
+PASS default diagnostics remain disabled and profile file is ignored without opt-in
+PASS private recording opt-in enables WAV and logs without changing persisted config
+PASS private OFF overrides stale external ON
+PASS invalid private control never falls back to external recording
+PASS legacy external opt-in still writes only into private storage
+PASS configured logs alone do not record audio
+PASS invalid test profile retains the configured profile
+PASS private route controls take precedence with legacy fallback and no external directory requirement

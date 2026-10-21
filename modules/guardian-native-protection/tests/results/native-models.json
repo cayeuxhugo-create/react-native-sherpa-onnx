@@ -1,0 +1,50 @@
+{
+  "sherpa_version": "1.13.8",
+  "scenarios": {
+    "silence_10s": {
+      "frames": 200,
+      "speech_frames": 0,
+      "runtime_seconds": 0.097
+    },
+    "white_noise_rms_0.003_10s": {
+      "frames": 200,
+      "speech_frames": 0,
+      "runtime_seconds": 0.059
+    },
+    "white_noise_rms_0.03_10s": {
+      "frames": 200,
+      "speech_frames": 0,
+      "runtime_seconds": 0.057
+    },
+    "hum_100hz_10s": {
+      "frames": 200,
+      "speech_frames": 0,
+      "runtime_seconds": 0.067
+    },
+    "speech_reference": {
+      "frames": 133,
+      "speech_frames": 117,
+      "runtime_seconds": 0.055
+    },
+    "speech_attenuated_x0.1": {
+      "frames": 133,
+      "speech_frames": 122,
+      "runtime_seconds": 0.11
+    },
+    "speech_plus_noise_rms_0.003": {
+      "frames": 133,
+      "speech_frames": 117,
+      "runtime_seconds": 0.064
+    },
+    "attenuated_speech_plus_noise_rms_0.003": {
+      "frames": 133,
+      "speech_frames": 104,
+      "runtime_seconds": 0.055
+    }
+  },
+  "gtcrn": {
+    "input_samples": 106000,
+    "output_samples": 105728,
+    "speech_frames": 111
+  }
+}

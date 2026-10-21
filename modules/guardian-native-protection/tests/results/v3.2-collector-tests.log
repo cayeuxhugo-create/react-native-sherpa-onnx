@@ -1,0 +1,8 @@
+PASS ok AUTO ZIP, five-stage integrity, route validation and exact restoration
+PASS stereo MIC_STEREO_FOCUS ZIP, five-stage integrity, route validation and exact restoration
+PASS mic MIC_MONO ZIP, five-stage integrity, route validation and exact restoration
+PASS voice VOICE_RECOGNITION_MONO ZIP, five-stage integrity, route validation and exact restoration
+PASS old AUTO ZIP, five-stage integrity, route validation and exact restoration
+PASS corrupt AUTO ZIP, five-stage integrity, route validation and exact restoration
+PASS limit AUTO ZIP, five-stage integrity, route validation and exact restoration
+PASS route-rejected MIC_STEREO_FOCUS ZIP, five-stage integrity, route validation and exact restoration

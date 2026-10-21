@@ -1,0 +1,6 @@
+PowerShell 7.4.6 on Linux; fake ADB, not Android.
+PASS DISTANT: four binary WAVs, index, manifest, ZIP, exact prior controls restored
+PASS NOISY: same collection, new controls removed
+PASS old APK: refused, partial ZIP preserved, controls restored
+PASS corrupted download: SHA mismatch refused, partial ZIP, controls restored
+PASS WAV limit: recovered files but incomplete session, controls restored

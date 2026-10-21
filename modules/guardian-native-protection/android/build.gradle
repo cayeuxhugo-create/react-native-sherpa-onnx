@@ -1,0 +1,88 @@
+apply plugin: 'com.android.library'
+
+group = 'expo.modules.guardiannativeprotection'
+version = ''
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+// If you want to use the managed Android SDK versions from expo-modules-core, set this to true.
+// The Android SDK versions will be bumped from time to time in SDK releases and may introduce breaking changes in your module code.
+// Most of the time, you may like to manage the Android SDK versions yourself.
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  buildscript {
+    // Simple helper that allows the root project to override versions declared by this library.
+    ext.safeExtGet = { prop, fallback ->
+      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+  }
+  project.android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 36)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 24)
+      targetSdkVersion safeExtGet("targetSdkVersion", 36)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.guardiannativeprotection"
+
+  buildFeatures {
+    buildConfig true
+  }
+
+  defaultConfig {
+    consumerProguardFiles "consumer-rules.pro"
+    versionCode 1
+    versionName ""
+
+    buildConfigField(
+  "String",
+  "GUARDIAN_API_BASE_URL",
+  "\"https://guardian-cloud-api-1089861873115.europe-west1.run.app\""
+)
+  }
+
+  lintOptions {
+    abortOnError false
+  }
+}
+
+
+
+dependencies {
+
+  compileOnly files("${rootProject.projectDir}/app/libs/sherpa-onnx-1.13.8-gv3895-2.aar")
+  
+  implementation "com.google.android.gms:play-services-location:21.3.0"
+
+  implementation "androidx.datastore:datastore-preferences:1.2.1"
+
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
+
+  implementation "androidx.work:work-runtime-ktx:2.10.3"
+
+  implementation "com.squareup.okhttp3:okhttp:5.0.0"
+
+  implementation platform(
+  "com.google.firebase:firebase-bom:34.12.0"
+)
+
+  implementation "com.google.firebase:firebase-auth"
+
+  implementation "com.google.firebase:firebase-appcheck"
+
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2"
+
+  implementation "com.google.firebase:firebase-appcheck-playintegrity"
+
+  debugImplementation "com.google.firebase:firebase-appcheck-debug"
+
+}

@@ -1,0 +1,164 @@
+[
+  {
+    "type": "synthetic-short-word",
+    "word": "au-secours",
+    "dbfs": -35,
+    "positiveFrames": 14
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "au-secours",
+    "dbfs": -50,
+    "positiveFrames": 17
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "au-secours",
+    "dbfs": -60,
+    "positiveFrames": 21
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "oui",
+    "dbfs": -35,
+    "positiveFrames": 6
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "oui",
+    "dbfs": -50,
+    "positiveFrames": 7
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "oui",
+    "dbfs": -60,
+    "positiveFrames": 9
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "stop",
+    "dbfs": -35,
+    "positiveFrames": 8
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "stop",
+    "dbfs": -50,
+    "positiveFrames": 15
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "stop",
+    "dbfs": -60,
+    "positiveFrames": 12
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "non",
+    "dbfs": -35,
+    "positiveFrames": 7
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "non",
+    "dbfs": -50,
+    "positiveFrames": 7
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "non",
+    "dbfs": -60,
+    "positiveFrames": 9
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "aide",
+    "dbfs": -35,
+    "positiveFrames": 6
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "aide",
+    "dbfs": -50,
+    "positiveFrames": 9
+  },
+  {
+    "type": "synthetic-short-word",
+    "word": "aide",
+    "dbfs": -60,
+    "positiveFrames": 10
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "white",
+    "dbfs": -65,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "white",
+    "dbfs": -45,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "white",
+    "dbfs": -25,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "pink",
+    "dbfs": -65,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "pink",
+    "dbfs": -45,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "pink",
+    "dbfs": -25,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "fan",
+    "dbfs": -65,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "fan",
+    "dbfs": -45,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "fan",
+    "dbfs": -25,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "clicks",
+    "dbfs": -65,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "clicks",
+    "dbfs": -45,
+    "positiveFrames": 0
+  },
+  {
+    "type": "synthetic-noise",
+    "kind": "clicks",
+    "dbfs": -25,
+    "positiveFrames": 0
+  }
+]

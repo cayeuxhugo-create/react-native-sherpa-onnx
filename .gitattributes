@@ -36,3 +36,6 @@
 # Windows-specific files should use CRLF
 *.bat text eol=crlf
 *.cmd text eol=crlf
+
+# Preserve the verified Guardian module bytes (including original CRLF files).
+modules/guardian-native-protection/** -text

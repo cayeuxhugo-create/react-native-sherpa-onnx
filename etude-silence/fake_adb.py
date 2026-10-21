@@ -3,6 +3,9 @@ import sys,os,pathlib,json,time,hashlib,shutil,wave
 r=pathlib.Path(os.environ['FAKE_ADB_ROOT']);a=sys.argv[1:];mode=os.environ.get('FAKE_MODE','ok')
 def f(n):return r/n.lstrip('/')
 def emit(event,**kw):
+ if os.environ.get('FAKE_FIRERED')=='1':
+  if event=='SESSION_START':kw['engineRevision']='guardian-voice-v3.2.1' if mode=='wrong-engine' else 'guardian-voice-v3.3-firered'
+  if event=='WAV_READY':emit('FIRERED_START_FAILED' if mode=='firered-failed' else 'FIRERED_READY',**{k:v for k,v in kw.items() if k=='session'})
  with f('events').open('a') as h:h.write('10-19 12:00:00.000 123 123 I GuardianVoiceDiag: '+json.dumps(dict(event=event,**({'session':'abc12345'}|kw)))+'\n')
 if a[0]=='get-state':print('device')
 elif a[0]=='push':p=f(a[2]);p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a[1],p);print('pushed')

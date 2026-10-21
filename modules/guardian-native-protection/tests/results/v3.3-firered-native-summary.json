@@ -1,0 +1,358 @@
+{
+  "scope": "Native CPU admission only; not Android APK or Qwen recognition",
+  "jniWindows": 157,
+  "jniRepeatedCalls": 314,
+  "originalPcmUnchanged": true,
+  "repeatedDecisionsIdentical": true,
+  "referenceComparisons": 647,
+  "referenceDecisionMismatches": 0,
+  "maxFeatureError": 0.01245737075805664,
+  "maxProbabilityError": 0.009051412343978882,
+  "counts": {
+    "negative": {
+      "accepted": 0,
+      "total": 8
+    },
+    "positive": {
+      "accepted": 12,
+      "total": 12
+    },
+    "recorded-nonspeech-control": {
+      "accepted": 2,
+      "total": 65
+    },
+    "short-word": {
+      "accepted": 15,
+      "total": 15
+    },
+    "speech-noisy": {
+      "accepted": 22,
+      "total": 24
+    },
+    "synthetic-noise": {
+      "accepted": 0,
+      "total": 18
+    },
+    "synthetic-word-noisy": {
+      "accepted": 15,
+      "total": 15
+    }
+  },
+  "stress": [
+    {
+      "db": -6,
+      "offsetMs": 0,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 5,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 11,
+          "nativeAccepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 10,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 15,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 11,
+          "nativeAccepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 20,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 0,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 5,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 10,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 15,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 20,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 0,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 5,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 10,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 15,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 20,
+      "counts": {
+        "negative": {
+          "referenceAccepted": 0,
+          "nativeAccepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "referenceAccepted": 12,
+          "nativeAccepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "referenceAccepted": 15,
+          "nativeAccepted": 15,
+          "total": 15
+        }
+      }
+    }
+  ]
+}

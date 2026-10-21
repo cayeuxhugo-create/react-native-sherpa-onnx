@@ -1,0 +1,16 @@
+{
+  "fireRedRevision": "c30ec49e8cc69642b0ee65362eba11b9d11c6e54",
+  "conversionRevision": "8e9d2694e7e55abeda4bfdb14f31e56dc0d4c95e",
+  "ncnnRevision": "e956fbf9bd97fe945df35d736747dc816f8b5f42",
+  "ndk": "r27c",
+  "archives": {
+    "android-ndk-r27c-linux.zip": "59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc",
+    "ncnn-20260113-android.zip": "c05263ca7f1f25bde9ac5172b696a40c55eb931b863b8820be98276ee2eaf7e5"
+  },
+  "nativeLibraries": {
+    "android/src/main/jniLibs/arm64-v8a/libguardian_firered_vad.so": "95e68fe05753cd3431bdfdafc33adbe739ba9a7a9c2b4dbffbb77843d9fcfb26",
+    "android/src/main/jniLibs/x86_64/libguardian_firered_vad.so": "ffbc541d364819b5ef05e5d01357faab86d77e8bc22182f6148e5d9b03fd6a72",
+    "android/src/main/jniLibs/x86/libguardian_firered_vad.so": "83d8a1af596dd9942901c4a9a35bbe45cb515a55241ccb14f4d41e0eb3990612",
+    "android/src/main/jniLibs/armeabi-v7a/libguardian_firered_vad.so": "d7fc596ae75c6347c5755001b6cfe595771dcda19436657820ec89bbc1964ad3"
+  }
+}
