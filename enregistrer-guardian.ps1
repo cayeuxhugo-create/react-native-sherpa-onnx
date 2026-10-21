@@ -92,6 +92,15 @@ function Read-DiagnosticEvents {
         }
     }
 }
+function Assert-SimpleSessionActive {
+    param($Session, [object[]]$Events)
+    if (@($Events | Where-Object { $_.session -eq $Session.session -and $_.event -eq "SESSION_END" }).Count -gt 0) {
+        throw "La session vocale s'est arretee pendant le test. Les fichiers partiels sont conserves ; ce bloc n'est pas valide."
+    }
+    if (@($Events | Where-Object { $_.event -eq "SESSION_START" -and $_.session -ne $Session.session -and $_.elapsedMs -gt $Session.elapsedMs }).Count -gt 0) {
+        throw "Le moteur a change de session pendant le test. Bloc non valide ; voir guardian.log."
+    }
+}
 function Get-GuardianWavHeader {
     param([string]$Path)
     $data = [IO.File]::ReadAllBytes($Path)
@@ -126,7 +135,7 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ("guardian-simple-"+[Guid]::NewGuid
 $backups = New-Object 'System.Collections.Generic.List[object]'
 $records = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion="simple-3"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
+    collectorVersion="simple-3.1"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
     packageName=$PackageName; startUtc=[DateTime]::UtcNow.ToString("o")
     phoneModel=Invoke-SimpleAdb @("shell","getprop","ro.product.model")
     android=Invoke-SimpleAdb @("shell","getprop","ro.build.version.release")
@@ -165,8 +174,11 @@ try {
         $knownOld = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.diagnosticControlRevision -lt 3 })
         if ($knownOld.Count -gt 0) { throw "Le moteur a démarré avec une ancienne révision diagnostique. Installer le module v3.2 et son APK pour ce collecteur." }
         $starts = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.diagnosticControlRevision -ge 3 -and $_.profile -eq $Profile -and $_.diagnosticsEnabledBy -eq "PRIVATE_FILE" })
-        foreach ($candidate in $starts) {
+        foreach ($candidate in @($starts | Sort-Object elapsedMs -Descending)) {
             $same = @($events | Where-Object { $_.session -eq $candidate.session })
+            # A previously ready session may already have ended while the user
+            # was responding to the prompt. Never time a test against its WAV.
+            if (@($same | Where-Object { $_.event -eq "SESSION_END" }).Count -gt 0) { continue }
             if (@($same | Where-Object { $_.event -in @("WAV_ERROR","WAV_UNAVAILABLE") }).Count -gt 0) { throw "Le moteur signale une erreur WAV : voir guardian.log." }
             $wavReady = @($same | Where-Object { $_.event -eq "WAV_READY" })
             if ($wavReady.Count -gt 0 -and @($same | Where-Object { $_.event -eq "AUDIO_FRAME" }).Count -gt 0) {
@@ -200,20 +212,28 @@ try {
     Write-Host "ENREGISTREMENT ACTIF : parler maintenant."
     $timer = [Diagnostics.Stopwatch]::StartNew()
     $lastRemaining = -1
+    $lastSessionCheck = -1
     while ($timer.Elapsed.TotalSeconds -lt $DurationSeconds) {
         if ($process.HasExited) { throw "La lecture des logs s'est interrompue." }
+        $second = [int][math]::Floor($timer.Elapsed.TotalSeconds)
+        if ($second -ne $lastSessionCheck) {
+            $current = @(Read-DiagnosticEvents)
+            Assert-SimpleSessionActive $session $current
+            $lastSessionCheck = $second
+        }
         $remaining = [int][math]::Ceiling($DurationSeconds-$timer.Elapsed.TotalSeconds)
         if ($remaining -ne $lastRemaining -and ($remaining % 10 -eq 0 -or $remaining -le 5)) {
             Write-Host ("Encore " + $remaining + " s..."); $lastRemaining = $remaining
         }
         Start-Sleep -Milliseconds 250
     }
+    Assert-SimpleSessionActive $session @(Read-DiagnosticEvents)
     $metadata["recordEndUtc"] = [DateTime]::UtcNow.ToString("o")
     [void](Invoke-SimpleAdb @("shell","log","-p","i","-t","GuardianVoiceDiag","SIMPLE_RECORD_END"))
     [void](Read-Host "Durée terminée. Arrêter complètement la protection pour fermer les WAV, puis Entrée")
     $deadline = [DateTime]::UtcNow.AddSeconds(6)
     do {
-        $saved = @(Read-DiagnosticEvents | Where-Object { $_.session -eq $session.session -and $_.event -eq "WAV_SAVED" })
+        $saved = @(Read-DiagnosticEvents | Where-Object { $_.session -eq $session.session -and $_.event -eq "WAV_SAVED" -and $_.stage -in @("raw","pregain","truth","asr","vad") } | Sort-Object stage -Unique)
         if ($saved.Count -ge 5) { break }
         Start-Sleep -Milliseconds 300
     } while ([DateTime]::UtcNow -lt $deadline)
@@ -227,6 +247,9 @@ try {
         $header = if ($suffix.EndsWith(".wav")) { Get-GuardianWavHeader $local } else { @{valid=$true; kind="alignment-index"} }
         $records.Add([pscustomobject]@{file=$name; header=$header; sha256=(Get-FileHash -LiteralPath $local -Algorithm SHA256).Hash.ToLowerInvariant()})
         if (-not $header.valid) { throw ("WAV incomplet : " + $name) }
+        if ($suffix -in @("asr.wav","vad.wav") -and $header.durationSeconds -lt ($DurationSeconds-0.1)) {
+            throw ("WAV plus court que le test demande : " + $name + ". Bloc non valide.")
+        }
     }
     $limits = @(Read-DiagnosticEvents | Where-Object { $_.session -eq $session.session -and $_.event -eq "WAV_LIMIT" })
     if ($limits.Count -gt 0) { throw "La limite de 180 secondes WAV a été atteinte. Les fichiers sont récupérés, mais ne couvrent pas forcément tout le test ; recommencer en démarrant rapidement après la protection." }

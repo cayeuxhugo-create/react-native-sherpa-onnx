@@ -1,0 +1,72 @@
+[
+  {
+    "block": 1,
+    "condition": "silence",
+    "sessionCount": 1,
+    "selectedSessionQwenResults": 4,
+    "allSessionQwenResults": 4,
+    "selectedSessionDroppedTasks": [
+      0
+    ],
+    "loggedEmergencyOrWakeTrue": 0,
+    "notes": ""
+  },
+  {
+    "block": 2,
+    "condition": "silence",
+    "sessionCount": 1,
+    "selectedSessionQwenResults": 0,
+    "allSessionQwenResults": 0,
+    "selectedSessionDroppedTasks": [
+      0
+    ],
+    "loggedEmergencyOrWakeTrue": 0,
+    "notes": ""
+  },
+  {
+    "block": 3,
+    "condition": "silence-partial",
+    "sessionCount": 2,
+    "selectedSessionQwenResults": 0,
+    "allSessionQwenResults": 2,
+    "selectedSessionDroppedTasks": [
+      0
+    ],
+    "loggedEmergencyOrWakeTrue": 0,
+    "notes": "Selected WAVs precede timed interval; later session WAVs missing"
+  },
+  {
+    "block": 4,
+    "condition": "vacuum",
+    "sessionCount": 1,
+    "selectedSessionQwenResults": 0,
+    "allSessionQwenResults": 0,
+    "selectedSessionDroppedTasks": [],
+    "loggedEmergencyOrWakeTrue": 0,
+    "notes": ""
+  },
+  {
+    "block": 5,
+    "condition": "fan",
+    "sessionCount": 1,
+    "selectedSessionQwenResults": 2,
+    "allSessionQwenResults": 2,
+    "selectedSessionDroppedTasks": [
+      0
+    ],
+    "loggedEmergencyOrWakeTrue": 0,
+    "notes": ""
+  },
+  {
+    "block": 6,
+    "condition": "white-noise",
+    "sessionCount": 1,
+    "selectedSessionQwenResults": 3,
+    "allSessionQwenResults": 3,
+    "selectedSessionDroppedTasks": [
+      0
+    ],
+    "loggedEmergencyOrWakeTrue": 0,
+    "notes": ""
+  }
+]
