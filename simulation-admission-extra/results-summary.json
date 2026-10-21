@@ -1,0 +1,1784 @@
+{
+  "date": "2026-10-21",
+  "scope": "CPU completed-window acoustic admission only, no Android changes, no recognition or alert scoring",
+  "baseDataset": {
+    "negative": 8,
+    "positivePhrases": 12,
+    "syntheticShortWords": 15,
+    "independentRealHeldOutData": false
+  },
+  "extraSingleCandidates": [
+    {
+      "candidate": "silero-threshold0.25-duration0.128-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.25-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 3,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.25-duration0.192-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.25-duration0.192-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.5-duration0.128-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.5-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.5-duration0.192-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.5-duration0.192-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 13,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.75-duration0.128-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 6,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.75-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.75-duration0.192-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 6,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 12,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.75-duration0.192-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 12,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.25-duration0.128-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.25-duration0.128-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.25-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.25-duration0.192-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 7,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.25-duration0.192-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.25-duration0.192-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.5-duration0.128-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 2,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.5-duration0.128-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 3,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 6,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.5-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 5,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.5-duration0.192-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 2,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 13,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.5-duration0.192-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 3,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.5-duration0.192-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.75-duration0.128-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 0,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 5,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.75-duration0.128-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 6,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.75-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 3,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 9,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.75-duration0.192-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 0,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 3,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.75-duration0.192-gain16",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 0,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 4,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "ten-threshold0.75-duration0.192-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 2,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 4,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode1-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode1-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode1-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 5,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode1-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode2-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode2-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 10,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode2-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 5,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band80-4000-mode2-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 13,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode1-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode1-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode1-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode1-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode2-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode2-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 10,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode2-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band150-4000-mode2-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode1-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode1-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode1-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 6,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode1-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 5,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode2-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode2-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 10,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode2-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 6,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "band300-3400-mode2-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 13,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.1-duration0.096-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 7,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.1-duration0.096-gain256",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.1-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 7,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.1-duration0.128-gain256",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.15-duration0.096-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 6,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.15-duration0.096-gain256",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.15-duration0.128-gain64",
+      "counts": {
+        "negative": {
+          "accepted": 6,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "silero-threshold0.15-duration0.128-gain256",
+      "counts": {
+        "negative": {
+          "accepted": 7,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    }
+  ],
+  "fixedFusionRule": "WebRTC mode1 gainMax4 support180ms AND (Silero threshold0.5 minSpeech128ms gainMax16 support100ms OR TEN threshold0.5 minSpeech128ms gainMax64 support100ms)",
+  "fixedFusionOriginal": {
+    "negative": {
+      "accepted": 0,
+      "total": 8
+    },
+    "positive": {
+      "accepted": 12,
+      "total": 12
+    },
+    "short-word": {
+      "accepted": 15,
+      "total": 15
+    }
+  },
+  "fixedFusionStress": [
+    {
+      "db": -6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 8,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    }
+  ],
+  "normalizedFusionStress": [
+    {
+      "targetDbfs": -40,
+      "db": -6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": -6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": -6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 8,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": 0,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": 0,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": 0,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 8,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": 6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": 6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -40,
+      "db": 6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 8,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": -6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": -6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": -6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": 0,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": 0,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": 0,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": 6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": 6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -30,
+      "db": 6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": -6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": -6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": -6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": 0,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": 0,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": 0,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": 6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": 6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "targetDbfs": -20,
+      "db": 6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    }
+  ],
+  "newSyntheticAndMixedControls": [
+    {
+      "counts": {
+        "speech-noisy": {
+          "accepted": 21,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 1,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    }
+  ],
+  "conclusion": "8/8 rejection with all original speech preserved is achieved on the fitted examples but loses weak speech under perturbations; not approved as a blocking gate",
+  "modelHashes": {
+    "silero": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6",
+    "ten": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+  },
+  "extraSingleCandidateCount": 62
+}
