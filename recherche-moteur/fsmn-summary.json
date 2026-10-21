@@ -1,0 +1,2667 @@
+{
+  "scope": "Admission of completed windows on CPU; no ASR score or Android validation",
+  "sweep": [
+    {
+      "gainMax": 1,
+      "speechNoiseThreshold": 0.4,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 6,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.6435693899984471
+    },
+    {
+      "gainMax": 1,
+      "speechNoiseThreshold": 0.6,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 5,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.630385281983763
+    },
+    {
+      "gainMax": 1,
+      "speechNoiseThreshold": 0.8,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 5,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 13,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.6561837199842557
+    },
+    {
+      "gainMax": 4,
+      "speechNoiseThreshold": 0.4,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 7,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.6935716639854945
+    },
+    {
+      "gainMax": 4,
+      "speechNoiseThreshold": 0.6,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 6,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.7522630600142293
+    },
+    {
+      "gainMax": 4,
+      "speechNoiseThreshold": 0.8,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 5,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.9188374220393598
+    },
+    {
+      "gainMax": 16,
+      "speechNoiseThreshold": 0.4,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.79994913097471
+    },
+    {
+      "gainMax": 16,
+      "speechNoiseThreshold": 0.6,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.8606395710376091
+    },
+    {
+      "gainMax": 16,
+      "speechNoiseThreshold": 0.8,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 8,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.8548832800006494
+    },
+    {
+      "gainMax": 64,
+      "speechNoiseThreshold": 0.4,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.7965905099990778
+    },
+    {
+      "gainMax": 64,
+      "speechNoiseThreshold": 0.6,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.7941188090480864
+    },
+    {
+      "gainMax": 64,
+      "speechNoiseThreshold": 0.8,
+      "levelDb": 0,
+      "leadingSilenceMs": 0,
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "wallSeconds": 0.8177103020134382
+    }
+  ],
+  "comparisons": {
+    "threshold0.4-original": {
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "either": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    "threshold0.4-noisy-controls": {
+      "fsmn": {
+        "speech-noisy": {
+          "accepted": 24,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 2,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "speech-noisy": {
+          "accepted": 22,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 0,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "speech-noisy": {
+          "accepted": 22,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 0,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "either": {
+        "speech-noisy": {
+          "accepted": 24,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 2,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    "threshold0.4-nonspeech-controls": {
+      "fsmn": {
+        "recorded-nonspeech-control": {
+          "accepted": 13,
+          "total": 65
+        }
+      },
+      "firered": {
+        "recorded-nonspeech-control": {
+          "accepted": 2,
+          "total": 65
+        }
+      },
+      "both": {
+        "recorded-nonspeech-control": {
+          "accepted": 0,
+          "total": 65
+        }
+      },
+      "either": {
+        "recorded-nonspeech-control": {
+          "accepted": 15,
+          "total": 65
+        }
+      }
+    },
+    "threshold0.6-original": {
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "either": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    "threshold0.6-noisy-controls": {
+      "fsmn": {
+        "speech-noisy": {
+          "accepted": 22,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 0,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "speech-noisy": {
+          "accepted": 22,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 0,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "speech-noisy": {
+          "accepted": 21,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 0,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "either": {
+        "speech-noisy": {
+          "accepted": 23,
+          "total": 24
+        },
+        "synthetic-noise": {
+          "accepted": 0,
+          "total": 18
+        },
+        "synthetic-word-noisy": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    "threshold0.6-nonspeech-controls": {
+      "fsmn": {
+        "recorded-nonspeech-control": {
+          "accepted": 6,
+          "total": 65
+        }
+      },
+      "firered": {
+        "recorded-nonspeech-control": {
+          "accepted": 2,
+          "total": 65
+        }
+      },
+      "both": {
+        "recorded-nonspeech-control": {
+          "accepted": 0,
+          "total": 65
+        }
+      },
+      "either": {
+        "recorded-nonspeech-control": {
+          "accepted": 8,
+          "total": 65
+        }
+      }
+    }
+  },
+  "reversedOrderIdenticalSegments": true,
+  "stress": [
+    {
+      "threshold": 0.4,
+      "db": -6,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": -6,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": -6,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": -6,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": -6,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 0,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 0,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 0,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 0,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 0,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 6,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 6,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 6,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 6,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.4,
+      "db": 6,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": -6,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": -6,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": -6,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": -6,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": -6,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 10,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 0,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 0,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 0,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 0,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 0,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 6,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 6,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 6,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 6,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "db": 6,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": -6,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": -6,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": -6,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": -6,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": -6,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 9,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 0,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 0,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 0,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 0,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 0,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 6,
+      "offsetMs": 0,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 6,
+      "offsetMs": 5,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 6,
+      "offsetMs": 10,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 6,
+      "offsetMs": 15,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "db": 6,
+      "offsetMs": 20,
+      "fsmn": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "firered": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      },
+      "both": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    }
+  ],
+  "models": {
+    "am.mvn": "df189fd5f4352df84a0fd464eeab4e450a5e645665d6b38f13c832492261a739",
+    "fsmnvad-online.onnx": "3b10ac401cf3e73290d3734c22ac328f485697008f183a54e2ae2cbef6a4a1e4",
+    "fsmnvad-offline.onnx": "4bbd68b11519e916b6871ff6f8df15e2100936b256be9cb104cd63fb7c859965"
+  },
+  "fsmnPortRevision": "7bb4811a628e29f4645fae15fc9106b2932d089e"
+}
