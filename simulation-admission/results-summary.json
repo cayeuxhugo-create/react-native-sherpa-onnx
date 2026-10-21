@@ -1,0 +1,1022 @@
+{
+  "date": "2026-10-21",
+  "scope": "Completed-segment acoustic admission on CPU; not Android validation or transcription scoring",
+  "dataset": {
+    "recordedNegativeWindows": 8,
+    "recordedPositivePhraseWindows": 12,
+    "syntheticShortWordWindows": 15,
+    "independentHeldOutSet": false
+  },
+  "webRtcVersion": "2.0.14.post1",
+  "variantsEvaluated": {
+    "webrtc": 36,
+    "sileroOriginalAudioConfirmation": 12
+  },
+  "candidates": [
+    {
+      "candidate": "WebRTC-mode0-gain1-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain1-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain1-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain4-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 3,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain16-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode0-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 7,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain1-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain1-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain1-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain4-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 7,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain16-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode1-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain1-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 3,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain1-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 2,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 9,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain1-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 6,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain4-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 7,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 11,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 12,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain16-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode2-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain1-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 9,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain1-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 0,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 5,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain1-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 0,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 4,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain4-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 3,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain4-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 2,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 12,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain4-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 8,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain16-support0.09",
+      "counts": {
+        "negative": {
+          "accepted": 8,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain16-support0.18",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "WebRTC-mode3-gain16-support0.3",
+      "counts": {
+        "negative": {
+          "accepted": 4,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 13,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.5-duration0.192-gain1",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.5-duration0.192-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 1,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 6,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.5-duration0.32-gain1",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 9,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.5-duration0.32-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 6,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 10,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.65-duration0.192-gain1",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 11,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.65-duration0.192-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 5,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 14,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.65-duration0.32-gain1",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 3,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.65-duration0.32-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 5,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 6,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.8-duration0.192-gain1",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 8,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.8-duration0.192-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 5,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 11,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.8-duration0.32-gain1",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 1,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 0,
+          "total": 15
+        }
+      }
+    },
+    {
+      "candidate": "Silero-threshold0.8-duration0.32-gain4",
+      "counts": {
+        "negative": {
+          "accepted": 0,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 5,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 0,
+          "total": 15
+        }
+      }
+    }
+  ],
+  "selectedExploratoryCandidate": "WebRTC-mode1-gain4-support0.18",
+  "selectedCandidateCounts": {
+    "negative": {
+      "accepted": 2,
+      "total": 8
+    },
+    "positive": {
+      "accepted": 12,
+      "total": 12
+    },
+    "short-word": {
+      "accepted": 15,
+      "total": 15
+    }
+  },
+  "selectedCandidateResidualNegativeConditions": [
+    "white-noise",
+    "fan"
+  ],
+  "stressTests": [
+    {
+      "db": -6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": -6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 0,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 0.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 10.0,
+      "counts": {
+        "negative": {
+          "accepted": 3,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    },
+    {
+      "db": 6,
+      "offsetMs": 20.0,
+      "counts": {
+        "negative": {
+          "accepted": 2,
+          "total": 8
+        },
+        "positive": {
+          "accepted": 12,
+          "total": 12
+        },
+        "short-word": {
+          "accepted": 15,
+          "total": 15
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "No independent held-out recordings",
+    "Short words are synthetic and scored for admission, not recognition",
+    "Completed-window filter does not validate continuous-stream admission or latency",
+    "No change made to Android engine or alerts"
+  ]
+}
