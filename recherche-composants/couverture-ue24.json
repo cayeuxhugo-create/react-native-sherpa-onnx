@@ -1,0 +1,223 @@
+{
+  "note": "UE24 seulement, pas toutes les langues européennes. Présence documentaire ne prouve pas la qualité.",
+  "languages": [
+    {
+      "language": "bulgare",
+      "iso639_1": "bg",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "bul_Cyrl"
+      ]
+    },
+    {
+      "language": "croate",
+      "iso639_1": "hr",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "hrv_Latn"
+      ]
+    },
+    {
+      "language": "tchèque",
+      "iso639_1": "cs",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "ces_Latn"
+      ]
+    },
+    {
+      "language": "danois",
+      "iso639_1": "da",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "dan_Latn"
+      ]
+    },
+    {
+      "language": "néerlandais",
+      "iso639_1": "nl",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "nld_Latn"
+      ]
+    },
+    {
+      "language": "anglais",
+      "iso639_1": "en",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "eng_Latn"
+      ]
+    },
+    {
+      "language": "estonien",
+      "iso639_1": "et",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "ekk_Latn"
+      ],
+      "iso_mapping_note": "estonien standard : ISO 639-3 ekk, plutôt que macrolangue est"
+    },
+    {
+      "language": "finnois",
+      "iso639_1": "fi",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "fin_Latn"
+      ]
+    },
+    {
+      "language": "français",
+      "iso639_1": "fr",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "fra_Latn"
+      ]
+    },
+    {
+      "language": "allemand",
+      "iso639_1": "de",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "deu_Latn"
+      ]
+    },
+    {
+      "language": "grec",
+      "iso639_1": "el",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "ell_Grek",
+        "ell_Grek_cypr1249"
+      ]
+    },
+    {
+      "language": "hongrois",
+      "iso639_1": "hu",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "hun_Latn"
+      ]
+    },
+    {
+      "language": "irlandais",
+      "iso639_1": "ga",
+      "qwen3_asr_declared": false,
+      "whisper_token": false,
+      "omni_language_ids": [
+        "gle_Latn"
+      ]
+    },
+    {
+      "language": "italien",
+      "iso639_1": "it",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "ita_Latn"
+      ]
+    },
+    {
+      "language": "letton",
+      "iso639_1": "lv",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "lav_Latn"
+      ]
+    },
+    {
+      "language": "lituanien",
+      "iso639_1": "lt",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "lit_Latn"
+      ]
+    },
+    {
+      "language": "maltais",
+      "iso639_1": "mt",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "mlt_Latn"
+      ]
+    },
+    {
+      "language": "polonais",
+      "iso639_1": "pl",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "pol_Latn"
+      ]
+    },
+    {
+      "language": "portugais",
+      "iso639_1": "pt",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "por_Latn"
+      ]
+    },
+    {
+      "language": "roumain",
+      "iso639_1": "ro",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "ron_Latn"
+      ]
+    },
+    {
+      "language": "slovaque",
+      "iso639_1": "sk",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "slk_Latn"
+      ]
+    },
+    {
+      "language": "slovène",
+      "iso639_1": "sl",
+      "qwen3_asr_declared": false,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "slv_Latn"
+      ]
+    },
+    {
+      "language": "espagnol",
+      "iso639_1": "es",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "spa_Latn"
+      ]
+    },
+    {
+      "language": "suédois",
+      "iso639_1": "sv",
+      "qwen3_asr_declared": true,
+      "whisper_token": true,
+      "omni_language_ids": [
+        "swe_Latn"
+      ]
+    }
+  ]
+}

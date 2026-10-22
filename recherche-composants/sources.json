@@ -1,0 +1,189 @@
+[
+  {
+    "name": "qwen",
+    "url": "https://raw.githubusercontent.com/QwenLM/Qwen3-ASR/main/README.md",
+    "status": 200,
+    "bytes": 60537,
+    "sha256": "27b5d6e31c3dc10c9b4b86e226f215baacca57bede504994779ad334a67275a0"
+  },
+  {
+    "name": "whisper",
+    "url": "https://raw.githubusercontent.com/openai/whisper/main/README.md",
+    "status": 200,
+    "bytes": 8246,
+    "sha256": "38c180c2a8d8ba628a3e131ad42bf06c8a51bb681efb30fbe28d5a0f4b65f288"
+  },
+  {
+    "name": "whispercpp",
+    "url": "https://raw.githubusercontent.com/ggml-org/whisper.cpp/master/README.md",
+    "status": 200,
+    "bytes": 40988,
+    "sha256": "43451813ec96b5ea286c6d676f467bdffb053224c110c257ce3d67d911e774e7"
+  },
+  {
+    "name": "omni",
+    "url": "https://raw.githubusercontent.com/facebookresearch/omnilingual-asr/main/README.md",
+    "status": 200,
+    "bytes": 13928,
+    "sha256": "8462bbca4935ffab8745b047fe6baab9b0329805818e58a926f0f7306af410fd"
+  },
+  {
+    "name": "canary",
+    "url": "https://raw.githubusercontent.com/NVIDIA/NeMo/main/README.md",
+    "status": 200,
+    "bytes": 10646,
+    "sha256": "f7f63002e9f9fc053094e26f6828687dccdfda41a2e13c13cf2587fcacf556f8"
+  },
+  {
+    "name": "firered",
+    "url": "https://raw.githubusercontent.com/FireRedTeam/FireRedVAD/main/README.md",
+    "status": 200,
+    "bytes": 9780,
+    "sha256": "864b4ac07e8be50b59d07e2e4d2d56e3e717d8a18ba3b22912417adb02ca76c1"
+  },
+  {
+    "name": "silero",
+    "url": "https://raw.githubusercontent.com/snakers4/silero-vad/master/README.md",
+    "status": 200,
+    "bytes": 9725,
+    "sha256": "cd0ee56c91b8042e62a714c0c94bc8b74dbea127a483e390f8033bb8ec8cec78"
+  },
+  {
+    "name": "ten",
+    "url": "https://raw.githubusercontent.com/TEN-framework/ten-vad/main/README.md",
+    "status": 200,
+    "bytes": 29576,
+    "sha256": "96fc31c9382066c4b469f14074d006dc5e6c9f99cdd71a208a2d3fe1bff73286"
+  },
+  {
+    "name": "dfnet",
+    "url": "https://raw.githubusercontent.com/Rikorose/DeepFilterNet/main/README.md",
+    "status": 200,
+    "bytes": 13031,
+    "sha256": "9de21807df78381ae1dc859bbd826b957afd7599e907e1b1591df3e27d766680"
+  },
+  {
+    "name": "gtcrn",
+    "url": "https://raw.githubusercontent.com/Xiaobin-Rong/gtcrn/main/README.md",
+    "status": 200,
+    "bytes": 4419,
+    "sha256": "7f890b7a9b1d7b49613733878e104233a3a3019854b3105007be69db37e33413"
+  },
+  {
+    "name": "rnnoise",
+    "url": "https://raw.githubusercontent.com/xiph/rnnoise/main/README",
+    "status": 200,
+    "bytes": 6119,
+    "sha256": "87fc8de7620259a3200be2012e7c77fc9383997d3224318451eaded27691754f"
+  },
+  {
+    "name": "parakeet",
+    "url": "https://raw.githubusercontent.com/NVIDIA/NeMo/main/examples/asr/README.md",
+    "status": 200,
+    "bytes": 1150,
+    "sha256": "e186531a6c08212d9bd0bdf686030097c03d4ce5dad95e5c6c266456caebe66f"
+  },
+  {
+    "name": "whisper-langs",
+    "url": "https://raw.githubusercontent.com/openai/whisper/main/whisper/tokenizer.py",
+    "status": 200,
+    "bytes": 12338,
+    "sha256": "3b48e361a7e95b4ec0356ca6d72bba635778aa10269153136ee7bc34cae30b85"
+  },
+  {
+    "name": "moonshine",
+    "url": "https://raw.githubusercontent.com/moonshine-ai/moonshine/main/README.md",
+    "status": 200,
+    "bytes": 2636,
+    "sha256": "d666f3f97157caf3e769e2555e9b2929a3dbb25a3e123efff950f4fd346f8904"
+  },
+  {
+    "name": "nemo-models",
+    "url": "https://raw.githubusercontent.com/NVIDIA/NeMo/main/docs/source/asr/models.rst",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "nemo-results",
+    "url": "https://raw.githubusercontent.com/NVIDIA/NeMo/main/docs/source/asr/results.rst",
+    "status": 200,
+    "bytes": 16775,
+    "sha256": "91854cdabf1862a1d4f3094c123110b5d6e0aa2b95f39f6fbf17e280791648bd"
+  },
+  {
+    "name": "moonshine-models",
+    "url": "https://moonshine-voice.readthedocs.io/en/latest/models/",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  },
+  {
+    "name": "omni-languages",
+    "url": "https://raw.githubusercontent.com/facebookresearch/omnilingual-asr/main/src/omnilingual_asr/models/wav2vec2_llama/lang_ids.py",
+    "status": 200,
+    "bytes": 27052,
+    "sha256": "675b8a263aed48269020d4e9f06b3063d5b4e0d5399b2c3e0e06160e08d24f8e"
+  },
+  {
+    "name": "omni-license",
+    "url": "https://raw.githubusercontent.com/facebookresearch/omnilingual-asr/main/LICENSE",
+    "status": 200,
+    "bytes": 581,
+    "sha256": "a70a523bafbb595c2844104feb313d204904dac91c3d186c05f22a10a71c7a94"
+  },
+  {
+    "name": "qwen-license",
+    "url": "https://raw.githubusercontent.com/QwenLM/Qwen3-ASR/main/LICENSE",
+    "status": 200,
+    "bytes": 11343,
+    "sha256": "a44a6081c73ad75f0255bb2bb5cab74ef1829565a895a24e53a4f11290ab7655"
+  },
+  {
+    "name": "sherpa-parakeet",
+    "url": "https://k2-fsa.github.io/sherpa/onnx/nemo/parakeet/index.html",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  },
+  {
+    "name": "sherpa-canary",
+    "url": "https://k2-fsa.github.io/sherpa/onnx/nemo/canary.html",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  },
+  {
+    "name": "sherpa-parakeet-source",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa/master/docs/source/onnx/nemo/parakeet/index.rst",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "sherpa-canary-source",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa/master/docs/source/onnx/nemo/canary.rst",
+    "status": 200,
+    "bytes": 8144,
+    "sha256": "25089da3d26583e2dffae52511b591dfc546cc5d7e4bfcafda681d2bfaedbad5"
+  },
+  {
+    "name": "nemo-models-index",
+    "url": "https://raw.githubusercontent.com/NVIDIA/NeMo/main/docs/source/asr/models/index.rst",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "nemo-parakeet",
+    "url": "https://raw.githubusercontent.com/NVIDIA/NeMo/main/docs/source/asr/models/parakeet.rst",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "moonshine-models-source",
+    "url": "https://raw.githubusercontent.com/moonshine-ai/moonshine/main/docs/models.md",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "ulunas",
+    "url": "https://raw.githubusercontent.com/Xiaobin-Rong/ul-unas/main/README.md",
+    "status": 200,
+    "bytes": 2669,
+    "sha256": "dda67971606f6611968032dd1b03843b3126c6fff616ccd7ca97b990b1e78034"
+  },
+  {
+    "name": "hgtcrn",
+    "url": "https://raw.githubusercontent.com/Max1Wz/H-GTCRN/main/README.md",
+    "status": 200,
+    "bytes": 4742,
+    "sha256": "2e5bdedb6e2a94f67a9d2292fa31aaf774ac8380986749ec5a288642869233a7"
+  }
+]
