@@ -1,0 +1,41 @@
+{
+  "inputRecordings": 24,
+  "realVoiceRecordings": 4,
+  "realVoiceRepetitions": 12,
+  "realNonspeechSeconds": 500,
+  "syntheticShortWords": 15,
+  "voiceStressVariants": [
+    {
+      "db": 0,
+      "offsetMs": 0
+    },
+    {
+      "db": -6,
+      "offsetMs": 0
+    },
+    {
+      "db": -6,
+      "offsetMs": 5
+    }
+  ],
+  "architectureVariants": 10,
+  "replayRows": 320,
+  "uniqueQwenInferences": 235,
+  "causalityPrefixChecks": 3,
+  "nativeConfirmation": {
+    "comparisons": 119,
+    "mismatches": 0,
+    "tailReadyTimingChangedInputs": 0,
+    "tailInputVariants": 32
+  },
+  "sherpaVersion": "1.13.8",
+  "fireRedSourceRevision": "c30ec49e8cc69642b0ee65362eba11b9d11c6e54",
+  "baseline": "v3.3 candidate logic replayed from quantized ASR PCM; GTCRN recomputed; not a phone trace",
+  "models": {
+    "fireredvad_vad.onnx": "a226e68e695548754a9ab5480a55bbcb8522aa69111cb97e4f093ddce63ad5dc",
+    "fireredvad_stream_vad_with_cache.onnx": "b3c97836130dc34fc32d56fab551e88cf9454511de2b3c250a5e6578dee74b93",
+    "cmvn.ark": "c87f6f13edf0f0ec7535ddfc9cc3387d9268cb234b70182d566c5e2edf3ca473"
+  },
+  "androidMeasured": false,
+  "productionChanged": false
+}

@@ -1,0 +1,2755 @@
+{
+  "scope": "Local reference-model replay; no Android alert/energy validation; voice stress is synthetic",
+  "results": [
+    {
+      "strategy": "current",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.15,
+            19.7,
+            27.85
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 3,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.85,
+            21.5,
+            32.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            18.0,
+            26.4
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.75,
+            20.0,
+            26.9
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 17.30594592099078,
+      "confirmationSeconds": 0.2687657900387421,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 63.55,
+      "qwenWallSeconds": 16.235258314118255,
+      "exactVoiceRepetitions": 7,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.14583333333333334,
+      "detectorRtf": 0.08647270080215275,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "current",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.1,
+            19.65,
+            27.85
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 5,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.7,
+            21.85,
+            32.1
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 16,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 1,
+          "windowReadySeconds": [
+            18.3
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.6,
+            19.9,
+            26.55
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 17.104968011088204,
+      "confirmationSeconds": 0.2704311619163491,
+      "inputSeconds": 203.22,
+      "qwenCalls": 10,
+      "qwenAudioSeconds": 59.300000000000004,
+      "qwenWallSeconds": 16.049969602841884,
+      "exactVoiceRepetitions": 7,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.22916666666666666,
+      "detectorRtf": 0.08550043880033734,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "current",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.05,
+            19.25,
+            27.55
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.75,
+            22.0,
+            31.7
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.05,
+            18.4,
+            25.9
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 3,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.25,
+            19.6,
+            27.55
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 7,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 66.12131477810908,
+      "confirmationSeconds": 0.6581912739784457,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 27,
+      "qwenAudioSeconds": 112.04999999999997,
+      "qwenWallSeconds": 28.35654066922143,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.041666666666666664,
+      "detectorRtf": 0.08614817977352397,
+      "syntheticNominalEndToReadyMedianSeconds": 1.1845000000000003
+    },
+    {
+      "strategy": "sliding4-lag0",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            19.0,
+            27.5
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            22.0,
+            31.5
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 5,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            10.0,
+            17.0,
+            24.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.5,
+            19.0,
+            26.0
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.903797802980989,
+      "confirmationSeconds": 0.0006024289759807289,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 63.650000000000006,
+      "qwenWallSeconds": 18.350803083216306,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.0625,
+      "detectorRtf": 0.029051368982272046,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag0",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            19.0,
+            27.5
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            22.0,
+            31.5
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 6,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            10.0,
+            17.0,
+            24.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.5,
+            19.0,
+            26.0
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.813742619939148,
+      "confirmationSeconds": 0.0005463259294629097,
+      "inputSeconds": 203.22,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 63.65,
+      "qwenWallSeconds": 17.588256330927834,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.07291666666666667,
+      "detectorRtf": 0.028610810677436333,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag0",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            19.0,
+            27.5
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            22.0,
+            31.5
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            10.5,
+            17.0,
+            25.5
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            19.0,
+            26.0
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 6,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 1,
+      "noiseNonemptyResults": 1,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 22.795888031017967,
+      "confirmationSeconds": 0.0015341470134444535,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 28,
+      "qwenAudioSeconds": 107.74999999999997,
+      "qwenWallSeconds": 28.37473419919843,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.041666666666666664,
+      "detectorRtf": 0.0294095679988124,
+      "syntheticNominalEndToReadyMedianSeconds": 1.3175625000000002
+    },
+    {
+      "strategy": "sliding4-lag0-confirm",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            19.0,
+            27.5
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            22.0,
+            31.5
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 5,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            10.0,
+            17.0,
+            24.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.5,
+            19.0,
+            26.0
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.903797802980989,
+      "confirmationSeconds": 0.2610843149595894,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 63.650000000000006,
+      "qwenWallSeconds": 18.350803083216306,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.0625,
+      "detectorRtf": 0.03033301573479915,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag0-confirm",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            19.0,
+            27.5
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            22.0,
+            31.5
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 12,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            10.0,
+            17.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.5,
+            19.0,
+            26.0
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.813742619939148,
+      "confirmationSeconds": 0.24739028903422877,
+      "inputSeconds": 203.22,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 60.6,
+      "qwenWallSeconds": 16.558786279929336,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.13541666666666666,
+      "detectorRtf": 0.029825474406915548,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag0-confirm",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            19.0,
+            27.5
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            22.0,
+            31.5
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            10.5,
+            17.0,
+            25.5
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.0,
+            19.0,
+            26.0
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 6,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 1,
+      "noiseNonemptyResults": 1,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 22.795888031017967,
+      "confirmationSeconds": 0.42515174177242443,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 28,
+      "qwenAudioSeconds": 107.74999999999997,
+      "qwenWallSeconds": 28.37473419919843,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.041666666666666664,
+      "detectorRtf": 0.02995605129684787,
+      "syntheticNominalEndToReadyMedianSeconds": 1.3175625000000002
+    },
+    {
+      "strategy": "sliding4-lag1.6",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 4,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.5,
+            18.5,
+            26.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.8859669819357805,
+      "confirmationSeconds": 0.0008151399670168757,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 68.3,
+      "qwenWallSeconds": 17.71181235316908,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.052083333333333336,
+      "detectorRtf": 0.028964682748980505,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag1.6",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 11,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            11.5,
+            18.5
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.97176731901709,
+      "confirmationSeconds": 0.0009526890353299677,
+      "inputSeconds": 203.22,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 64.4,
+      "qwenWallSeconds": 15.840991782955825,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.11458333333333333,
+      "detectorRtf": 0.02939041436892245,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag1.6",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            18.5,
+            27.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 4,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 6,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 1,
+      "noiseNonemptyResults": 1,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 23.09266706398921,
+      "confirmationSeconds": 0.001688979915343225,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 28,
+      "qwenAudioSeconds": 111.79999999999997,
+      "qwenWallSeconds": 29.40861777216196,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.0625,
+      "detectorRtf": 0.029792624322082215,
+      "syntheticNominalEndToReadyMedianSeconds": 2.8175625
+    },
+    {
+      "strategy": "sliding4-lag1.6-confirm",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 4,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.5,
+            18.5,
+            26.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.8859669819357805,
+      "confirmationSeconds": 0.2522217089426704,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 68.3,
+      "qwenWallSeconds": 17.71181235316908,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.052083333333333336,
+      "detectorRtf": 0.030201676298358845,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag1.6-confirm",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 11,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            11.5,
+            18.5
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 5.97176731901709,
+      "confirmationSeconds": 0.24577032192610204,
+      "inputSeconds": 203.22,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 64.4,
+      "qwenWallSeconds": 15.840991782955825,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.11458333333333333,
+      "detectorRtf": 0.030595106982300915,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding4-lag1.6-confirm",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.0,
+            18.5,
+            27.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 4,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 6,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 1,
+      "noiseNonemptyResults": 1,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 23.09266706398921,
+      "confirmationSeconds": 0.4237210489809513,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 28,
+      "qwenAudioSeconds": 111.79999999999997,
+      "qwenWallSeconds": 29.40861777216196,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.0625,
+      "detectorRtf": 0.030337062229839392,
+      "syntheticNominalEndToReadyMedianSeconds": 2.8175625
+    },
+    {
+      "strategy": "sliding8-lag1.6",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            18.5,
+            26.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 11.187730058038142,
+      "confirmationSeconds": 0.000969894987065345,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 63.699999999999996,
+      "qwenWallSeconds": 16.459740360151045,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.11458333333333333,
+      "detectorRtf": 0.0550516628273234,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding8-lag1.6",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 0,
+          "extraExactRepetitions": 0,
+          "wordErrors": 18,
+          "referenceWords": 24,
+          "candidateWindows": 1,
+          "qwenCalls": 1,
+          "windowReadySeconds": [
+            18.5
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 10.948854223941453,
+      "confirmationSeconds": 0.0005085979937575758,
+      "inputSeconds": 203.22,
+      "qwenCalls": 10,
+      "qwenAudioSeconds": 59.85,
+      "qwenWallSeconds": 14.57672641397221,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.1875,
+      "detectorRtf": 0.05387935647050099,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "sliding8-lag1.6",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            13.5,
+            20.5,
+            29.0
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            23.5,
+            33.0
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 8,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            18.5,
+            27.0
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 4,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            14.5,
+            20.5,
+            27.5
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 6,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 1,
+      "noiseNonemptyResults": 1,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 41.65126053499989,
+      "confirmationSeconds": 0.00167665391927585,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 27,
+      "qwenAudioSeconds": 106.89999999999996,
+      "qwenWallSeconds": 28.013258028193377,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.125,
+      "detectorRtf": 0.05373392127589928,
+      "syntheticNominalEndToReadyMedianSeconds": 2.8175625
+    },
+    {
+      "strategy": "stream0.5",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 4,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15,
+            49.05
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            16.5,
+            24.25
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 2.940700234961696,
+      "confirmationSeconds": 0.000712334003765136,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 63.65,
+      "qwenWallSeconds": 17.171283234958537,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.125,
+      "detectorRtf": 0.014472606617621833,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            10.2,
+            16.5,
+            24.2
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 3.0042205610661767,
+      "confirmationSeconds": 0.0006729880115017295,
+      "inputSeconds": 203.22,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 64.05000000000001,
+      "qwenWallSeconds": 17.76585681497818,
+      "exactVoiceRepetitions": 10,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.03125,
+      "detectorRtf": 0.014786406599142203,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 4,
+          "windowReadySeconds": [
+            11.65,
+            18.85,
+            27.15,
+            49.1
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.2,
+            16.85,
+            25.3
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 4,
+          "windowReadySeconds": [
+            12.55,
+            18.95,
+            25.8,
+            50.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 5,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 6,
+      "noiseNonemptyResults": 6,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 2,
+          "nonemptyResults": 2
+        },
+        "quiet-second": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        },
+        "vacuum": {
+          "qwenCalls": 2,
+          "nonemptyResults": 2
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        }
+      },
+      "detectorSeconds": 12.221109444159083,
+      "confirmationSeconds": 0.0014910920290276408,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 35,
+      "qwenAudioSeconds": 122.85,
+      "qwenWallSeconds": 32.515378170181066,
+      "exactVoiceRepetitions": 11,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.125,
+      "detectorRtf": 0.01576763367297456,
+      "syntheticNominalEndToReadyMedianSeconds": 1.0345000000000004
+    },
+    {
+      "strategy": "stream0.5-confirm",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            16.5,
+            24.25
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 2.940700234961696,
+      "confirmationSeconds": 0.25387537700589746,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 60.6,
+      "qwenWallSeconds": 16.488283935934305,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.11458333333333333,
+      "detectorRtf": 0.015718242530838387,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5-confirm",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            10.2,
+            16.5
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 3.0042205610661767,
+      "confirmationSeconds": 0.24320156895555556,
+      "inputSeconds": 203.22,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 60.10000000000001,
+      "qwenWallSeconds": 16.432123279955704,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.11458333333333333,
+      "detectorRtf": 0.01597983530175048,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5-confirm",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.65,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.2,
+            16.85,
+            25.3
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.95,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 5,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 12.221109444159083,
+      "confirmationSeconds": 0.49280454707331955,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 27,
+      "qwenAudioSeconds": 105.44999999999999,
+      "qwenWallSeconds": 26.895185328205116,
+      "exactVoiceRepetitions": 11,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.010416666666666666,
+      "detectorRtf": 0.016401447283654655,
+      "syntheticNominalEndToReadyMedianSeconds": 1.0345000000000004
+    },
+    {
+      "strategy": "stream0.5-tail1.2",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 4,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15,
+            49.05
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            16.5,
+            24.25
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 3.1747189059387892,
+      "confirmationSeconds": 0.0004775619599968195,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 68.45,
+      "qwenWallSeconds": 16.52766686800169,
+      "exactVoiceRepetitions": 10,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.11458333333333333,
+      "detectorRtf": 0.015622891497238665,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5-tail1.2",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 2,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            10.2,
+            16.5,
+            24.2
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 2.916107324999757,
+      "confirmationSeconds": 0.0005790959694422781,
+      "inputSeconds": 203.22,
+      "qwenCalls": 12,
+      "qwenAudioSeconds": 68.85,
+      "qwenWallSeconds": 16.85567881190218,
+      "exactVoiceRepetitions": 9,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.03125,
+      "detectorRtf": 0.01435235912296624,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5-tail1.2",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 4,
+          "windowReadySeconds": [
+            11.65,
+            18.85,
+            27.15,
+            49.1
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.2,
+            16.85,
+            25.3
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 1,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 4,
+          "windowReadySeconds": [
+            12.55,
+            18.95,
+            25.8,
+            50.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 6,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 6,
+      "noiseNonemptyResults": 6,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 2,
+          "nonemptyResults": 2
+        },
+        "quiet-second": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        },
+        "vacuum": {
+          "qwenCalls": 2,
+          "nonemptyResults": 2
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 1,
+          "nonemptyResults": 1
+        }
+      },
+      "detectorSeconds": 11.569367421150673,
+      "confirmationSeconds": 0.0026277099968865514,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 35,
+      "qwenAudioSeconds": 136.85,
+      "qwenWallSeconds": 34.39222593209706,
+      "exactVoiceRepetitions": 12,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.020833333333333332,
+      "detectorRtf": 0.014928327204440003,
+      "syntheticNominalEndToReadyMedianSeconds": 1.0270937500000004
+    },
+    {
+      "strategy": "stream0.5-tail1.2-confirm",
+      "db": -6,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 10,
+          "referenceWords": 24,
+          "candidateWindows": 2,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            16.5,
+            24.25
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 3.1747189059387892,
+      "confirmationSeconds": 0.22564742009853944,
+      "inputSeconds": 203.23999999999998,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 65.0,
+      "qwenWallSeconds": 15.932007232971955,
+      "exactVoiceRepetitions": 10,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.10416666666666667,
+      "detectorRtf": 0.016730792787036652,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5-tail1.2-confirm",
+      "db": -6,
+      "offsetMs": 5,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.6,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 9,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 2,
+          "windowReadySeconds": [
+            10.2,
+            16.5
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 1,
+          "extraExactRepetitions": 0,
+          "wordErrors": 2,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.9,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 0,
+      "syntheticWordsAdmitted": 0,
+      "syntheticWordsRecognized": 0,
+      "noiseSeconds": 0.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {},
+      "detectorSeconds": 2.916107324999757,
+      "confirmationSeconds": 0.23038460389943793,
+      "inputSeconds": 203.22,
+      "qwenCalls": 11,
+      "qwenAudioSeconds": 64.5,
+      "qwenWallSeconds": 15.615970595914405,
+      "exactVoiceRepetitions": 8,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.11458333333333333,
+      "detectorRtf": 0.015483180439421292,
+      "syntheticNominalEndToReadyMedianSeconds": null
+    },
+    {
+      "strategy": "stream0.5-tail1.2-confirm",
+      "db": 0,
+      "offsetMs": 0,
+      "voice": [
+        {
+          "condition": "voice-1m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.65,
+            18.85,
+            27.15
+          ]
+        },
+        {
+          "condition": "voice-3m",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.9,
+            21.6,
+            31.15
+          ]
+        },
+        {
+          "condition": "voice-5m-first",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 3,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            11.2,
+            16.85,
+            25.3
+          ]
+        },
+        {
+          "condition": "voice-5m-latest",
+          "expectedRepetitions": 3,
+          "exactRepetitions": 3,
+          "extraExactRepetitions": 0,
+          "wordErrors": 0,
+          "referenceWords": 24,
+          "candidateWindows": 4,
+          "qwenCalls": 3,
+          "windowReadySeconds": [
+            12.55,
+            18.95,
+            25.8
+          ]
+        }
+      ],
+      "syntheticWordsTotal": 15,
+      "syntheticWordsAdmitted": 15,
+      "syntheticWordsRecognized": 6,
+      "noiseSeconds": 500.0,
+      "noiseQwenCalls": 0,
+      "noiseNonemptyResults": 0,
+      "noiseByCondition": {
+        "quiet-first": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "quiet-second": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "vacuum": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "fan": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        },
+        "white-noise": {
+          "qwenCalls": 0,
+          "nonemptyResults": 0
+        }
+      },
+      "detectorSeconds": 11.569367421150673,
+      "confirmationSeconds": 0.47659710398875177,
+      "inputSeconds": 775.1702500000001,
+      "qwenCalls": 27,
+      "qwenAudioSeconds": 116.25,
+      "qwenWallSeconds": 28.401879499084316,
+      "exactVoiceRepetitions": 12,
+      "expectedVoiceRepetitions": 12,
+      "voiceWordErrorRate": 0.0,
+      "detectorRtf": 0.015539766296680533,
+      "syntheticNominalEndToReadyMedianSeconds": 1.0270937500000004
+    }
+  ]
+}
