@@ -1,0 +1,63 @@
+{
+  "models": {
+    "gtcrn": {
+      "bytes": 535638,
+      "sha256": "e77603ac0c23dac3227dd2d7135b3a585cbee2679048aecfa886657d3ae1b534"
+    },
+    "ulunas": {
+      "bytes": 788967,
+      "sha256": "f2e804d54d6a88f4f82f44d86c9f1cf646db2509bfca935cfbfc5fcd8cbfac3b"
+    },
+    "deepfilternet3_cli": {
+      "bytes": 36417296,
+      "sha256": "70775e251eee44c0f2451a1e833326cf8bcbbe304d3e7cd12851e6fce72ef7da"
+    }
+  },
+  "ulunasCommit": "00f7c700da43d38347f30a6ccebd86fcbc798e07",
+  "deepfilterVersion": "0.5.6; embedded model type deepfilternet3, lookahead 2 verified in log",
+  "sherpaVersion": "1.13.8",
+  "sampleRate": 16000,
+  "ulunasStft": {
+    "nfft": 512,
+    "hop": 256,
+    "periodicHann": true,
+    "center": true,
+    "reflectPadding": true
+  },
+  "deepfilter": {
+    "sampleRate": 48000,
+    "compensateDelay": true,
+    "eofPaddingSamples": 4800,
+    "trimToOriginalLength": true,
+    "postFilter": false,
+    "attenuationLimitDb": 100,
+    "outputEncoding": "PCM16; truncation to i16 verified in wav_utils.rs; level calibration required for very quiet audio"
+  },
+  "qwenSettings": {
+    "models": {
+      "conv_frontend.onnx": "d22dc4423e0940e49884e903d2ea2f7e5567c14fc1aed97e4e26d6b8f208ef9e",
+      "decoder.int8.onnx": "4f6885be5959ae26af3089d38ee7972c5fafbeeb1cf8d5e76eab6d8b61ca5771",
+      "encoder.int8.onnx": "60748d3e6744a57c9c91e1b17424a6c2990567e8adceb0783940c03ed98fa9d9",
+      "tokenizer/merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "tokenizer/tokenizer_config.json": "4942d005604266809309cabc9f4e9cb89ce855d59b14681fdc0e1cc62ea26c4c",
+      "tokenizer/vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    },
+    "sherpaVersion": "1.13.8",
+    "language": "French",
+    "maxTotalLen": 512,
+    "maxNewTokens": 256,
+    "numThreads": 2
+  },
+  "deepfilterSourceCommit": "978576aa8400552a4ce9730838c635aa30db5e61",
+  "gainExperiments": [
+    16,
+    64,
+    256
+  ],
+  "sources": [
+    "https://github.com/Xiaobin-Rong/ul-unas/tree/00f7c700da43d38347f30a6ccebd86fcbc798e07",
+    "https://github.com/Rikorose/DeepFilterNet/blob/v0.5.6/libDF/src/wav_utils.rs",
+    "https://github.com/Rikorose/DeepFilterNet/releases/tag/v0.5.6",
+    "https://github.com/Xiaobin-Rong/gtcrn"
+  ]
+}

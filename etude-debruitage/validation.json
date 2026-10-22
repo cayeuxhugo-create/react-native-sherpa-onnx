@@ -1,0 +1,16 @@
+{
+  "ulunasSimplificationMaxAbsError": 0,
+  "frames": 12,
+  "stftRoundtripMaxAbsError": 6.332993507385254e-08,
+  "deepfilterPublicAudioControl": {
+    "sampleRate": 48000,
+    "dtype": "int16",
+    "nonzeroSamples": 437616,
+    "sampleCount": 478560
+  },
+  "qwenFreshRepeatability": {
+    "newDecodes": 2,
+    "matchingPriorResults": 2,
+    "cacheHits": 0
+  }
+}

@@ -1,0 +1,773 @@
+{
+  "scope": "Fixed offline windows; forced Qwen and FireRed admission assessed separately; no Android validation",
+  "results": [
+    {
+      "method": "original",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 11,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 1,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 5,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 6,
+      "syntheticAdmitted": 15,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 3,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 0.011754624138120562,
+      "enhanceAudioSeconds": 178.28025000000002,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 0
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 0,
+          "regressed": 0
+        }
+      },
+      "voiceWer": 0.010416666666666666,
+      "hostEnhanceRtf": 6.593340618560138e-05
+    },
+    {
+      "method": "gtcrn",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 8,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 9,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 2,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 6,
+      "syntheticAdmitted": 15,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 12.760059973865282,
+      "enhanceAudioSeconds": 178.28025000000002,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 3
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 1,
+          "regressed": 1
+        }
+      },
+      "voiceWer": 0.09375,
+      "hostEnhanceRtf": 0.07157304285732873
+    },
+    {
+      "method": "ulunas",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 9,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 3,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 3,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 3,
+      "syntheticAdmitted": 14,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 4
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 2,
+      "negativeNonemptyAfterVad": 2,
+      "enhanceSeconds": 10.273765243182424,
+      "enhanceAudioSeconds": 178.28025000000002,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 2
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 0,
+          "regressed": 3
+        }
+      },
+      "voiceWer": 0.03125,
+      "hostEnhanceRtf": 0.05762705203286636
+    },
+    {
+      "method": "deepfilternet3",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 0,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 105,
+      "voiceAdmitted": 0,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 0,
+          "admitted": 0
+        },
+        "3m": {
+          "total": 3,
+          "exact": 0,
+          "admitted": 0
+        },
+        "5m": {
+          "total": 6,
+          "exact": 0,
+          "admitted": 0
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 1,
+      "syntheticAdmitted": 7,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 0,
+          "admitted": 2
+        },
+        "60": {
+          "total": 5,
+          "exact": 0,
+          "admitted": 0
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 17.48494336300064,
+      "enhanceAudioSeconds": 181.83024999999998,
+      "zeroOutputs": 15,
+      "zeroVoiceOutputs": 10,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 11
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 0,
+          "regressed": 5
+        }
+      },
+      "voiceWer": 1.09375,
+      "hostEnhanceRtf": 0.09616080582301702
+    },
+    {
+      "method": "gtcrn-gain16",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 9,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 5,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 3,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 8,
+      "syntheticAdmitted": 15,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 3,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 3,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 1,
+      "negativeNonemptyAfterVad": 1,
+      "enhanceSeconds": 13.141369359043892,
+      "enhanceAudioSeconds": 181.83024999999998,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 1,
+          "regressed": 3
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 2,
+          "regressed": 0
+        }
+      },
+      "voiceWer": 0.052083333333333336,
+      "hostEnhanceRtf": 0.07227273437199748
+    },
+    {
+      "method": "ulunas-gain16",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 8,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 6,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 2,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 3,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 3,
+      "syntheticAdmitted": 15,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 5,
+      "negativeNonemptyAfterVad": 5,
+      "enhanceSeconds": 10.830428652931005,
+      "enhanceAudioSeconds": 181.83024999999998,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 3
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 0,
+          "regressed": 3
+        }
+      },
+      "voiceWer": 0.0625,
+      "hostEnhanceRtf": 0.05956340407017537
+    },
+    {
+      "method": "deepfilternet3-gain16",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 4,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 51,
+      "voiceAdmitted": 7,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 1,
+          "admitted": 1
+        },
+        "5m": {
+          "total": 6,
+          "exact": 0,
+          "admitted": 3
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 4,
+      "syntheticAdmitted": 15,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 19.339781634043902,
+      "enhanceAudioSeconds": 181.83024999999998,
+      "zeroOutputs": 1,
+      "zeroVoiceOutputs": 1,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 7
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 1,
+          "regressed": 3
+        }
+      },
+      "voiceWer": 0.53125,
+      "hostEnhanceRtf": 0.1063617392268003
+    },
+    {
+      "method": "deepfilternet3-gain64",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 6,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 17,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 1,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 2,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 4,
+      "syntheticAdmitted": 15,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 19.63634945306694,
+      "enhanceAudioSeconds": 181.83024999999998,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 5
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 1,
+          "regressed": 3
+        }
+      },
+      "voiceWer": 0.17708333333333334,
+      "hostEnhanceRtf": 0.10799275397282325
+    },
+    {
+      "method": "deepfilternet3-gain256",
+      "totalInputs": 35,
+      "voiceTotal": 12,
+      "voiceExact": 6,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 22,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 1,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 2,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 15,
+      "syntheticExact": 4,
+      "syntheticAdmitted": 15,
+      "syntheticByLevel": {
+        "35": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "50": {
+          "total": 5,
+          "exact": 1,
+          "admitted": 5
+        },
+        "60": {
+          "total": 5,
+          "exact": 2,
+          "admitted": 5
+        }
+      },
+      "negativeTotal": 8,
+      "negativeNonemptyForcedQwen": 8,
+      "negativeVadAdmitted": 1,
+      "negativeNonemptyAfterVad": 1,
+      "enhanceSeconds": 19.547199109278154,
+      "enhanceAudioSeconds": 181.83024999999998,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 5
+        },
+        "short-word": {
+          "total": 15,
+          "improved": 1,
+          "regressed": 3
+        }
+      },
+      "voiceWer": 0.22916666666666666,
+      "hostEnhanceRtf": 0.10750245962527223
+    },
+    {
+      "method": "resample-control",
+      "totalInputs": 12,
+      "voiceTotal": 12,
+      "voiceExact": 11,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 1,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 5,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 0,
+      "syntheticExact": 0,
+      "syntheticAdmitted": 0,
+      "syntheticByLevel": {},
+      "negativeTotal": 0,
+      "negativeNonemptyForcedQwen": 0,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 0.10404545086203143,
+      "enhanceAudioSeconds": 73.2,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 0
+        },
+        "short-word": {
+          "total": 0,
+          "improved": 0,
+          "regressed": 0
+        }
+      },
+      "voiceWer": 0.010416666666666666,
+      "hostEnhanceRtf": 0.0014213859407381341
+    },
+    {
+      "method": "pcm16-resample-control",
+      "totalInputs": 12,
+      "voiceTotal": 12,
+      "voiceExact": 10,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 2,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 4,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 0,
+      "syntheticExact": 0,
+      "syntheticAdmitted": 0,
+      "syntheticByLevel": {},
+      "negativeTotal": 0,
+      "negativeNonemptyForcedQwen": 0,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 0.10566075780661777,
+      "enhanceAudioSeconds": 73.2,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 1
+        },
+        "short-word": {
+          "total": 0,
+          "improved": 0,
+          "regressed": 0
+        }
+      },
+      "voiceWer": 0.020833333333333332,
+      "hostEnhanceRtf": 0.0014434529755002427
+    },
+    {
+      "method": "pcm16-resample-control-gain256",
+      "totalInputs": 12,
+      "voiceTotal": 12,
+      "voiceExact": 8,
+      "voiceReferenceWords": 96,
+      "voiceWordErrors": 5,
+      "voiceAdmitted": 12,
+      "voiceByDistance": {
+        "1m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "3m": {
+          "total": 3,
+          "exact": 3,
+          "admitted": 3
+        },
+        "5m": {
+          "total": 6,
+          "exact": 2,
+          "admitted": 6
+        }
+      },
+      "syntheticTotal": 0,
+      "syntheticExact": 0,
+      "syntheticAdmitted": 0,
+      "syntheticByLevel": {},
+      "negativeTotal": 0,
+      "negativeNonemptyForcedQwen": 0,
+      "negativeVadAdmitted": 0,
+      "negativeNonemptyAfterVad": 0,
+      "enhanceSeconds": 0.10352318006334826,
+      "enhanceAudioSeconds": 73.2,
+      "zeroOutputs": 0,
+      "zeroVoiceOutputs": 0,
+      "pairedChanges": {
+        "positive": {
+          "total": 12,
+          "improved": 0,
+          "regressed": 3
+        },
+        "short-word": {
+          "total": 0,
+          "improved": 0,
+          "regressed": 0
+        }
+      },
+      "voiceWer": 0.052083333333333336,
+      "hostEnhanceRtf": 0.0014142510937615882
+    }
+  ]
+}
