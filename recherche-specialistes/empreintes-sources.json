@@ -1,0 +1,110 @@
+[
+  {
+    "snapshot": "esp-license.txt",
+    "sha256": "7d916fb00bc0742c47cafb0d0144b67f826d76779730b1cb8796045ea6ba1b9a"
+  },
+  {
+    "snapshot": "esp-sr.txt",
+    "sha256": "429a4a2fc9e827ad01f0306be34a609c7d3e340548891be768e1d9f500ff77ce"
+  },
+  {
+    "snapshot": "esp-wakeword-list.txt",
+    "sha256": "47196f6c470219edbf648fb8b42e2cd0871cdf093544a07b6d3ed289c682f620"
+  },
+  {
+    "snapshot": "kws-api.txt",
+    "sha256": "34ddf2c267963fbc54a8101545502ef46de6802f6859f9303b430a0486b5d922"
+  },
+  {
+    "snapshot": "kws-encoding.txt",
+    "sha256": "8226d02f91fe42f7f048ae04353b5874f4917aff72f3c0e7dd9aaec528bdac41"
+  },
+  {
+    "snapshot": "matchboxnet.txt",
+    "sha256": "6552526c83cefd7230a62003405095d5f451276ff4b5af43a8ee6497693c5557"
+  },
+  {
+    "snapshot": "microwakeword-models.txt",
+    "sha256": "bee9ce31bfae0e24aaa1ef71eec099300aaa3486be5e125d32a07831191a674a"
+  },
+  {
+    "snapshot": "microwakeword.txt",
+    "sha256": "a86731053ee2be8c242a1db4bbe7abc1bae6debd698b862b0f5931f27281f3e5"
+  },
+  {
+    "snapshot": "openwakeword.txt",
+    "sha256": "00190089228bb85e6caf6d11708f0f75931b53b375a33f3bebfa01ee97d02692"
+  },
+  {
+    "snapshot": "oww-model-versions.txt",
+    "sha256": "b8f003c0ef84df66bc5dda4fa535a8d6ccb5d700eb29f9a7abd6f936febcab53"
+  },
+  {
+    "snapshot": "pocketsphinx.txt",
+    "sha256": "0090e976185f91253ace457805c6a80574ee32b529c20112cfe4499c276d0f4d"
+  },
+  {
+    "snapshot": "porcupine-license.txt",
+    "sha256": "930c1bf076c9477108de5d2b053b5aa682bd68ee215f183f783207aaf2bc0153"
+  },
+  {
+    "snapshot": "porcupine-maven.txt",
+    "sha256": "dcb602e88d07515c3ed7a7748c9758aa6aa4b02664c60114ed97ce11f871736d"
+  },
+  {
+    "snapshot": "porcupine.txt",
+    "sha256": "dca135190eac1417afdd0394a111043bc4938a903d588d1e699c5c8a2a23c1d2"
+  },
+  {
+    "snapshot": "precise.txt",
+    "sha256": "8ccb78786ada671fc595edce3bdac2ebb83467104cde4597c254687f856b32f8"
+  },
+  {
+    "snapshot": "rhino-license.txt",
+    "sha256": "7b67e9a557bc18c134acc00c6dd5ee776912be770a82c7281ee34656bc708d50"
+  },
+  {
+    "snapshot": "rhino-maven.txt",
+    "sha256": "ba56254f915ee220271ae5e3622b3ed5446a96a5ae74397aee4186d41d8b791a"
+  },
+  {
+    "snapshot": "rhino.txt",
+    "sha256": "6e4e212e4330386bd436c4bd3377b4264ec9ce48eeaf1f6512477d5a0bff7709"
+  },
+  {
+    "snapshot": "rustpotter-cli.txt",
+    "sha256": "cef8383bd90ab82104cbe762144bebd98e12bf86f1a78278c9a308aa91740f6f"
+  },
+  {
+    "snapshot": "rustpotter-version.txt",
+    "sha256": "c8395dfc79b0c8f771e58c54a509cf0d6fe17bd3c8843471e2984acf93de05ed"
+  },
+  {
+    "snapshot": "rustpotter.txt",
+    "sha256": "1e294f6d484727f37fdbe2d9c8b8ddca4d05ff19f4da23ada7b6bde24d8e12e1"
+  },
+  {
+    "snapshot": "sherpa-kws.txt",
+    "sha256": "e9e425854ec9c1c5f8d18cbc041e2590a6e875ec69b90951f95e4d3cfdfa1ed5"
+  },
+  {
+    "snapshot": "speechbrain.txt",
+    "sha256": "dbab04c0e83535cf2da9df600310af7310412b16d664e99e8471ea476bed03d3"
+  },
+  {
+    "snapshot": "vosk-model-list.txt",
+    "sha256": "be3599963ee12a6424f194c50f5358e190a19f125a27611f77b590549d8e4915"
+  },
+  {
+    "snapshot": "vosk.txt",
+    "sha256": "5f56ab2addced6c3655d22dbeeaf05dd5fc75ab9aa8e5e6a9f18b622fe68e5bb"
+  },
+  {
+    "snapshot": "wekws.txt",
+    "sha256": "ce24e743f433b4eecc758377177f427604060e5f385c090408e7093f1e3fc8bd"
+  },
+  {
+    "snapshot": "whisperstream.txt",
+    "sha256": "cc6720dfe390aec23cfa1727148856658938361b2d4c0cef02d85ba5d2da966c"
+  }
+]

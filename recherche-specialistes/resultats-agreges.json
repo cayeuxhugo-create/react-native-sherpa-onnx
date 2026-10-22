@@ -1,0 +1,80 @@
+[
+  {
+    "variant": "kroko2025",
+    "profile": "default",
+    "score": 1.0,
+    "threshold": 0.25,
+    "maxInputGain": 1,
+    "bpeDecompositions": {
+      "aide": 8,
+      "au secours": 48,
+      "non": 4,
+      "oui": 3,
+      "stop": 4
+    },
+    "modelHashes": {
+      "encoder.onnx": "e02facae1daf6f1f13da67ea3ace7c722516d0868d1768d78c0580bc22cc0c5b",
+      "decoder.onnx": "6aed547570e3ab5afc05429a017cedd3a056c16df3baa5703f02461cefa25bac",
+      "joiner.onnx": "a51eec759bcdcaae2614686fa2a8b57417b2d420dd55a5a5558b388d35a9b2b6",
+      "tokens.txt": "fedfb9c844bfb2bf14171f8184863e3d617b815a8667bdd9fc9a3149fde73298"
+    },
+    "completedInputs": 24,
+    "positiveSyntheticInputs": 15,
+    "positiveInputsWithDetection": 0,
+    "negativeSeconds": 703.24,
+    "negativeEvents": 0,
+    "syntheticCorrectKeywordInputs": 0
+  },
+  {
+    "variant": "kroko2025",
+    "profile": "sensitive",
+    "score": 2.0,
+    "threshold": 0.15,
+    "maxInputGain": 64.0,
+    "bpeDecompositions": {
+      "aide": 8,
+      "au secours": 48,
+      "non": 4,
+      "oui": 3,
+      "stop": 4
+    },
+    "modelHashes": {
+      "encoder.onnx": "e02facae1daf6f1f13da67ea3ace7c722516d0868d1768d78c0580bc22cc0c5b",
+      "decoder.onnx": "6aed547570e3ab5afc05429a017cedd3a056c16df3baa5703f02461cefa25bac",
+      "joiner.onnx": "a51eec759bcdcaae2614686fa2a8b57417b2d420dd55a5a5558b388d35a9b2b6",
+      "tokens.txt": "fedfb9c844bfb2bf14171f8184863e3d617b815a8667bdd9fc9a3149fde73298"
+    },
+    "completedInputs": 24,
+    "positiveSyntheticInputs": 15,
+    "positiveInputsWithDetection": 1,
+    "negativeSeconds": 703.24,
+    "negativeEvents": 0,
+    "syntheticCorrectKeywordInputs": 1
+  },
+  {
+    "variant": "mobile2023-int8",
+    "profile": "sensitive",
+    "score": 2.0,
+    "threshold": 0.15,
+    "maxInputGain": 64.0,
+    "bpeDecompositions": {
+      "aide": 8,
+      "au secours": 48,
+      "non": 5,
+      "oui": 3,
+      "stop": 6
+    },
+    "modelHashes": {
+      "encoder-epoch-29-avg-9-with-averaged-model.int8.onnx": "9a7e83bbb25d627f8c501c6abe91d36bdc7fc106fb7cd6ee8fa5744f316fc6f7",
+      "decoder-epoch-29-avg-9-with-averaged-model.onnx": "3ef2840b684440e26382af87b2174d25732a9f113f1965cd8abba7ffc5d033fb",
+      "joiner-epoch-29-avg-9-with-averaged-model.int8.onnx": "fc2f3bb851a15a532c6f2422d53eecd1ca949f12b0897e07a852021c30481711",
+      "tokens.txt": "37fb3f2a7bcb85e5fff3f1f66be04e6fbb05077a22f56d177fe85704e945fb31"
+    },
+    "completedInputs": 24,
+    "positiveSyntheticInputs": 15,
+    "positiveInputsWithDetection": 2,
+    "negativeSeconds": 703.24,
+    "negativeEvents": 0,
+    "syntheticCorrectKeywordInputs": 2
+  }
+]
