@@ -127,7 +127,7 @@ internal class GuardianSpeechSegmenter(
         // Keep weak consonants before/after the confident neural speech core,
         // and bridge short VAD dropouts inside a phrase. Not a speech gate.
         const val PRE_ROLL_MS = 2000
-        const val TAIL_MS = 800
+        const val TAIL_MS = 1200
         const val END_SILENCE_MS = 1200
         const val ROLLOVER_OVERLAP_MS = 400
         const val MIN_ROLLOVER_PAUSE_MS = 900

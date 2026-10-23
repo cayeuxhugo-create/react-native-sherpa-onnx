@@ -5,11 +5,10 @@ import android.os.SystemClock
 import android.util.Log
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
-/** One capture, ordered candidate segmentation, FireRed confirmation, one Qwen decoder.
+/** One capture, FireRed streaming segmentation, non-stream confirmation, one Qwen decoder.
  * Neither acoustic level labels nor ASR output can declare speech present. */
 internal class GuardianQwenPrimaryAudioProcessor(
     context: Context,
@@ -27,18 +26,10 @@ internal class GuardianQwenPrimaryAudioProcessor(
 
     // Load before capture. Missing/incompatible VAD must fail explicitly, never
     // silently fall back to RMS-only admission (the original hallucination bug).
-    private val vad = GuardianNeuralVad(context)
-    private val enhancedVad = try { GuardianNeuralVad(context) } catch (error: Throwable) { vad.close(); throw error }
-    private val clearRawVad = try { GuardianNeuralVad(context) } catch (error: Throwable) {
-        try { enhancedVad.close() } finally { vad.close() }; throw error
-    }
+    private val streamingVad = GuardianFireRedStreaming.load { name -> context.applicationContext.assets.open(name).use { it.readBytes() } }
     private val fireRed = try {
         GuardianFireRedConfirmation.load { name -> context.applicationContext.assets.open(name).use { it.readBytes() } }
-    } catch (error: Throwable) {
-        try { clearRawVad.close() } finally { try { enhancedVad.close() } finally { vad.close() } }
-        throw error
-    }
-    private val speechEvidence = GuardianSpeechEvidence()
+    } catch (error: Throwable) { streamingVad.close(); throw error }
     private val wav = diagnosticWavDirectory?.let { directory ->
         try {
             GuardianDiagnosticWavWriter(directory, profile.name,
@@ -51,7 +42,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val closed = AtomicBoolean(false)
     private val discontinuity = AtomicBoolean(false)
     private val pendingTasks = AtomicInteger(0)
-    private val worker = Executors.newSingleThreadScheduledExecutor { task ->
+    private val worker = Executors.newSingleThreadExecutor { task ->
         Thread(task, "Guardian-Speech-Input").apply { isDaemon = true }
     }
     private var previousKey: GuardianVoiceInputRouter.Key? = null
@@ -114,7 +105,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
         }
     })
     private val router = GuardianVoiceInputRouter(
-        noisy = true, // Join only when the capture frame actually expects enhancement.
+        noisy = false, // FireRed reads original PCM immediately; never wait for GTCRN.
         emit = { frame, pcm, enhanced ->
             val previous = previousKey
             if (previous != null && (frame.key.sequence != previous.sequence + 1 ||
@@ -126,23 +117,18 @@ internal class GuardianQwenPrimaryAudioProcessor(
             truthFrames++
             if (enhanced) enhancedFrames++
             // Qwen is more robust on the original noisy consonants than on
-            // aggressively denoised speech. Enhancement assists VAD only.
+            // aggressively denoised speech. Both FireRed passes use original PCM.
             val decoderPcm = frame.pcm
             wav?.write("asr", decoderPcm, frame.key.sequence, frame.key.capturedAtNanos)
-            wav?.write("vad", pcm, frame.key.sequence, frame.key.capturedAtNanos)
-            val primarySpeech = vad.isSpeech(decoderPcm)
-            val clearRawSpeech = clearRawVad.isSpeech(decoderPcm, 1f)
-            val enhancedSpeech = if (enhanced) enhancedVad.isSpeech(pcm) == true else {
-                enhancedVad.reset()
-                false
-            }
-            val speech = speechEvidence.accept(primarySpeech, enhancedSpeech, clearRawSpeech, decoderPcm.size, enhanced)
+            wav?.write("vad", GuardianNeuralInputGain.forVad(decoderPcm, 64f), frame.key.sequence, frame.key.capturedAtNanos)
+            val streamResult = streamingVad.accept(decoderPcm)
+            val speech = streamResult.speech
             val now = SystemClock.elapsedRealtime()
             if (diagnostics?.enabled == true) {
                 if (previousVad != speech) {
                     diagnostics.event("VAD_CHANGE", "sequence" to frame.key.sequence, "speech" to speech,
-                        "primarySpeech" to primarySpeech, "enhancedSpeech" to enhancedSpeech,
-                        "clearRawSpeech" to clearRawSpeech, "enhancedAvailable" to enhanced)
+                        "model" to GuardianFireRedStreaming.MODEL_ID, "peakProbability" to streamResult.peak,
+                        "neuralFrames" to streamResult.frames)
                 }
                 if (lastDiagnosticFrameMs == Long.MIN_VALUE || now - lastDiagnosticFrameMs >= 250L || previousVad != speech) {
                     diagnostics.event("AUDIO_FRAME", "sequence" to frame.key.sequence,
@@ -150,19 +136,18 @@ internal class GuardianQwenPrimaryAudioProcessor(
                         "captureAgeMs" to (now - frame.key.capturedAtNanos / 1000000L).coerceAtLeast(0),
                         "inputWaitMs" to (now - frame.queuedAtMs).coerceAtLeast(0),
                         "route" to "TRUTH",
-                        "vadRoute" to if (enhanced) "GTCRN" else "TRUTH",
-                        "primaryVadSpeech" to primarySpeech, "enhancedVadSpeech" to enhancedSpeech,
-                        "cleanedVadAvailable" to enhanced,
-                        "rawVadMaxInputGain" to 4,
-                        "clearRawVadSpeech" to clearRawSpeech,
-                        "clearRawAgreement" to (primarySpeech && clearRawSpeech),
+                        "vadRoute" to "FIRERED_STREAM_ORIGINAL",
+                        "streamVadPeakProbability" to streamResult.peak,
+                        "streamVadFrames" to streamResult.frames,
+                        "streamVadElapsedMs" to streamResult.elapsedMs,
+                        "rawVadMaxInputGain" to 64,
                         "enhancementExpected" to frame.enhancementExpected,
                         "vadSpeech" to speech, "gain" to frame.gain,
                         "preGainDbfs" to frame.preGainRms?.let { GuardianVoiceDiagnostics.dbfs(it) },
                         "noiseFloorDbfs" to frame.preGainNoiseRms?.let { GuardianVoiceDiagnostics.dbfs(it) },
                         "estimatedSnrDb" to frame.estimatedSnrDb,
                         "selectedDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(decoderPcm)),
-                        "vadViewDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(pcm)),
+                        "vadViewDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(GuardianNeuralInputGain.forVad(decoderPcm,64f))),
                         "peak" to decoderPcm.maxOfOrNull { kotlin.math.abs(it) },
                         "nearClipSamples" to decoderPcm.count { kotlin.math.abs(it) >= 0.979f },
                         "pendingInputTasks" to pendingTasks.get(),
@@ -184,9 +169,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
     init {
         Log.i(TAG, "FIRERED_READY model=${GuardianFireRedConfirmation.MODEL_ID} threshold=${GuardianFireRedPolicy.THRESHOLD}")
         diagnostics?.event("FIRERED_READY", "model" to GuardianFireRedConfirmation.MODEL_ID,
-            "threshold" to GuardianFireRedPolicy.THRESHOLD, "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN)
-        worker.scheduleAtFixedRate({ guarded { router.drain(SystemClock.elapsedRealtime()) } },
-            20L, 20L, TimeUnit.MILLISECONDS)
+            "threshold" to GuardianFireRedPolicy.THRESHOLD, "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN,
+            "candidateVad" to GuardianFireRedStreaming.MODEL_ID)
     }
 
     override fun onAudioFrame(frame: GuardianAudioEngine.AudioFrame) {
@@ -220,14 +204,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
         }
     }
 
-    override fun onEnhancedAudioFrame(frame: GuardianAudioEngine.EnhancedAudioFrame) {
-        if (closed.get() || frame.source != "GTCRN") return
-        val count = frame.sampleCount.coerceIn(0, frame.samples.size)
-        if (count == 0) return
-        val key = GuardianVoiceInputRouter.Key(frame.sequenceNumber, frame.capturedAtElapsedRealtimeNanos)
-        val pcm = frame.samples.copyOf(count)
-        enqueue { router.enhanced(key, pcm, SystemClock.elapsedRealtime()) }
-    }
+    // No delayed enhancer output can enter the streaming detector or Qwen.
+    override fun onEnhancedAudioFrame(frame: GuardianAudioEngine.EnhancedAudioFrame) = Unit
 
     private fun enqueue(action: () -> Unit) {
         if (pendingTasks.incrementAndGet() > 32) {
@@ -266,10 +244,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
         diagnostics?.event("PIPELINE_RESET")
         previousVad = null
         decoder.reset()
-        vad.reset()
-        enhancedVad.reset()
-        clearRawVad.reset()
-        speechEvidence.reset()
+        streamingVad.reset()
         segmenter.reset()
     }
 
@@ -290,9 +265,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
         worker.execute {
             try {
                 router.reset()
-                try { vad.close() } finally {
-                    try { enhancedVad.close() } finally { try { clearRawVad.close() } finally { try { fireRed.close() } finally { wav?.close() } } }
-                }
+                try { streamingVad.close() } finally { try { fireRed.close() } finally { wav?.close() } }
             } finally { worker.shutdownNow() }
         }
     }

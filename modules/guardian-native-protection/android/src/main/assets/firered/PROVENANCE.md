@@ -25,3 +25,17 @@ no Vulkan/GPU, 16 KB ELF segment alignment, Android API 24 minimum, four ABIs.
 This integration does not assert NCNN probabilities are bit-identical to ONNX.
 Measured: 647 window/perturbation decisions identical on host CPU; maximum absolute
 probability difference 0.009052. Android runtime/device validation remains required.
+
+## v3.4 — modèle streaming ajouté
+
+`firered_vad_packed_cache_stream.ncnn.param/.bin` proviennent du même paquet
+NCNN public déjà conservé pour cette intégration, export officiel Stream-VAD
+avec huit caches `[128,19]` regroupés en `[1024,19]`. Les empreintes attendues
+sont fixées dans `GuardianFireRedStreaming.kt`. Inférence CPU FP32, poids FP16 ;
+ni Vulkan ni FP16 arithmétique ne sont activés. Le frontal utilise la même CMVN
+et les mêmes caractéristiques que la confirmation, avec fenêtre 400/pas 160.
+L'état et le reste du PCM sont conservés entre les blocs de capture.
+
+La validation réelle JNI sur les 24 entrées reproduit les 15 492 décisions par
+bloc de capture du prototype de référence, et les 27 fenêtres admises sont
+identiques octet pour octet. Les tableaux publics ne contiennent pas de voix.

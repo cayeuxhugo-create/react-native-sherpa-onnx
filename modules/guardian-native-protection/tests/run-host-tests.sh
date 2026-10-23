@@ -6,6 +6,8 @@ build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 sources=(
   "$source_dir/GuardianFireRedPolicy.kt"
+  "$source_dir/GuardianFireRedStreaming.kt"
+  "$module_dir/tests/host/FireRedStreamPolicyTest.kt"
   "$module_dir/tests/host/FireRedPolicyTest.kt"
   "$source_dir/GuardianDiagnosticOptions.kt"
   "$source_dir/GuardianNeuralInputGain.kt"

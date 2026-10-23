@@ -1,0 +1,50 @@
+{
+  "version": "guardian-voice-v3.4-firered-stream",
+  "scope": "Real host JNI + production Kotlin streaming policy/segmenter + native confirmation; no APK/phone execution",
+  "acceptedWindows": 27,
+  "byteIdenticalToReference": 27,
+  "captureFrames": 15492,
+  "decisionMismatches": 0,
+  "inputs": 24,
+  "voiceExact": 12,
+  "voiceTotal": 12,
+  "voice5mExact": 6,
+  "voice5mTotal": 6,
+  "syntheticWordsAdmitted": 15,
+  "syntheticWordsExact": 6,
+  "syntheticWordsTotal": 15,
+  "recordedNoiseSeconds": 500,
+  "qwenCallsForNoise": 0,
+  "qwenResultsReusedFromVerifiedCache": 27,
+  "qwenFreshDecodes": 0,
+  "androidNativeBuilds": {
+    "arm64-v8a": {
+      "bytes": 4459120,
+      "loadAlignmentAtLeast16KiB": true,
+      "isolatedNcnnRuntime": true
+    },
+    "armeabi-v7a": {
+      "bytes": 2338828,
+      "loadAlignmentAtLeast16KiB": true,
+      "isolatedNcnnRuntime": true
+    },
+    "x86": {
+      "bytes": 9075704,
+      "loadAlignmentAtLeast16KiB": true,
+      "isolatedNcnnRuntime": true
+    },
+    "x86_64": {
+      "bytes": 8920232,
+      "loadAlignmentAtLeast16KiB": true,
+      "isolatedNcnnRuntime": true
+    }
+  },
+  "hostProcessorOriginalPcmWindows": 3,
+  "collectorFixtureCases": 14,
+  "apiSignatureCompilation": true,
+  "apkBuilt": false,
+  "androidDeviceTested": false,
+  "shortReadNativeContinuityTest": true,
+  "hostCorePolicyDiagnosticsTests": true,
+  "installerFixtureCases": 4
+}

@@ -21,10 +21,14 @@ mais Qwen n'en reconnaît correctement que 6/15, contre 7/15 pour la chaîne act
 Le « non » synthétique le plus faible régresse ; les variantes à -6 dB restent
 imparfaites. Aucune validation multi-téléphones, de batterie ou d'alertes réelles.
 
-Version effectivement livrée : v3.3 FireRed, commit
-fd3c96d180113dd2ab42033c768ed309705f5087, qui conserve **Silero/GTCRN pour le
-prédécoupage**, puis FireRed non streaming et Qwen. Elle n'a pas été remplacée
-par la chaîne entièrement FireRed. Ne pas confondre candidat retenu et code livré.
+Version intégrée le 23 octobre : **v3.4 FireRed streaming**. Le module remplace
+le prédécoupage Silero/GTCRN par FireRed streaming, puis confirmation FireRed
+non streaming et Qwen sur l'original. GTCRN est désactivé pour cette chaîne.
+Les 15 492 décisions de capture et les 27 fenêtres admises du replay JNI sont
+identiques au prototype étudié ; APK et téléphone restent à valider.
+Guide : [livraison v3.4](LIVRAISON-FIRERED-STREAM-V3.4.md).
+La précédente livraison v3.3 (fd3c96d180113dd2ab42033c768ed309705f5087)
+conservait Silero/GTCRN ; elle reste une version de retour possible.
 
 Étude de référence : [comparaison sur les flux complets](ETUDE-ARCHITECTURE-VAD-COMPLET-20261022.md),
 commit 9d0d1c38b0e47f2fff2d864ae2d5fbaa4161e848.

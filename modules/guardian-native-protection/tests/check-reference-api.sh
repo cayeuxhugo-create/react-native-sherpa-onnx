@@ -35,6 +35,7 @@ else
 fi
 sources=(
   "$source_dir/GuardianFireRedPolicy.kt"
+  "$source_dir/GuardianFireRedStreaming.kt"
   "$source_dir/GuardianFireRedConfirmation.kt"
   "$source_dir/GuardianGtcrnEnhancer.kt"
   "$source_dir/GuardianDiagnosticOptions.kt"

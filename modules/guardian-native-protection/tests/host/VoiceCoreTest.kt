@@ -53,13 +53,13 @@ fun main() {
         checkThat(pcm.take(32000).chunked(frame).map { it.first() } == (9..48).map { it/1000f }, "Wrong extended pre-roll")
         checkThat(sink.windows.single().final && pcm.count { it == 0.2f } == 8000, "Onset duplicated or partial scheduled")
     }
-    test("one natural final with 800 ms tail, no partial during silence") {
+    test("one natural final with 1200 ms tail, no partial during silence") {
         val sink = RecordingSink(); val s = GuardianSpeechSegmenter(sink)
         repeat(25) { s.accept(FloatArray(frame) { 0.1f }, true) }
         val partials = sink.windows.count { !it.final }; silence(s, 40)
         checkThat(sink.windows.count { !it.final } == partials, "Silent partial")
         val final = sink.windows.single { it.final }
-        checkThat(final.pcm.size == 25 * frame + 12800, "Silence was not trimmed")
+        checkThat(final.pcm.size == 25 * frame + 19200, "Silence was not trimmed")
         checkThat(sink.starts == 1 && sink.ends == 1, "Unbalanced speech callbacks")
     }
     test("technical rollover overlaps 400 ms without losing source samples") {
@@ -85,7 +85,7 @@ fun main() {
         val windows = sink.windows
         checkThat(windows.size == 2, "Pause generated an extra window")
         checkThat(windows[0].reason == "QWEN_PAUSE_ALIGNED_ROLLOVER", "Known pause was not used")
-        checkThat(windows[0].pcm.size == 76_800, "Pause tail was truncated")
+        checkThat(windows[0].pcm.size == 80_000, "Pause tail was truncated")
         checkThat(windows[0].pcm.takeLast(6400) == windows[1].pcm.take(6400), "Overlap lost")
         val rebuilt = windows[0].pcm.toList() + windows[1].pcm.drop(6400)
         checkThat(rebuilt.take(source.size) == source.toList(), "Buffered following speech lost or duplicated")
@@ -186,6 +186,7 @@ fun main() {
     }
     println("$tests core tests passed")
     fireRedPolicyTests()
+    fireRedStreamPolicyTests()
     decoderTests()
     diagnosticsTests()
     wavWriterTests()

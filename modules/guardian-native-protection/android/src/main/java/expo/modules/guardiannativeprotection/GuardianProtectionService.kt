@@ -62,7 +62,7 @@ class GuardianProtectionService : Service() {
   /*
    * Guardian Lexical Timeline V3 - autorité phrase/contexte.
    *
-   * Les PARTIAL Qwen sont publies progressivement pour la reactivite,
+   * Qwen ne decode que les fenetres finales confirmees par FireRed,
    * mais un FINAL technique n'est jamais assimilé directement à une phrase.
    * Seules les NATURAL_PHRASE de la timeline alimentent le chemin produit.
    */
@@ -1307,23 +1307,23 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.3-firered",
+      "engineRevision" to "guardian-voice-v3.4-firered-stream",
       "diagnosticControlRevision" to 3,
       "wavStageCount" to 5,
       "decoderMode" to "FINAL_ONLY",
       "admissionModel" to GuardianFireRedConfirmation.MODEL_ID,
       "admissionThreshold" to GuardianFireRedPolicy.THRESHOLD,
       "admissionMaxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN,
-      "candidateVad" to "SILERO_RAW_AND_GTCRN",
+      "candidateVad" to GuardianFireRedStreaming.MODEL_ID,
       "diagnosticsEnabledBy" to diagnosticOptions.controlSource,
       "wavStorage" to "PRIVATE",
       "sampleRateHz" to 16000, "vadThreshold" to 0.5,
-      "vadMinSpeechMs" to GuardianNeuralVad.MIN_SPEECH_MS, "preRollMs" to GuardianSpeechSegmenter.PRE_ROLL_MS,
+      "vadMinSpeechMs" to 80, "preRollMs" to GuardianSpeechSegmenter.PRE_ROLL_MS,
       "endSilenceMs" to GuardianSpeechSegmenter.END_SILENCE_MS,
-      "tailMs" to GuardianSpeechSegmenter.TAIL_MS, "vadMaxInputGain" to 4,
-      "gtcrnMaxModelGain" to 6,
-      "asrInput" to "TRUTH", "gtcrnRole" to "VAD_WITH_RAW_NEURAL_AGREEMENT",
-      "gtcrnMaxWaitMs" to 200, "maxSegmentMs" to 8000,
+      "tailMs" to GuardianSpeechSegmenter.TAIL_MS, "vadMaxInputGain" to 64,
+      "gtcrnMaxModelGain" to 0,
+      "asrInput" to "TRUTH", "gtcrnRole" to "DISABLED_ORIGINAL_PCM",
+      "gtcrnMaxWaitMs" to 0, "maxSegmentMs" to 8000,
       "rolloverStrategy" to "NEURAL_PAUSE_FIRST",
       "rolloverMinPauseMs" to GuardianSpeechSegmenter.MIN_ROLLOVER_PAUSE_MS,
       "wavEnabled" to (diagnosticWavDirectory != null),
@@ -2372,11 +2372,7 @@ try {
  * Ces décisions appartiennent au service et doivent être
  * calculées AVANT la construction de GuardianAudioEngine.Configuration.
  */
-val speechEnhancementEnabledForSession =
-    (voiceProfile == GuardianVoiceProfile.NOISY || audioCapabilities.neuralEnhancementAllowed)
-
-val gtcrnAllowedForSession =
-    speechEnhancementEnabledForSession // Capable phones also clean the DISTANT VAD view.
+val gtcrnAllowedForSession = false // v3.4: original PCM -> FireRed stream -> confirmation -> Qwen.
 
 Log.i(TAG, "VOICE_PROFILE=$voiceProfile neuralEnhancementRecommended=${audioCapabilities.neuralEnhancementAllowed}")
 
@@ -3008,6 +3004,7 @@ val audio =
 
                 sampleRateHz =
                     16_000,
+                frameDurationMs = 50,
 
                 /*
                  * C5 :
@@ -3080,7 +3077,7 @@ stereoDiagnosticCaptureEnabled =
                     selectedMicrophoneField.dimension,
 
                 /*
-                 * GTCRN est le débruiteur principal de la route neural.
+                 * v3.4 : aucun débruiteur ne remplace le PCM original.
                  * Le NoiseSuppressor Android reste désactivé afin
                  * d'éviter deux traitements de réduction de bruit.
                  */
