@@ -1,0 +1,16 @@
+{
+  "priorQwenFixedWindows": 35,
+  "identicalFreshQwenResults": 35,
+  "fixedWindows": 35,
+  "fireredAcceptedWindows": 27,
+  "fixedVoiceWindows": 12,
+  "fireredVoiceWindows": 12,
+  "fixedNegativeWindows": 8,
+  "syntheticShortWordWindowsPerScope": 15,
+  "noRemoteInference": true,
+  "freshInferenceNoCache": true,
+  "totalCorpusDecodes": 496,
+  "modelRuns": 8,
+  "pairedInputsPerRun": 62,
+  "matchingModelFingerprintsAcrossGainPasses": true
+}

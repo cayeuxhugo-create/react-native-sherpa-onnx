@@ -39,3 +39,8 @@ seul une alerte confirmée.
 Ne pas changer le téléphone, la sélection des micros ou la chaîne livrée au seul
 motif d'un résultat synthétique. Séparer clairement code disponible, poids
 accessibles, essais réellement exécutés et besoins d'entraînement/licence.
+
+Comparaison ASR du 23 octobre : [Qwen, Parakeet v3 et Whisper](COMPARAISON-RECONNAISSEURS-20261023.md).
+Sur les sorties FireRed françaises, Qwen reste la référence (12/12 phrases,
+dont 6/6 à 5 m). Les mots courts, la couverture européenne et les performances
+Android restent à valider ; aucun remplacement de production issu de ce test.

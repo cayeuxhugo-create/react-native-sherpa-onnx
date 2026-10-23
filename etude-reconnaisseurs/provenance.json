@@ -1,0 +1,25 @@
+{
+  "scope": "Local CPU benchmark; no Android execution",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+  "models": [
+    {
+      "archive": "sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8.tar.bz2",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8.tar.bz2",
+      "bytes": 487170055,
+      "sha256": "5793d0fd397c5778d2cf2126994d58e9d56b1be7c04d13c7a15bb1b4eafb16bf"
+    },
+    {
+      "archive": "sherpa-onnx-whisper-small.tar.bz2",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2",
+      "bytes": 639387718,
+      "sha256": "486a46afbb7ba798507190ffe02fea2dd726049af212e774537efac6afb210a6"
+    },
+    {
+      "archive": "sherpa-onnx-whisper-turbo.tar.bz2",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-turbo.tar.bz2",
+      "bytes": 563790207,
+      "sha256": "b11acbbcd660b44a8e0df33724feb5aaa709cf65668f2823d59f656312544f22"
+    }
+  ]
+}
