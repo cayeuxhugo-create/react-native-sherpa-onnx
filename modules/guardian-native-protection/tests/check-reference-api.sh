@@ -38,6 +38,7 @@ sources=(
   "$source_dir/GuardianFireRedStreaming.kt"
   "$source_dir/GuardianFireRedConfirmation.kt"
   "$source_dir/GuardianGtcrnEnhancer.kt"
+  "$source_dir/GuardianGtcrnComparison.kt"
   "$source_dir/GuardianDiagnosticOptions.kt"
   "$source_dir/GuardianNeuralInputGain.kt"
   "$source_dir/GuardianDiagnosticWavWriter.kt"

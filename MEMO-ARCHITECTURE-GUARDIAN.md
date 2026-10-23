@@ -48,3 +48,9 @@ Comparaison ASR du 23 octobre : [Qwen, Parakeet v3 et Whisper](COMPARAISON-RECON
 Sur les sorties FireRed françaises, Qwen reste la référence (12/12 phrases,
 dont 6/6 à 5 m). Les mots courts, la couverture européenne et les performances
 Android restent à valider ; aucun remplacement de production issu de ce test.
+
+Mise à jour v3.4.1 : voie GTCRN indépendante en comparaison uniquement pendant
+un diagnostic NOISY avec WAV. Aucun texte ni alerte issus de cette voie ;
+FireRed et Qwen continuent sur l’original. Paires original/GTCRN avec index
+et pertes explicites. Valider le bruit réel avant tout secours automatique.
+Guide : [comparaison GTCRN](LIVRAISON-GTCRN-COMPARAISON-V3.4.1.md).

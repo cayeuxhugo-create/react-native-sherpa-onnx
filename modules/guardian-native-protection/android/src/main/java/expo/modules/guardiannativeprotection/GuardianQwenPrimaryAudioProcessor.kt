@@ -39,6 +39,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
             null
         }
     }
+    private val comparison = if (diagnosticWavDirectory != null && profile == GuardianVoiceProfile.NOISY)
+        GuardianGtcrnComparison(java.io.File(diagnosticWavDirectory, "gtcrn-comparison"), profile, diagnostics) else null
     private val closed = AtomicBoolean(false)
     private val discontinuity = AtomicBoolean(false)
     private val pendingTasks = AtomicInteger(0)
@@ -196,6 +198,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
             frame.detectorSampleCount.coerceIn(0, frame.detectorSamples.size)) else null
         val raw = if (wav != null) frame.rawSamples.copyOf(
             frame.rawSampleCount.coerceIn(0, frame.rawSamples.size)) else null
+        comparison?.primary(input)
         enqueue {
             if (raw != null) wav?.write("raw", raw, input.key.sequence, input.key.capturedAtNanos)
             if (preGain != null) wav?.write("pregain", preGain, input.key.sequence, input.key.capturedAtNanos)
@@ -205,7 +208,13 @@ internal class GuardianQwenPrimaryAudioProcessor(
     }
 
     // No delayed enhancer output can enter the streaming detector or Qwen.
-    override fun onEnhancedAudioFrame(frame: GuardianAudioEngine.EnhancedAudioFrame) = Unit
+    override fun onEnhancedAudioFrame(frame: GuardianAudioEngine.EnhancedAudioFrame) {
+        val target = comparison ?: return
+        if (closed.get() || frame.source != "GTCRN") return
+        val count = frame.sampleCount.coerceIn(0, frame.samples.size)
+        if (count > 0) target.enhanced(GuardianVoiceInputRouter.Key(frame.sequenceNumber,
+            frame.capturedAtElapsedRealtimeNanos), frame.samples.copyOf(count))
+    }
 
     private fun enqueue(action: () -> Unit) {
         if (pendingTasks.incrementAndGet() > 32) {
@@ -260,6 +269,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     fun close() {
         if (!closed.compareAndSet(false, true)) return
         diagnostics?.event("SESSION_END", "droppedInputTasks" to droppedInputTasks.get())
+        comparison?.close()
         decoder.close()
         // Same worker as VAD inference: no native release during a VAD call.
         worker.execute {

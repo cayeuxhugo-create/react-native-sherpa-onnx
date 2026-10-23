@@ -1307,7 +1307,7 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4-firered-stream",
+      "engineRevision" to "guardian-voice-v3.4.1-gtcrn-comparison",
       "diagnosticControlRevision" to 3,
       "wavStageCount" to 5,
       "decoderMode" to "FINAL_ONLY",
@@ -1321,8 +1321,8 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
       "vadMinSpeechMs" to 80, "preRollMs" to GuardianSpeechSegmenter.PRE_ROLL_MS,
       "endSilenceMs" to GuardianSpeechSegmenter.END_SILENCE_MS,
       "tailMs" to GuardianSpeechSegmenter.TAIL_MS, "vadMaxInputGain" to 64,
-      "gtcrnMaxModelGain" to 0,
-      "asrInput" to "TRUTH", "gtcrnRole" to "DISABLED_ORIGINAL_PCM",
+      "gtcrnMaxModelGain" to if (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY) 6 else 0,
+      "asrInput" to "TRUTH", "gtcrnRole" to if (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY) "PAIRED_RECORDING_ONLY" else "DISABLED_ORIGINAL_PCM",
       "gtcrnMaxWaitMs" to 0, "maxSegmentMs" to 8000,
       "rolloverStrategy" to "NEURAL_PAUSE_FIRST",
       "rolloverMinPauseMs" to GuardianSpeechSegmenter.MIN_ROLLOVER_PAUSE_MS,
@@ -2372,7 +2372,7 @@ try {
  * Ces décisions appartiennent au service et doivent être
  * calculées AVANT la construction de GuardianAudioEngine.Configuration.
  */
-val gtcrnAllowedForSession = false // v3.4: original PCM -> FireRed stream -> confirmation -> Qwen.
+val gtcrnAllowedForSession = diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY // Paired recording only; original admission/ASR unchanged.
 
 Log.i(TAG, "VOICE_PROFILE=$voiceProfile neuralEnhancementRecommended=${audioCapabilities.neuralEnhancementAllowed}")
 

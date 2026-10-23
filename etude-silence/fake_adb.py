@@ -3,8 +3,8 @@ import sys,os,pathlib,json,time,hashlib,shutil,wave
 r=pathlib.Path(os.environ['FAKE_ADB_ROOT']);a=sys.argv[1:];mode=os.environ.get('FAKE_MODE','ok')
 def f(n):return r/n.lstrip('/')
 def emit(event,**kw):
- if os.environ.get('FAKE_FIRERED') in ['1','2']:
-  if event=='SESSION_START':kw['engineRevision']='guardian-voice-v3.2.1' if mode=='wrong-engine' else ('guardian-voice-v3.4-firered-stream' if os.environ.get('FAKE_FIRERED')=='2' else 'guardian-voice-v3.3-firered')
+ if os.environ.get('FAKE_FIRERED') in ['1','2','3']:
+  if event=='SESSION_START':kw['engineRevision']='guardian-voice-v3.2.1' if mode=='wrong-engine' else ('guardian-voice-v3.4-firered-stream' if os.environ.get('FAKE_FIRERED')=='2' else 'guardian-voice-v3.4.1-gtcrn-comparison' if os.environ.get('FAKE_FIRERED')=='3' else 'guardian-voice-v3.3-firered')
   if event=='WAV_READY':emit('FIRERED_START_FAILED' if mode=='firered-failed' else 'FIRERED_READY',**{k:v for k,v in kw.items() if k=='session'})
  with f('events').open('a') as h:h.write('10-19 12:00:00.000 123 123 I GuardianVoiceDiag: '+json.dumps(dict(event=event,**({'session':'abc12345'}|kw)))+'\n')
 if a[0]=='get-state':print('device')
@@ -28,6 +28,11 @@ elif a[:2]==['shell','log']:
   emit('SESSION_START',session='other123',elapsedMs=101)
  if a[-1]=='SIMPLE_RECORD_END':
   for stage in (['asr']*5 if mode=='duplicate-saved' else ['raw','pregain','truth','asr','vad']):emit('WAV_SAVED',stage=stage)
+  if os.environ.get('FAKE_FIRERED')=='3':
+   prefix='guardian-voice-1792424800000-NOISY-abc12345'
+   for suffix in ['truth.wav','asr.wav','index.tsv']:
+    src=f('files/guardian-diagnostics/'+prefix+'-'+suffix);dst=f('files/guardian-diagnostics/gtcrn-comparison/'+prefix+'-'+suffix);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst)
+   emit('GTCRN_COMPARISON_SAVED',prefix=prefix,pairs=0 if mode=='shadow-unavailable' else 40,samples=32000,dropped=0,unmatched=0)
   if mode=='limit':emit('WAV_LIMIT',stage='truth')
 elif a[:2]==['shell','run-as']:
  c=a[3:]

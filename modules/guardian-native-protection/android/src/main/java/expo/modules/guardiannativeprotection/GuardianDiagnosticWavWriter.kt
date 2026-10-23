@@ -12,11 +12,14 @@ internal class GuardianDiagnosticWavWriter(
     sessionId: String,
     private val diagnostics: GuardianVoiceDiagnostics?,
     private val maxSamples: Long = 16_000L * 180L,
+    private val emitLifecycleEvents: Boolean = true,
 ) {
     private data class Stage(val file: File, val stream: RandomAccessFile, var samples: Long = 0, var limited: Boolean = false)
     private val stages = linkedMapOf<String, Stage>()
     private val prefix = "guardian-voice-" + System.currentTimeMillis() + "-" + profile + "-" + sessionId.take(8)
+    val filePrefix: String get() = prefix
     private var closed = false
+    val isClosed: Boolean get() = closed
     private var writes = 0
     private val index: BufferedWriter
 
@@ -25,7 +28,7 @@ internal class GuardianDiagnosticWavWriter(
         index = File(directory, "$prefix-index.tsv").bufferedWriter()
         index.write("stage\tsequence\tcapturedAtNs\tfileSampleStart\tsampleCount\n")
         index.flush()
-        diagnostics?.event("WAV_READY", "directory" to directory.absolutePath,
+        if (emitLifecycleEvents) diagnostics?.event("WAV_READY", "directory" to directory.absolutePath,
             "prefix" to prefix, "sampleRateHz" to 16000, "channels" to 1,
             "format" to "PCM16", "maxSecondsPerStage" to maxSamples / 16000)
     }
@@ -80,7 +83,7 @@ internal class GuardianDiagnosticWavWriter(
             try {
                 header(stage.stream, stage.samples * 2)
                 stage.stream.fd.sync()
-                diagnostics?.event("WAV_SAVED", "stage" to name, "file" to stage.file.name,
+                if (emitLifecycleEvents) diagnostics?.event("WAV_SAVED", "stage" to name, "file" to stage.file.name,
                     "samples" to stage.samples, "durationMs" to stage.samples * 1000 / 16000)
             } catch (error: Exception) {
                 diagnostics?.event("WAV_FINALIZE_ERROR", "stage" to name, "error" to error.javaClass.simpleName)

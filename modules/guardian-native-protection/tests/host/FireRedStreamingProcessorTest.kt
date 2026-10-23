@@ -33,7 +33,9 @@ fun main(args:Array<String>) {
         val i=calls.getAndIncrement();check(i<expected.size && x.contentEquals(expected[i])){"Qwen PCM differs from real native reference"}
         decoded.countDown();GuardianQwenRescueRecognizer.Result("test")
     }
-    val diagnostic=GuardianVoiceDiagnostics(true,output={events+=it})
+    val saved=CountDownLatch(5);val comparisonSaved=CountDownLatch(1)
+    val directory=java.nio.file.Files.createTempDirectory("processor-paired-").toFile()
+    val diagnostic=GuardianVoiceDiagnostics(true,output={events+=it;if(it.contains("\"event\":\"WAV_SAVED\""))saved.countDown();if(it.contains("GTCRN_COMPARISON_SAVED"))comparisonSaved.countDown()})
     val decoder=GuardianQwenProgressiveDecoder(qwen,object:GuardianQwenProgressiveDecoder.Listener {
         override fun onPartial(hypothesis:GuardianQwenProgressiveDecoder.Hypothesis)=error("partial")
         override fun onFinal(hypothesis:GuardianQwenProgressiveDecoder.Hypothesis)=Unit
@@ -44,12 +46,14 @@ fun main(args:Array<String>) {
         override fun onSpeechStarted()=Unit
         override fun onSpeechEnded(){ended.countDown()}
         override fun onWarning(message:String){warnings+=message}
-    },profile=GuardianVoiceProfile.NOISY,diagnostics=diagnostic)
+    },profile=GuardianVoiceProfile.NOISY,diagnostics=diagnostic,diagnosticWavDirectory=directory)
     try {
         var sequence=1L
         for(i in 0 until full.size-799 step 800) {
             val x=full.copyOfRange(i,i+800)
-            processor.onAudioFrame(testFrame(x,sequence++).copy(enhancementExpected=true))
+            val number=sequence++
+            processor.onAudioFrame(testFrame(x,number).copy(enhancementExpected=true))
+            processor.onEnhancedAudioFrame(GuardianAudioEngine.EnhancedAudioFrame(FloatArray(800){.9f},800,number*50_000_000,number,"GTCRN"))
             x.fill(.73f) // capture pool is reused immediately after its callback
             Thread.sleep(5)
         }
@@ -57,6 +61,6 @@ fun main(args:Array<String>) {
         check(calls.get()==3);check(warnings.isEmpty()){warnings.joinToString()}
         check(events.none{it.contains("FIRERED_ERROR") || it.contains("PIPELINE_RESET")})
         check(events.any{it.contains(GuardianFireRedStreaming.MODEL_ID)})
-    }finally{processor.close();check(qwen.released.await(5,TimeUnit.SECONDS))}
-    println("PASS real streaming processor: NOISY ignores missing GTCRN, original capture copied, three exact PCM windows, no partial decode")
+    }finally{processor.close();check(qwen.released.await(5,TimeUnit.SECONDS));check(saved.await(5,TimeUnit.SECONDS));check(comparisonSaved.await(5,TimeUnit.SECONDS));directory.deleteRecursively()}
+    println("PASS real streaming processor: GTCRN comparison preserves original, original capture copied, three exact PCM windows, no partial decode")
 }

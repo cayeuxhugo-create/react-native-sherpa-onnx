@@ -1,0 +1,14 @@
+{
+  "version": "guardian-voice-v3.4.1-gtcrn-comparison",
+  "date": "2026-10-23",
+  "role": "recording-only; no secondary decision or ASR",
+  "hostPairingTests": "passed",
+  "primaryPcmWindowsUnchanged": 3,
+  "processorTest": "real FireRed JNI, injected secondary audio, fake Qwen callback; original reference PCM byte-identical",
+  "collectorSimulatedCases": 15,
+  "kotlinApiCompilation": "passed with Android stubs",
+  "nativeLibraries": "unchanged from v3.4",
+  "apkBuilt": false,
+  "deviceTested": false,
+  "realNoiseAccuracyGainMeasured": false
+}

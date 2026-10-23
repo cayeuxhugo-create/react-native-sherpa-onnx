@@ -190,6 +190,7 @@ fun main() {
     decoderTests()
     diagnosticsTests()
     wavWriterTests()
+    gtcrnComparisonTests()
     neuralInputGainTests()
     diagnosticOptionsTests()
 }

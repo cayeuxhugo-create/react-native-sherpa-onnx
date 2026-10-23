@@ -12,6 +12,8 @@ sources=(
   "$source_dir/GuardianDiagnosticOptions.kt"
   "$source_dir/GuardianNeuralInputGain.kt"
   "$source_dir/GuardianDiagnosticWavWriter.kt"
+  "$source_dir/GuardianGtcrnComparison.kt"
+  "$module_dir/tests/host/GtcrnComparisonTest.kt"
   "$source_dir/GuardianSpeechSegmenter.kt"
   "$source_dir/GuardianVoiceInputRouter.kt"
   "$source_dir/GuardianVoiceProfile.kt"
