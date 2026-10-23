@@ -6,7 +6,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 $expectedZipHash = "8d5f1f522fa6edd1223a9a411f938d97295300544d5c5d4f3b910382ac7c5d0d"
-$downloadUrl = "https://raw.githubusercontent.com/cayeuxhugo-create/react-native-sherpa-onnx/codex/guardian-firered-stream-v34-20261023/modules-voix-v3.4-firered-stream.zip"
+$downloadUrl = "https://raw.githubusercontent.com/cayeuxhugo-create/react-native-sherpa-onnx/8e0544d5170e77f82bb8fd3b1ad4014ddca969b2/modules-voix-v3.4-firered-stream.zip"
 
 function Assert-GuardianModule {
     param([string]$Root, $Expected)
