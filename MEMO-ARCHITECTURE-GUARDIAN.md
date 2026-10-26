@@ -54,3 +54,9 @@ un diagnostic NOISY avec WAV. Aucun texte ni alerte issus de cette voie ;
 FireRed et Qwen continuent sur l’original. Paires original/GTCRN avec index
 et pertes explicites. Valider le bruit réel avant tout secours automatique.
 Guide : [comparaison GTCRN](LIVRAISON-GTCRN-COMPARAISON-V3.4.1.md).
+
+Mise à jour v3.4.2 du 26 octobre : exports Float32 LE sans en-tête à côté
+des WAV, index commun ; AUDIO_FRAME associe capture/observation monotoniques
+et horodatage de log. Collecteur annoté avec route fixée, consignes et
+observations réelles. Aucun changement de détection, gain ou décision Qwen.
+Guide : [diagnostics flottants](LIVRAISON-DIAGNOSTICS-FLOTTANTS-V3.4.2.md).

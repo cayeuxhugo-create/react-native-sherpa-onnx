@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import sys,os,pathlib,json,time,hashlib,shutil,wave
+import sys,os,pathlib,json,time,hashlib,shutil,wave,struct
 r=pathlib.Path(os.environ['FAKE_ADB_ROOT']);a=sys.argv[1:];mode=os.environ.get('FAKE_MODE','ok')
 def f(n):return r/n.lstrip('/')
 def emit(event,**kw):
- if os.environ.get('FAKE_FIRERED') in ['1','2','3']:
-  if event=='SESSION_START':kw['engineRevision']='guardian-voice-v3.2.1' if mode=='wrong-engine' else ('guardian-voice-v3.4-firered-stream' if os.environ.get('FAKE_FIRERED')=='2' else 'guardian-voice-v3.4.1-gtcrn-comparison' if os.environ.get('FAKE_FIRERED')=='3' else 'guardian-voice-v3.3-firered')
+ if os.environ.get('FAKE_FIRERED') in ['1','2','3','4']:
+  if event=='SESSION_START':kw['engineRevision']='guardian-voice-v3.2.1' if mode=='wrong-engine' else ('guardian-voice-v3.4-firered-stream' if os.environ.get('FAKE_FIRERED')=='2' else 'guardian-voice-v3.4.1-gtcrn-comparison' if os.environ.get('FAKE_FIRERED')=='3' else 'guardian-voice-v3.4.2-float-diagnostics' if os.environ.get('FAKE_FIRERED')=='4' else 'guardian-voice-v3.3-firered')
   if event=='WAV_READY':emit('FIRERED_START_FAILED' if mode=='firered-failed' else 'FIRERED_READY',**{k:v for k,v in kw.items() if k=='session'})
  with f('events').open('a') as h:h.write('10-19 12:00:00.000 123 123 I GuardianVoiceDiag: '+json.dumps(dict(event=event,**({'session':'abc12345'}|kw)))+'\n')
 if a[0]=='get-state':print('device')
@@ -17,23 +17,25 @@ elif a[0]=='logcat':
   time.sleep(.05)
 elif a[0]=='exec-out':
  b=f(a[-1]).read_bytes()
- if mode=='corrupt' and a[-1].endswith('asr.wav'):b=b[:-1]+bytes([b[-1]^255])
+ if (mode=='corrupt' and a[-1].endswith('asr.wav')) or (mode=='float-corrupt' and a[-1].endswith('asr.f32')):b=b[:-1]+bytes([b[-1]^255])
  sys.stdout.buffer.write(b)
 elif a[:2]==['shell','getprop']:print('Fixture' if 'model' in a[-1] else '16')
 elif a[:2]==['shell','chmod']:pass
 elif a[:2]==['shell','rm']:f(a[-1]).unlink(missing_ok=True)
 elif a[:2]==['shell','log']:
+ with f('events').open('a') as h:h.write('10-19 12:00:00.000 123 123 I GuardianVoiceDiag: '+a[-1]+'\n')
  if a[-1].startswith('SIMPLE_RECORD_BEGIN') and mode=='restart':
   emit('SESSION_END',elapsedMs=100)
   emit('SESSION_START',session='other123',elapsedMs=101)
  if a[-1]=='SIMPLE_RECORD_END':
   for stage in (['asr']*5 if mode=='duplicate-saved' else ['raw','pregain','truth','asr','vad']):emit('WAV_SAVED',stage=stage)
-  if os.environ.get('FAKE_FIRERED')=='3':
+  if os.environ.get('FAKE_FIRERED') in ['3','4']:
    prefix='guardian-voice-1792424800000-NOISY-abc12345'
-   for suffix in ['truth.wav','asr.wav','index.tsv']:
+   for suffix in (['truth.wav','asr.wav','index.tsv']+(['truth.f32','asr.f32'] if os.environ.get('FAKE_FIRERED')=='4' else [])):
     src=f('files/guardian-diagnostics/'+prefix+'-'+suffix);dst=f('files/guardian-diagnostics/gtcrn-comparison/'+prefix+'-'+suffix);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst)
-   emit('GTCRN_COMPARISON_SAVED',prefix=prefix,pairs=0 if mode=='shadow-unavailable' else 40,samples=32000,dropped=0,unmatched=0)
+   emit('GTCRN_COMPARISON_SAVED',prefix=prefix,pairs=0 if mode=='shadow-unavailable' else 40,samples=int(os.environ.get("FAKE_BLOCKS","250"))*128,dropped=0,unmatched=0)
   if mode=='limit':emit('WAV_LIMIT',stage='truth')
+  if mode=='export-error':emit('WAV_FINALIZE_ERROR',stage='truth',error='IOException')
 elif a[:2]==['shell','run-as']:
  c=a[3:]
  if c[0]=='id':print('uid=123')
@@ -56,7 +58,9 @@ elif a[:2]==['shell','run-as']:
    for suffix in ['raw.wav','pregain.wav','truth.wav','asr.wav','vad.wav','index.tsv']:
     out=f('files/guardian-diagnostics/'+prefix+'-'+suffix);out.parent.mkdir(parents=True,exist_ok=True)
     if suffix.endswith('.wav'):
-     with wave.open(str(out),'wb') as w:w.setnchannels(1);w.setsampwidth(2);w.setframerate(16000);w.writeframes(bytes(range(256))*(10 if mode=='short-wav' else 250))
+     with wave.open(str(out),'wb') as w:w.setnchannels(1);w.setsampwidth(2);w.setframerate(16000);w.writeframes(bytes(range(256))*(10 if mode=='short-wav' else int(os.environ.get('FAKE_BLOCKS','250'))))
+     if os.environ.get('FAKE_FIRERED')=='4':
+      data=out.read_bytes()[44:];samples=struct.unpack('<'+'h'*(len(data)//2),data);floats=struct.pack('<'+'f'*len(samples),*(x/32768 for x in samples));out.with_suffix('.f32').write_bytes(floats[:-4] if mode=='float-truncated' else floats)
     else:out.write_text('stage\tsequence\tcapturedAtNs\tfileSampleStart\tsampleCount\nraw\t1\t20000\t0\t800\n')
  else:sys.exit('unknown '+repr(a))
 else:sys.exit('unknown '+repr(a))

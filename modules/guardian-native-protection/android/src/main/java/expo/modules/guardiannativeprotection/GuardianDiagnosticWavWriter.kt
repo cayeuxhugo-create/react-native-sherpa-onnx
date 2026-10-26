@@ -5,7 +5,7 @@ import java.io.File
 import java.io.RandomAccessFile
 import kotlin.math.roundToInt
 
-/** Test-only PCM16 exports. Owned by the speech-input worker, never changes ASR. */
+/** Test-only PCM16 listening copies and exact little-endian Float32 sidecars. Owned by the speech-input worker, never changes ASR. */
 internal class GuardianDiagnosticWavWriter(
     private val directory: File,
     profile: String,
@@ -14,7 +14,7 @@ internal class GuardianDiagnosticWavWriter(
     private val maxSamples: Long = 16_000L * 180L,
     private val emitLifecycleEvents: Boolean = true,
 ) {
-    private data class Stage(val file: File, val stream: RandomAccessFile, var samples: Long = 0, var limited: Boolean = false)
+    private data class Stage(val file: File, val stream: RandomAccessFile, val floatFile: File, val floatStream: RandomAccessFile, var samples: Long = 0, var limited: Boolean = false)
     private val stages = linkedMapOf<String, Stage>()
     private val prefix = "guardian-voice-" + System.currentTimeMillis() + "-" + profile + "-" + sessionId.take(8)
     val filePrefix: String get() = prefix
@@ -30,7 +30,7 @@ internal class GuardianDiagnosticWavWriter(
         index.flush()
         if (emitLifecycleEvents) diagnostics?.event("WAV_READY", "directory" to directory.absolutePath,
             "prefix" to prefix, "sampleRateHz" to 16000, "channels" to 1,
-            "format" to "PCM16", "maxSecondsPerStage" to maxSamples / 16000)
+            "format" to "PCM16", "floatFormat" to "FLOAT32_LE_HEADERLESS", "maxSecondsPerStage" to maxSamples / 16000)
     }
 
     fun write(stageName: String, pcm: FloatArray, sequence: Long, capturedAtNs: Long) {
@@ -47,7 +47,15 @@ internal class GuardianDiagnosticWavWriter(
                 try {
                     stream.setLength(0)
                     header(stream, 0)
-                    Stage(file, stream)
+                    val floatFile = File(directory, "$prefix-$stageName.f32")
+                    val floatStream = RandomAccessFile(floatFile, "rw")
+                    try {
+                        floatStream.setLength(0)
+                        Stage(file, stream, floatFile, floatStream)
+                    } catch (error: Exception) {
+                        try { floatStream.close() } catch (_: Exception) {}
+                        throw error
+                    }
                 } catch (error: Exception) {
                     try { stream.close() } catch (_: Exception) {}
                     throw error
@@ -56,12 +64,15 @@ internal class GuardianDiagnosticWavWriter(
             val count = minOf(pcm.size.toLong(), maxSamples - stage.samples).toInt()
             if (count > 0) {
                 val bytes = ByteArray(count * 2)
+                val floats = java.nio.ByteBuffer.allocate(count * 4).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+                for (i in 0 until count) floats.putFloat(pcm[i])
                 for (i in 0 until count) {
                     val sample = (pcm[i].coerceIn(-1f, 1f) * 32768f).roundToInt().coerceIn(-32768, 32767)
                     bytes[2 * i] = (sample and 255).toByte()
                     bytes[2 * i + 1] = ((sample ushr 8) and 255).toByte()
                 }
                 stage.stream.write(bytes)
+                stage.floatStream.write(floats.array())
                 index.write("$stageName\t$sequence\t$capturedAtNs\t" + stage.samples + "\t$count\n")
                 stage.samples += count
                 if (++writes % 30 == 0) index.flush()
@@ -83,12 +94,15 @@ internal class GuardianDiagnosticWavWriter(
             try {
                 header(stage.stream, stage.samples * 2)
                 stage.stream.fd.sync()
+                stage.floatStream.fd.sync()
                 if (emitLifecycleEvents) diagnostics?.event("WAV_SAVED", "stage" to name, "file" to stage.file.name,
-                    "samples" to stage.samples, "durationMs" to stage.samples * 1000 / 16000)
+                    "samples" to stage.samples, "floatFile" to stage.floatFile.name,
+                    "floatBytes" to stage.floatStream.length(), "durationMs" to stage.samples * 1000 / 16000)
             } catch (error: Exception) {
                 diagnostics?.event("WAV_FINALIZE_ERROR", "stage" to name, "error" to error.javaClass.simpleName)
             } finally {
                 try { stage.stream.close() } catch (_: Exception) {}
+                try { stage.floatStream.close() } catch (_: Exception) {}
             }
         }
         try { index.close() } catch (_: Exception) {}

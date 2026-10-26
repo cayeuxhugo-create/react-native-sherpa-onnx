@@ -1307,7 +1307,7 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.1-gtcrn-comparison",
+      "engineRevision" to "guardian-voice-v3.4.2-float-diagnostics",
       "diagnosticControlRevision" to 3,
       "wavStageCount" to 5,
       "decoderMode" to "FINAL_ONLY",

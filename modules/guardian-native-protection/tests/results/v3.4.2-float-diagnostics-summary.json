@@ -1,0 +1,21 @@
+{
+  "version": "guardian-voice-v3.4.2-float-diagnostics",
+  "date": "2026-10-26",
+  "role": "diagnostics only; unchanged original detection and Qwen decision",
+  "floatFormat": "IEEE754_FLOAT32_LE_HEADERLESS_16000HZ_MONO",
+  "hostFloatBitPreservation": "passed, including sub-PCM16 values, signed zero and Float.MIN_VALUE",
+  "hostWriterTests": "passed: five stages, limits, invalid PCM, immutable input, timestamps and finalization",
+  "primaryPcmWindowsUnchanged": 3,
+  "processorTest": "real FireRed JNI; injected secondary PCM; fake Qwen callback; original PCM byte-identical",
+  "collectorSimulatedCases": 18,
+  "timedProtocol": {
+    "durationSeconds": 75,
+    "prompts": 6,
+    "testCase": "WORDS",
+    "result": "passed with fake ADB, ordered prompts within 3 seconds, metadata and BEGIN/END preserved"
+  },
+  "kotlinApiCompilation": "passed with Android framework stubs",
+  "nativeLibraries": "unchanged from v3.4",
+  "apkBuilt": false,
+  "deviceTested": false
+}

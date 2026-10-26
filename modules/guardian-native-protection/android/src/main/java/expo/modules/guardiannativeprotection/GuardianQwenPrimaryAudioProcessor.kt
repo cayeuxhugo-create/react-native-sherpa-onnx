@@ -144,6 +144,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
                         "streamVadElapsedMs" to streamResult.elapsedMs,
                         "rawVadMaxInputGain" to 64,
                         "enhancementExpected" to frame.enhancementExpected,
+                        "capturedAtNs" to frame.key.capturedAtNanos,
+                        "observedAtNs" to System.nanoTime(),
                         "vadSpeech" to speech, "gain" to frame.gain,
                         "preGainDbfs" to frame.preGainRms?.let { GuardianVoiceDiagnostics.dbfs(it) },
                         "noiseFloorDbfs" to frame.preGainNoiseRms?.let { GuardianVoiceDiagnostics.dbfs(it) },
