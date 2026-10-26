@@ -1,0 +1,25 @@
+{
+  "reusedInferenceNotNewDecodes": true,
+  "matchedOriginalWindows": 7,
+  "matchedLegacyWindows": 30,
+  "all37WaveformsMatch": true,
+  "aggregate": [
+    {
+      "method": "delayed-legacy-with-startup-candidate-guard",
+      "family": "compatibility-control",
+      "speechWindows": 24,
+      "negativeWindows": 13,
+      "forcedExact": 22,
+      "admittedExact": 22,
+      "admittedSpeech": 24,
+      "admittedNegative": 0,
+      "admittedNegativeTexts": 0,
+      "forcedNegativeTexts": 13,
+      "wordErrors": 3,
+      "referenceWords": 140,
+      "firstNoisyExact": true,
+      "preservedNoisyPhoneSuccesses": 2
+    }
+  ],
+  "scope": "additional causal compatibility control; not part of the frozen 26-configuration search"
+}

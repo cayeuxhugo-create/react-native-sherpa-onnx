@@ -1,0 +1,254 @@
+[
+  {
+    "method": "adaptive-dd-a0.98-f0.5",
+    "family": "adaptive_dd",
+    "speechWindows": 24,
+    "negativeWindows": 13,
+    "forcedExact": 23,
+    "admittedExact": 23,
+    "admittedSpeech": 24,
+    "admittedNegative": 0,
+    "admittedNegativeTexts": 0,
+    "forcedNegativeTexts": 13,
+    "wordErrors": 5,
+    "referenceWords": 140,
+    "firstNoisyExact": false,
+    "preservedNoisyPhoneSuccesses": 2,
+    "scopes": {
+      "recent": {
+        "expected": 9,
+        "admittedExact": 8,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 5,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-quiet": {
+        "expected": 15,
+        "admittedExact": 15,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 1,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-negative": {
+        "expected": 0,
+        "admittedExact": 0,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 7,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      }
+    }
+  },
+  {
+    "method": "adaptive-logmmse-a0.98-f0.5",
+    "family": "adaptive_logmmse",
+    "speechWindows": 24,
+    "negativeWindows": 13,
+    "forcedExact": 22,
+    "admittedExact": 22,
+    "admittedSpeech": 24,
+    "admittedNegative": 0,
+    "admittedNegativeTexts": 0,
+    "forcedNegativeTexts": 13,
+    "wordErrors": 6,
+    "referenceWords": 140,
+    "firstNoisyExact": false,
+    "preservedNoisyPhoneSuccesses": 2,
+    "scopes": {
+      "recent": {
+        "expected": 9,
+        "admittedExact": 8,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 5,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-quiet": {
+        "expected": 15,
+        "admittedExact": 14,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 1,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-negative": {
+        "expected": 0,
+        "admittedExact": 0,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 7,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      }
+    }
+  },
+  {
+    "method": "dd-a0.98-f0.5",
+    "family": "dd",
+    "speechWindows": 24,
+    "negativeWindows": 13,
+    "forcedExact": 22,
+    "admittedExact": 22,
+    "admittedSpeech": 24,
+    "admittedNegative": 0,
+    "admittedNegativeTexts": 0,
+    "forcedNegativeTexts": 13,
+    "wordErrors": 6,
+    "referenceWords": 140,
+    "firstNoisyExact": false,
+    "preservedNoisyPhoneSuccesses": 2,
+    "scopes": {
+      "recent": {
+        "expected": 9,
+        "admittedExact": 8,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 5,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-quiet": {
+        "expected": 15,
+        "admittedExact": 14,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 1,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-negative": {
+        "expected": 0,
+        "admittedExact": 0,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 7,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      }
+    }
+  },
+  {
+    "method": "original",
+    "family": "reference",
+    "speechWindows": 24,
+    "negativeWindows": 13,
+    "forcedExact": 22,
+    "admittedExact": 22,
+    "admittedSpeech": 23,
+    "admittedNegative": 0,
+    "admittedNegativeTexts": 0,
+    "forcedNegativeTexts": 12,
+    "wordErrors": 9,
+    "referenceWords": 140,
+    "firstNoisyExact": false,
+    "preservedNoisyPhoneSuccesses": 1,
+    "scopes": {
+      "recent": {
+        "expected": 9,
+        "admittedExact": 7,
+        "rejectedSpeech": 1,
+        "negativeCandidates": 5,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-quiet": {
+        "expected": 15,
+        "admittedExact": 15,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 1,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-negative": {
+        "expected": 0,
+        "admittedExact": 0,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 7,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      }
+    }
+  },
+  {
+    "method": "subtract-p1.5-o1.3-f0.35",
+    "family": "subtract",
+    "speechWindows": 24,
+    "negativeWindows": 13,
+    "forcedExact": 21,
+    "admittedExact": 21,
+    "admittedSpeech": 24,
+    "admittedNegative": 0,
+    "admittedNegativeTexts": 0,
+    "forcedNegativeTexts": 13,
+    "wordErrors": 6,
+    "referenceWords": 140,
+    "firstNoisyExact": false,
+    "preservedNoisyPhoneSuccesses": 2,
+    "scopes": {
+      "recent": {
+        "expected": 9,
+        "admittedExact": 8,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 5,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-quiet": {
+        "expected": 15,
+        "admittedExact": 13,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 1,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-negative": {
+        "expected": 0,
+        "admittedExact": 0,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 7,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      }
+    }
+  },
+  {
+    "method": "wiener-legacy-o1-f0.5",
+    "family": "legacy_wiener",
+    "speechWindows": 24,
+    "negativeWindows": 13,
+    "forcedExact": 22,
+    "admittedExact": 22,
+    "admittedSpeech": 24,
+    "admittedNegative": 1,
+    "admittedNegativeTexts": 1,
+    "forcedNegativeTexts": 12,
+    "wordErrors": 3,
+    "referenceWords": 140,
+    "firstNoisyExact": true,
+    "preservedNoisyPhoneSuccesses": 2,
+    "scopes": {
+      "recent": {
+        "expected": 9,
+        "admittedExact": 9,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 5,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      },
+      "old-quiet": {
+        "expected": 15,
+        "admittedExact": 13,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 1,
+        "admittedNegatives": 1,
+        "admittedNegativeTexts": 1
+      },
+      "old-negative": {
+        "expected": 0,
+        "admittedExact": 0,
+        "rejectedSpeech": 0,
+        "negativeCandidates": 7,
+        "admittedNegatives": 0,
+        "admittedNegativeTexts": 0
+      }
+    }
+  }
+]

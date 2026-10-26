@@ -1,0 +1,8 @@
+[
+  "original",
+  "wiener-legacy-o1-f0.5",
+  "subtract-p1.5-o1.3-f0.35",
+  "adaptive-dd-a0.98-f0.5",
+  "adaptive-logmmse-a0.98-f0.5",
+  "dd-a0.98-f0.5"
+]

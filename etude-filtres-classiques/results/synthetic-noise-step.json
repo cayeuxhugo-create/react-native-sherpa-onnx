@@ -1,0 +1,47 @@
+[
+  {
+    "method": "original",
+    "attenuationDb": {
+      "known-noise": 0.0,
+      "just-after-step": 0.0,
+      "later": 0.0
+    },
+    "finite": true
+  },
+  {
+    "method": "wiener-sqrt-o1-f0.5",
+    "attenuationDb": {
+      "known-noise": -4.769304275512695,
+      "just-after-step": -0.8524852395057678,
+      "later": -0.8228763937950134
+    },
+    "finite": true
+  },
+  {
+    "method": "dd-a0.98-f0.5",
+    "attenuationDb": {
+      "known-noise": -6.006182670593262,
+      "just-after-step": -1.6412904262542725,
+      "later": -1.5985924005508423
+    },
+    "finite": true
+  },
+  {
+    "method": "adaptive-dd-a0.98-f0.5",
+    "attenuationDb": {
+      "known-noise": -6.004511833190918,
+      "just-after-step": -1.6390924453735352,
+      "later": -2.0390737056732178
+    },
+    "finite": true
+  },
+  {
+    "method": "adaptive-logmmse-a0.98-f0.5",
+    "attenuationDb": {
+      "known-noise": -4.664416790008545,
+      "just-after-step": -1.4948115348815918,
+      "later": -1.8388103246688843
+    },
+    "finite": true
+  }
+]

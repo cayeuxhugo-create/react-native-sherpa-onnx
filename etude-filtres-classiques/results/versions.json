@@ -1,0 +1,8 @@
+{
+  "python": "3.12.14",
+  "numpy": "2.5.4",
+  "scipy": "1.17.0",
+  "sherpaOnnx": "1.13.8",
+  "sampleRate": 16000,
+  "numericalTests": 19
+}

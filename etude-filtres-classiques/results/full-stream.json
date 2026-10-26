@@ -1,0 +1,80 @@
+[
+  {
+    "method": "adaptive-dd-a0.98-f0.5",
+    "datasets": {
+      "quiet1m": {
+        "expected": 3,
+        "exactUtterances": 3,
+        "admittedWindows": 3,
+        "nonemptyCaptions": 3,
+        "nonemptyOutsideOriginalSpeechWindows": 0
+      },
+      "quiet3m": {
+        "expected": 3,
+        "exactUtterances": 3,
+        "admittedWindows": 3,
+        "nonemptyCaptions": 3,
+        "nonemptyOutsideOriginalSpeechWindows": 0
+      },
+      "vacuum3m": {
+        "expected": 3,
+        "exactUtterances": 1,
+        "admittedWindows": 4,
+        "nonemptyCaptions": 4,
+        "nonemptyOutsideOriginalSpeechWindows": 1
+      }
+    }
+  },
+  {
+    "method": "original",
+    "datasets": {
+      "quiet1m": {
+        "expected": 3,
+        "exactUtterances": 3,
+        "admittedWindows": 3,
+        "nonemptyCaptions": 3,
+        "nonemptyOutsideOriginalSpeechWindows": 0
+      },
+      "quiet3m": {
+        "expected": 3,
+        "exactUtterances": 3,
+        "admittedWindows": 3,
+        "nonemptyCaptions": 3,
+        "nonemptyOutsideOriginalSpeechWindows": 0
+      },
+      "vacuum3m": {
+        "expected": 3,
+        "exactUtterances": 1,
+        "admittedWindows": 2,
+        "nonemptyCaptions": 2,
+        "nonemptyOutsideOriginalSpeechWindows": 0
+      }
+    }
+  },
+  {
+    "method": "subtract-p1.5-o1.3-f0.35",
+    "datasets": {
+      "quiet1m": {
+        "expected": 3,
+        "exactUtterances": 3,
+        "admittedWindows": 3,
+        "nonemptyCaptions": 3,
+        "nonemptyOutsideOriginalSpeechWindows": 0
+      },
+      "quiet3m": {
+        "expected": 3,
+        "exactUtterances": 3,
+        "admittedWindows": 3,
+        "nonemptyCaptions": 3,
+        "nonemptyOutsideOriginalSpeechWindows": 0
+      },
+      "vacuum3m": {
+        "expected": 3,
+        "exactUtterances": 2,
+        "admittedWindows": 4,
+        "nonemptyCaptions": 4,
+        "nonemptyOutsideOriginalSpeechWindows": 1
+      }
+    }
+  }
+]

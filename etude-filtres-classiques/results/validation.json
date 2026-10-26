@@ -1,0 +1,15 @@
+{
+  "freshAsrDecodes": 474,
+  "initialConfigurations": 26,
+  "newConfigurations": 24,
+  "screenSpoken": 3,
+  "screenNegative": 5,
+  "completeSpoken": 24,
+  "completeNegativeUnique": 13,
+  "transferUtterances": 9,
+  "transferCorrelatedWindows": 18,
+  "fullReplayMethods": 2,
+  "extraDelayedControlUsesExactPcmInferenceReuse": true,
+  "blindIndependentValidation": false,
+  "androidChanged": false
+}
