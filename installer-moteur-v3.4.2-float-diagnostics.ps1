@@ -6,7 +6,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 $expectedZipHash = "31ba393f25a7a9dbf72d7ba1e375082cbc66d95e218ad225dfd0e67bcf0805af"
-$downloadUrl = "https://raw.githubusercontent.com/cayeuxhugo-create/react-native-sherpa-onnx/codex/guardian-float-diagnostics-20261026/modules-voix-v3.4.2-float-diagnostics.zip"
+$downloadUrl = "https://raw.githubusercontent.com/cayeuxhugo-create/react-native-sherpa-onnx/d5a82aadff485e3c180b5c758c95d213a025edf2/modules-voix-v3.4.2-float-diagnostics.zip"
 
 function Assert-GuardianModule {
     param([string]$Root, $Expected)
