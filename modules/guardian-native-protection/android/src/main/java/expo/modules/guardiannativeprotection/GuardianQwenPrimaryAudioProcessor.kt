@@ -17,6 +17,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val profile: GuardianVoiceProfile = GuardianVoiceProfile.DISTANT,
     private val diagnostics: GuardianVoiceDiagnostics? = null,
     diagnosticWavDirectory: java.io.File? = null,
+    private val speechOnlyGain: Boolean = false,
+    private val confirmedGainMaximum: Float = 1f,
 ) : GuardianAudioEngine.AudioProcessor {
     interface Listener {
         fun onSpeechStarted()
@@ -92,11 +94,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
                     "admission" to "FIRERED_REJECT")
                 return
             }
+            val segmentGain = if (speechOnlyGain) GuardianSpeechSegmentGain.apply(pcm, confirmed=true, maximumGain=confirmedGainMaximum) else null
+            val asrPcm = segmentGain?.pcm ?: pcm
+            if (segmentGain != null) diagnostics?.event("SEGMENT_GAIN", "segment" to id,
+                "gain" to segmentGain.gain, "samples" to pcm.size, "evidence" to "NEURAL_CONFIRMED",
+                "inputRmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(pcm)))
             val evidence = GuardianQwenProgressiveDecoder.AcousticEvidence.NEURAL_CONFIRMED
             val accepted = if (final) {
-                decoder.offerFinal(id, pcm, reason, evidence)
+                decoder.offerFinal(id, asrPcm, reason, evidence)
             } else {
-                decoder.offerPartial(id, pcm, evidence)
+                decoder.offerPartial(id, asrPcm, evidence)
             }
             diagnostics?.event("SEGMENT_WINDOW", "segment" to id, "final" to final,
                 "reason" to reason, "samples" to pcm.size,
@@ -144,8 +151,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                         "streamVadElapsedMs" to streamResult.elapsedMs,
                         "rawVadMaxInputGain" to 64,
                         "enhancementExpected" to frame.enhancementExpected,
-                        "capturedAtNs" to frame.key.capturedAtNanos,
-                        "observedAtNs" to System.nanoTime(),
+                        "observedAtElapsedRealtimeMs" to now,
                         "vadSpeech" to speech, "gain" to frame.gain,
                         "preGainDbfs" to frame.preGainRms?.let { GuardianVoiceDiagnostics.dbfs(it) },
                         "noiseFloorDbfs" to frame.preGainNoiseRms?.let { GuardianVoiceDiagnostics.dbfs(it) },
@@ -186,10 +192,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
         val count = frame.sampleCount.coerceIn(0, frame.samples.size)
         if (count == 0) return
         // The engine reuses its arrays immediately after this callback.
+        if (speechOnlyGain && (frame.detectorSampleCount != count || frame.detectorSamples.size < count)) {
+            discontinuity.set(true)
+            diagnostics?.event("PREGAIN_UNAVAILABLE", "sequence" to frame.sequenceNumber)
+            return
+        }
+        val selected = if (speechOnlyGain) frame.detectorSamples else frame.samples
         val input = GuardianVoiceInputRouter.Input(
             key = GuardianVoiceInputRouter.Key(frame.sequenceNumber, frame.capturedAtElapsedRealtimeNanos),
-            pcm = frame.samples.copyOf(count),
-            gain = frame.adaptiveGain,
+            pcm = selected.copyOf(count),
+            gain = if (speechOnlyGain) 1f else frame.adaptiveGain,
             enhancementExpected = frame.enhancementExpected,
             queuedAtMs = SystemClock.elapsedRealtime(),
             preGainRms = frame.acousticRms,

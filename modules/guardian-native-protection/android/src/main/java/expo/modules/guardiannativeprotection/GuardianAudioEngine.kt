@@ -69,6 +69,7 @@ class GuardianAudioEngine(
         val spatialInputTrustName: String = "NONE",
         val voiceFocusMode: GuardianVoiceFocusMode =
             GuardianVoiceFocusMode.OFF,
+        val voiceFocusHoldDuringSpeech: Boolean = false,
 
         val internalBufferMultiplier: Int = DEFAULT_INTERNAL_BUFFER_MULTIPLIER,
         val queueCapacity: Int = DEFAULT_QUEUE_CAPACITY,
@@ -1229,6 +1230,7 @@ private var enhancementProcessingTimesCount: Int =
                 inputTrustName =
                     configuration.spatialInputTrustName,
                 voiceFocusMode = configuration.voiceFocusMode,
+                holdDuringSpeech = configuration.voiceFocusHoldDuringSpeech,
          )
 
     private val frameQueue = ArrayBlockingQueue<PooledFrame>(configuration.queueCapacity)
@@ -3724,15 +3726,13 @@ if (
         lastNoiseFloorCandidateRms =
             candidateNoiseFloor
 
-        lastNoiseFloorClampActive =
-            candidateNoiseFloor < MINIMUM_NOISE_FLOOR_RMS ||
-                candidateNoiseFloor > MAXIMUM_NOISE_FLOOR_RMS
+        lastNoiseFloorClampActive = candidateNoiseFloor > 0f &&
+            (candidateNoiseFloor < MINIMUM_NOISE_FLOOR_RMS ||
+                candidateNoiseFloor > MAXIMUM_NOISE_FLOOR_RMS)
 
-        estimatedNoiseFloor =
-            candidateNoiseFloor.coerceIn(
-                MINIMUM_NOISE_FLOOR_RMS,
-                MAXIMUM_NOISE_FLOOR_RMS
-            )
+        estimatedNoiseFloor = GuardianNoiseFloorSeed.initial(
+            candidateNoiseFloor, MINIMUM_NOISE_FLOOR_RMS, MAXIMUM_NOISE_FLOOR_RMS
+        )
     } else {
 
         val currentNoiseFloor =

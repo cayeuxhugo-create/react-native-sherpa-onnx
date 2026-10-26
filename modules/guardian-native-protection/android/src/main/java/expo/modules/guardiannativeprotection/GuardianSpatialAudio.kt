@@ -50,6 +50,7 @@ internal class GuardianSpatialAudio(
     private val maximumTrustedTdoaSeconds: Double? = null,
     private val inputTrustName: String = "NONE",
     private val voiceFocusMode: GuardianVoiceFocusMode = GuardianVoiceFocusMode.OFF,
+    private val holdDuringSpeech: Boolean = false,
 ) {
 
 
@@ -72,6 +73,7 @@ internal class GuardianSpatialAudio(
     private val focusProcessor = if (voiceFocusMode != GuardianVoiceFocusMode.OFF) {
         GuardianVoiceFocusEngine(
             sampleRate = sampleRateHz,
+            holdDuringSpeech = holdDuringSpeech,
             frameCapacity = maximumFrameSamples,
             allowRelativeAlignment = inputTrustName == "INTER_CHANNEL_ONLY" ||
                 (steeringAllowed && inputTrustName == "PHYSICAL_TDOA"),
@@ -3196,6 +3198,7 @@ internal class GuardianVoiceFocusSelector(
     private val improvementMarginDb: Float = 1.25f,
     private val switchMarginDb: Float = 0.9f,
     private val emergencyDropDb: Float = 5.0f,
+    private val holdDuringSpeech: Boolean = false,
 ) {
     enum class View { CHANNEL_0, CHANNEL_1, WEIGHTED_FUSION, ALIGNED_FUSION }
     enum class State { SCANNING, VOICE_CANDIDATE, VOICE_LOCKED, TRACKING, TRANSITION, UNSTABLE }
@@ -3211,6 +3214,7 @@ internal class GuardianVoiceFocusSelector(
         val alignedValid: Boolean = false,
         val speechEvidence: Boolean = false,
         val alignmentStable: Boolean = false,
+        val confirmedSpeech: Boolean = false,
     )
 
     data class Decision(
@@ -3230,6 +3234,7 @@ internal class GuardianVoiceFocusSelector(
     private var scansSinceSpeech = 0
     private var lockAcquired = false
     private var transitions = 0L
+    private var confirmedLock = false
 
     fun reset() {
         active = View.CHANNEL_0
@@ -3239,6 +3244,7 @@ internal class GuardianVoiceFocusSelector(
         scansSinceSpeech = 0
         lockAcquired = false
         transitions = 0L
+        confirmedLock = false
     }
 
     fun currentView(): View = active
@@ -3254,6 +3260,7 @@ internal class GuardianVoiceFocusSelector(
         if (!valid[0] && !valid[1]) {
             pendingCount = 0
             lockAcquired = false
+            confirmedLock = false
             return Decision(active, State.UNSTABLE, false, Float.NEGATIVE_INFINITY,
                 Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, false)
         }
@@ -3272,6 +3279,21 @@ internal class GuardianVoiceFocusSelector(
             if (valid[i] && score[i] >= bestSingleDb + improvementMarginDb &&
                 score[i] > score[winner.ordinal] + if (winner.ordinal > 1) switchMarginDb else 0f) {
                 winner = candidate
+            }
+        }
+        // Experimental: acquire from voice/noise quality once per neural
+        // utterance, retain until its end. Invalid/clipped channels can fail over.
+        if (holdDuringSpeech) {
+            if (!o.confirmedSpeech) confirmedLock = false
+            if (o.confirmedSpeech && valid[active.ordinal]) {
+                val changed = !confirmedLock && winner != active
+                if (changed) { active = winner; transitions++ }
+                confirmedLock = true
+                pendingCount = 0
+                lockAcquired = true
+                return Decision(active, if (changed) State.TRANSITION else State.TRACKING,
+                    changed, bestSingleDb, score[active.ordinal],
+                    score[winner.ordinal] - bestSingleDb, true)
             }
         }
         // Ne pas apprendre de direction à partir du silence, des frottements ou du bruit.
@@ -3354,6 +3376,7 @@ internal class GuardianVoiceFocusEngine(
     private val frameCapacity: Int,
     private val allowRelativeAlignment: Boolean,
     private val alignmentLimitSamples: Float = 13.0f,
+    private val holdDuringSpeech: Boolean = false,
 ) {
     enum class Mode { OBSERVE, ACTIVE }
     data class FocusSnapshot(
@@ -3418,7 +3441,7 @@ internal class GuardianVoiceFocusEngine(
         )
     }
 
-    private val selector = GuardianVoiceFocusSelector()
+    private val selector = GuardianVoiceFocusSelector(holdDuringSpeech = holdDuringSpeech)
     private val sampleViews = Array(4) { FloatArray(frameCapacity) }
     private val bandViews = Array(4) { FloatArray(frameCapacity) }
     private val quietFloor = FloatArray(4)
@@ -3656,6 +3679,9 @@ internal class GuardianVoiceFocusEngine(
         if (!provisionalSpeech) {
             for (v in 0..3) {
                 val floor = quietFloor[v]
+                // Same startup rule as the mono tracker in the candidate:
+                // no usable measurement in an all-zero hardware startup block.
+                if (holdDuringSpeech && floor == 0f && bands[v] == 0f) continue
                 val candidate = bands[v].coerceAtLeast(0.00002f)
                 quietFloor[v] = if (floor <= 0f) candidate else floor +
                     (candidate - floor) * (if (candidate < floor) 0.12f else 0.012f)
@@ -3692,6 +3718,7 @@ internal class GuardianVoiceFocusEngine(
             alignedDb = scores[3], channel0Valid = valid0, channel1Valid = valid1,
             weightedValid = weightedAllowed, alignedValid = alignedAllowed,
             speechEvidence = provisionalSpeech && modelReady,
+            confirmedSpeech = confirmedSpeech,
             alignmentStable = alignmentStable,
         )
         val selection = selector.update(observation)

@@ -1304,10 +1304,24 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     )
     val voiceProfile = diagnosticOptions.profile
     val diagnosticWavDirectory = diagnosticOptions.wavDirectory
+    val processingMode = if (diagnosticWavDirectory != null) runCatching {
+      File(applicationContext.filesDir, "guardian-voice-processing.txt").readText().trim()
+        .takeIf { it in setOf("CANDIDATE", "CANDIDATE_GAIN2", "CANDIDATE_GAIN4") }
+    }.getOrNull() ?: "ORIGINAL" else "ORIGINAL"
+    val speechGainCandidate = processingMode != "ORIGINAL"
+    val segmentGainMaximum = when (processingMode) {
+      "CANDIDATE_GAIN4" -> 4f
+      "CANDIDATE_GAIN2" -> 2f
+      else -> 1f
+    }
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.2-float-diagnostics",
+      "engineRevision" to "guardian-voice-v3.4.3-speech-gain-study",
+      "processingMode" to processingMode,
+      "segmentGainMaximum" to segmentGainMaximum,
+      "captureGainMode" to if (speechGainCandidate) "UNITY_SEGMENT_GAIN_AFTER_CONFIRMATION" else "LEGACY",
+      "focusHoldDuringSpeech" to speechGainCandidate,
       "diagnosticControlRevision" to 3,
       "wavStageCount" to 5,
       "decoderMode" to "FINAL_ONLY",
@@ -2222,6 +2236,8 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
         profile = voiceProfile,
         diagnostics = voiceDiagnostics,
         diagnosticWavDirectory = diagnosticWavDirectory,
+        speechOnlyGain = speechGainCandidate,
+        confirmedGainMaximum = segmentGainMaximum,
         listener = object : GuardianQwenPrimaryAudioProcessor.Listener {
             override fun onSpeechStarted() {
                 if (isCurrentVoiceSession()) asrListener.onSpeechStarted()
@@ -3005,6 +3021,8 @@ val audio =
                 sampleRateHz =
                     16_000,
                 frameDurationMs = 50,
+                adaptiveGainEnabled = !speechGainCandidate,
+                voiceFocusHoldDuringSpeech = speechGainCandidate,
 
                 /*
                  * C5 :

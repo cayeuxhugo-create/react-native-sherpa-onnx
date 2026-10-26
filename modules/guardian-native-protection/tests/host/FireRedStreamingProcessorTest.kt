@@ -25,12 +25,14 @@ private fun pcm(file:File):FloatArray {
     return FloatArray(b.remaining()).also{b.get(it)}
 }
 fun main(args:Array<String>) {
+    val candidate = args.getOrNull(3) == "CANDIDATE"
+    val maximumGain = args.getOrNull(4)?.toFloat() ?: 4f
     System.setProperty("guardian.test.assets",args[0])
     val full=pcm(File(args[1]));val expected=File(args[2]).listFiles()!!.filter{it.name.startsWith("segment-")}.sortedBy{it.name}.map{pcm(it)}
     val calls=AtomicInteger();val ended=CountDownLatch(3);val decoded=CountDownLatch(3)
     val events=CopyOnWriteArrayList<String>();val warnings=CopyOnWriteArrayList<String>()
     val qwen=GuardianQwenRescueRecognizer { x ->
-        val i=calls.getAndIncrement();check(i<expected.size && x.contentEquals(expected[i])){"Qwen PCM differs from real native reference"}
+        val i=calls.getAndIncrement();val reference=if(candidate) GuardianSpeechSegmentGain.apply(expected[i],true,maximumGain).pcm else expected[i];check(i<expected.size && x.contentEquals(reference)){"Qwen PCM differs from real native reference"}
         decoded.countDown();GuardianQwenRescueRecognizer.Result("test")
     }
     val saved=CountDownLatch(5);val comparisonSaved=CountDownLatch(1)
@@ -46,13 +48,14 @@ fun main(args:Array<String>) {
         override fun onSpeechStarted()=Unit
         override fun onSpeechEnded(){ended.countDown()}
         override fun onWarning(message:String){warnings+=message}
-    },profile=GuardianVoiceProfile.NOISY,diagnostics=diagnostic,diagnosticWavDirectory=directory)
+    },profile=GuardianVoiceProfile.NOISY,diagnostics=diagnostic,diagnosticWavDirectory=directory,speechOnlyGain=candidate,confirmedGainMaximum=maximumGain)
     try {
         var sequence=1L
         for(i in 0 until full.size-799 step 800) {
             val x=full.copyOfRange(i,i+800)
             val number=sequence++
-            processor.onAudioFrame(testFrame(x,number).copy(enhancementExpected=true))
+            val input=testFrame(x,number).copy(enhancementExpected=true)
+            processor.onAudioFrame(if(candidate) input.copy(samples=FloatArray(x.size){x[it]*3f},adaptiveGain=3f) else input)
             processor.onEnhancedAudioFrame(GuardianAudioEngine.EnhancedAudioFrame(FloatArray(800){.9f},800,number*50_000_000,number,"GTCRN"))
             x.fill(.73f) // capture pool is reused immediately after its callback
             Thread.sleep(5)
@@ -62,5 +65,5 @@ fun main(args:Array<String>) {
         check(events.none{it.contains("FIRERED_ERROR") || it.contains("PIPELINE_RESET")})
         check(events.any{it.contains(GuardianFireRedStreaming.MODEL_ID)})
     }finally{processor.close();check(qwen.released.await(5,TimeUnit.SECONDS));check(saved.await(5,TimeUnit.SECONDS));check(comparisonSaved.await(5,TimeUnit.SECONDS));directory.deleteRecursively()}
-    println("PASS real streaming processor: GTCRN comparison preserves original, original capture copied, three exact PCM windows, no partial decode")
+    println("PASS candidate=$candidate real streaming processor: GTCRN comparison preserves original, original capture copied, three exact PCM windows, no partial decode")
 }

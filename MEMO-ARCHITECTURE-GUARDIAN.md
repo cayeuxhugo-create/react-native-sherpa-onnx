@@ -60,3 +60,16 @@ des WAV, index commun ; AUDIO_FRAME associe capture/observation monotoniques
 et horodatage de log. Collecteur annoté avec route fixée, consignes et
 observations réelles. Aucun changement de détection, gain ou décision Qwen.
 Guide : [diagnostics flottants](LIVRAISON-DIAGNOSTICS-FLOTTANTS-V3.4.2.md).
+
+Étude v3.4.3 (26 octobre) : correctif zéro numérique au démarrage ;
+mode ORIGINAL par défaut. Mode candidat explicite pendant diagnostic WAV :
+capture à gain unitaire, sélection tenue pendant la portion vocale,
+gain constant seulement après confirmation. Plafond recommandé ×1 :
+×2/×4 dégradent une phrase calme. Quinze éléments calmes préservés,
+dont trois anciens à 5 m. Stéréo sous aspirateur : une phrase sur trois
+récupérée dans le rejeu fermé candidat, contre zéro dans sa référence hôte ;
+pas de résolution générale du bruit, ni de validation du nouvel APK.
+Le collecteur récupère aussi le WAV deux canaux et appelle le répartiteur
+de ZIP s'il est disponible à côté du script.
+Voir [étude](ETUDE-CANAUX-GAIN-20261026.md) et
+[livraison v3.4.3](LIVRAISON-ETUDE-VOIX-V3.4.3.md).

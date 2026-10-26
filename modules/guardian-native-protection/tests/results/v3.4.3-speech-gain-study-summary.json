@@ -1,0 +1,38 @@
+{
+  "version": "guardian-voice-v3.4.3-speech-gain-study",
+  "date": "2026-10-26",
+  "productionDefault": "ORIGINAL with digital-zero calibration fix",
+  "candidateRequiresExplicitWavDiagnostic": true,
+  "recommendedSegmentGainMaximum": 1,
+  "hostTests": "passed",
+  "apiCompilation": "passed with Android framework stubs",
+  "processorIntegration": {
+    "native": "real FireRed JNI",
+    "decoder": "fake callback checking PCM",
+    "cases": [
+      "ORIGINAL",
+      "CANDIDATE max1",
+      "CANDIDATE max2",
+      "CANDIDATE max4"
+    ],
+    "windowsPerCase": 3
+  },
+  "collectorSimulatedCases": 21,
+  "offlineStudy": {
+    "nativeReplayInputs": 20,
+    "qwenDecodes": 83,
+    "quietElements": 15,
+    "quietCorrectGain1": 15,
+    "quietCorrectGain2": 14,
+    "quietCorrectGain4": 14,
+    "shortWordsPreserved": 6,
+    "older5mPhrasesPreserved": 3,
+    "closedLoopStereoNoiseReferenceCorrect": 0,
+    "closedLoopStereoNoiseCandidateCorrect": 1,
+    "closedLoopStereoExpected": 3,
+    "hostNeuralFeedback": "synchronous, unlike Android"
+  },
+  "apkBuilt": false,
+  "modifiedEngineDeviceTested": false,
+  "allEuropeanLanguagesValidated": false
+}
