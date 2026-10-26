@@ -1,0 +1,23 @@
+{
+  "version": "guardian-voice-v3.4.4-continuous-study",
+  "date": "2026-10-26",
+  "productionDefault": "ORIGINAL",
+  "experimentalModes": [
+    "CONTINUOUS_STUDY",
+    "CONTINUOUS_QUALITY_STUDY"
+  ],
+  "explicitPrivateWavRequired": true,
+  "denoiser": "existing GTCRN continuous streaming",
+  "deepFilterNetIntegrated": false,
+  "hostTestPassLines": 46,
+  "apiCompilation": "passed against sherpa-onnx 1.13.8 with Android framework stubs",
+  "collectorSimulatedCases": [
+    "ok",
+    "study-invalid",
+    "float-corrupt",
+    "float-truncated"
+  ],
+  "apkBuilt": false,
+  "modifiedEngineDeviceTested": false,
+  "allEuropeanLanguagesValidated": false
+}

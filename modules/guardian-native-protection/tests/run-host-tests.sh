@@ -5,6 +5,9 @@ source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotect
 build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 sources=(
+  "$source_dir/GuardianStudyBuffer.kt"
+  "$module_dir/tests/host/ContinuousStudyTest.kt"
+  "$source_dir/GuardianChannelQualityScores.kt"
   "$source_dir/GuardianSpeechSegmentGain.kt"
   "$source_dir/GuardianSpatialAudio.kt"
   "$source_dir/GuardianFireRedPolicy.kt"

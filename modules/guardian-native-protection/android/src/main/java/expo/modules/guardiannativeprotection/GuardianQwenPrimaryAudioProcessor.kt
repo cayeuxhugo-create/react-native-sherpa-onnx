@@ -19,6 +19,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     diagnosticWavDirectory: java.io.File? = null,
     private val speechOnlyGain: Boolean = false,
     private val confirmedGainMaximum: Float = 1f,
+    continuousStudy: Boolean = false,
 ) : GuardianAudioEngine.AudioProcessor {
     interface Listener {
         fun onSpeechStarted()
@@ -41,8 +42,10 @@ internal class GuardianQwenPrimaryAudioProcessor(
             null
         }
     }
-    private val comparison = if (diagnosticWavDirectory != null && profile == GuardianVoiceProfile.NOISY)
+    private val comparison = if (!continuousStudy && diagnosticWavDirectory != null && profile == GuardianVoiceProfile.NOISY)
         GuardianGtcrnComparison(java.io.File(diagnosticWavDirectory, "gtcrn-comparison"), profile, diagnostics) else null
+    private val study = if (continuousStudy && diagnosticWavDirectory != null)
+        GuardianContinuousStudy(context.applicationContext, diagnosticWavDirectory, diagnostics, decoder) else null
     private val closed = AtomicBoolean(false)
     private val discontinuity = AtomicBoolean(false)
     private val pendingTasks = AtomicInteger(0)
@@ -66,7 +69,9 @@ internal class GuardianQwenPrimaryAudioProcessor(
             diagnostics?.event("SPEECH_END")
             listener.onSpeechEnded()
         }
-        override fun onWindow(id: Long, pcm: FloatArray, final: Boolean, reason: String) {
+        override fun onWindow(id: Long, pcm: FloatArray, final: Boolean, reason: String) =
+            error("Segmenter must supply sample clock")
+        override fun onWindowAt(id: Long, pcm: FloatArray, final: Boolean, reason: String, endSample: Long) {
             if (closed.get()) return
             // Only completed windows are validated/decoded. A partial must never
             // bypass the new acoustic admission gate.
@@ -88,6 +93,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "threshold" to GuardianFireRedPolicy.THRESHOLD,
                 "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN)
             Log.i(TAG, "FIRERED_RESULT segment=$id accepted=${validation.decision.accepted} elapsedMs=${validation.elapsedMs}")
+            study?.window(id, pcm, endSample, validation.decision.accepted)
             if (!validation.decision.accepted) {
                 diagnostics?.event("SEGMENT_WINDOW", "segment" to id, "final" to final,
                     "reason" to reason, "samples" to pcm.size, "accepted" to false,
@@ -167,6 +173,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 }
             }
             previousVad = speech
+            study?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos)
             segmenter.accept(decoderPcm, speech)
             if (now - lastMetricsAtMs >= 5_000L) {
                 Log.i(TAG, "VOICE_INPUT profile=$profile truthFrames=$truthFrames gtcrnFrames=$enhancedFrames")
@@ -266,6 +273,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private fun resetSpeech() {
         diagnostics?.event("PIPELINE_RESET")
         previousVad = null
+        study?.invalidate("PRIMARY_DISCONTINUITY")
         decoder.reset()
         streamingVad.reset()
         segmenter.reset()
@@ -283,6 +291,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     fun close() {
         if (!closed.compareAndSet(false, true)) return
         diagnostics?.event("SESSION_END", "droppedInputTasks" to droppedInputTasks.get())
+        study?.close()
         comparison?.close()
         decoder.close()
         // Same worker as VAD inference: no native release during a VAD call.

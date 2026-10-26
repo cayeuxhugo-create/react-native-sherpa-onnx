@@ -51,6 +51,7 @@ internal class GuardianSpatialAudio(
     private val inputTrustName: String = "NONE",
     private val voiceFocusMode: GuardianVoiceFocusMode = GuardianVoiceFocusMode.OFF,
     private val holdDuringSpeech: Boolean = false,
+    private val qualityScoring: Boolean = false,
 ) {
 
 
@@ -74,6 +75,7 @@ internal class GuardianSpatialAudio(
         GuardianVoiceFocusEngine(
             sampleRate = sampleRateHz,
             holdDuringSpeech = holdDuringSpeech,
+            qualityScoring = qualityScoring,
             frameCapacity = maximumFrameSamples,
             allowRelativeAlignment = inputTrustName == "INTER_CHANNEL_ONLY" ||
                 (steeringAllowed && inputTrustName == "PHYSICAL_TDOA"),
@@ -3377,6 +3379,7 @@ internal class GuardianVoiceFocusEngine(
     private val allowRelativeAlignment: Boolean,
     private val alignmentLimitSamples: Float = 13.0f,
     private val holdDuringSpeech: Boolean = false,
+    private val qualityScoring: Boolean = false,
 ) {
     enum class Mode { OBSERVE, ACTIVE }
     data class FocusSnapshot(
@@ -3446,6 +3449,7 @@ internal class GuardianVoiceFocusEngine(
     private val bandViews = Array(4) { FloatArray(frameCapacity) }
     private val quietFloor = FloatArray(4)
     private val quietFrames = IntArray(4)
+    private val qualityScores = GuardianChannelQualityScores()
     private val lagHistory = FloatArray(5)
     private val lagScratch = FloatArray(5)
     private var lagHistoryCount = 0
@@ -3488,6 +3492,7 @@ internal class GuardianVoiceFocusEngine(
         smoothedLag = 0f
         quietFloor.fill(0f)
         quietFrames.fill(0)
+        qualityScores.reset()
         selector.reset()
         snapshot = null
     }
@@ -3499,6 +3504,7 @@ internal class GuardianVoiceFocusEngine(
         selector.reset()
         quietFloor.fill(0f)
         quietFrames.fill(0)
+        qualityScores.reset()
         lagHistory.fill(0f)
         lagHistoryCount = 0
         lagHistoryIndex = 0
@@ -3702,6 +3708,13 @@ internal class GuardianVoiceFocusEngine(
         for (i in 0 until n) {
             if (kotlin.math.abs(ch0[i].toInt()) >= 32000) clip0++
             if (kotlin.math.abs(ch1[i].toInt()) >= 32000) clip1++
+        }
+        if (qualityScoring) {
+            for (view in 0..3) {
+                var clipped = 0
+                for (i in 0 until n) if (kotlin.math.abs(sampleViews[view][i]) >= .979f) clipped++
+                scores[view] = qualityScores.update(view, scores[view], clipped.toFloat()/n)
+            }
         }
         val valid0 = bands[0] >= 0.00004f && clip0 <= n / 50
         val valid1 = bands[1] >= 0.00004f && clip1 <= n / 50

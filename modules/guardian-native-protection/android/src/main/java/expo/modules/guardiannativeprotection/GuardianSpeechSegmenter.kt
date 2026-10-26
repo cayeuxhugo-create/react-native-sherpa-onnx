@@ -11,6 +11,8 @@ internal class GuardianSpeechSegmenter(
         fun onSpeechStarted()
         fun onSpeechEnded()
         fun onWindow(id: Long, pcm: FloatArray, final: Boolean, reason: String)
+        fun onWindowAt(id: Long, pcm: FloatArray, final: Boolean, reason: String, endSample: Long) =
+            onWindow(id, pcm, final, reason)
     }
 
     private val preRollSamples = sampleRate * preRollMs / 1_000
@@ -27,11 +29,16 @@ internal class GuardianSpeechSegmenter(
     private var silenceSamples = 0
     private var lastSpeechEnd = 0
     private var pauseCut = 0
+    private var totalSamples = 0L
+    private var segmentStart = 0L
 
     fun accept(pcm: FloatArray, speech: Boolean) {
         require(pcm.all { it.isFinite() }) { "PCM non fini" }
         if (pcm.isEmpty()) return
+        val inputStart = totalSamples
+        totalSamples += pcm.size
         if (!active && speech) {
+            segmentStart = inputStart - ringSize
             id++
             active = true
             size = 0
@@ -60,12 +67,13 @@ internal class GuardianSpeechSegmenter(
                     // discard the beginning of the following utterance.
                     val cut = if (pauseCut > 0) pauseCut else size
                     val reason = if (pauseCut > 0) "QWEN_PAUSE_ALIGNED_ROLLOVER" else "QWEN_TECHNICAL_ROLLOVER"
-                    sink.onWindow(id, segment.copyOf(cut), true, reason)
+                    sink.onWindowAt(id, segment.copyOf(cut), true, reason, segmentStart + cut)
                     id++
                     val overlap = sampleRate * ROLLOVER_OVERLAP_MS / 1_000
                     val retainedStart = cut - overlap
                     segment.copyInto(segment, 0, retainedStart, size)
                     size -= retainedStart
+                    segmentStart += retainedStart
                     lastSpeechEnd = (lastSpeechEnd - retainedStart).coerceAtLeast(0)
                     pauseCut = 0
                 }
@@ -105,7 +113,7 @@ internal class GuardianSpeechSegmenter(
 
     private fun finishNatural() {
         val end = minOf(size, lastSpeechEnd + tailSamples)
-        sink.onWindow(id, segment.copyOf(end), true, "QWEN_NEURAL_SILENCE")
+        sink.onWindowAt(id, segment.copyOf(end), true, "QWEN_NEURAL_SILENCE", segmentStart + end)
         active = false
         size = 0
         sink.onSpeechEnded()
@@ -116,6 +124,8 @@ internal class GuardianSpeechSegmenter(
         val wasActive = active
         active = false
         size = 0
+        totalSamples = 0
+        segmentStart = 0
         ringSize = 0
         ringHead = 0
         silenceSamples = 0

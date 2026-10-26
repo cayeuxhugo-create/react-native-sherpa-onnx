@@ -1306,8 +1306,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val diagnosticWavDirectory = diagnosticOptions.wavDirectory
     val processingMode = if (diagnosticWavDirectory != null) runCatching {
       File(applicationContext.filesDir, "guardian-voice-processing.txt").readText().trim()
-        .takeIf { it in setOf("CANDIDATE", "CANDIDATE_GAIN2", "CANDIDATE_GAIN4") }
+        .takeIf { it in setOf("CANDIDATE", "CANDIDATE_GAIN2", "CANDIDATE_GAIN4", "CONTINUOUS_STUDY", "CONTINUOUS_QUALITY_STUDY") }
     }.getOrNull() ?: "ORIGINAL" else "ORIGINAL"
+    val continuousStudy = processingMode.startsWith("CONTINUOUS_")
+    val qualityStudy = processingMode == "CONTINUOUS_QUALITY_STUDY"
     val speechGainCandidate = processingMode != "ORIGINAL"
     val segmentGainMaximum = when (processingMode) {
       "CANDIDATE_GAIN4" -> 4f
@@ -1317,8 +1319,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.3-speech-gain-study",
+      "engineRevision" to "guardian-voice-v3.4.4-continuous-study",
       "processingMode" to processingMode,
+      "continuousStudy" to continuousStudy,
+      "voiceFocusQualityScoring" to qualityStudy,
       "segmentGainMaximum" to segmentGainMaximum,
       "captureGainMode" to if (speechGainCandidate) "UNITY_SEGMENT_GAIN_AFTER_CONFIRMATION" else "LEGACY",
       "focusHoldDuringSpeech" to speechGainCandidate,
@@ -1335,8 +1339,8 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
       "vadMinSpeechMs" to 80, "preRollMs" to GuardianSpeechSegmenter.PRE_ROLL_MS,
       "endSilenceMs" to GuardianSpeechSegmenter.END_SILENCE_MS,
       "tailMs" to GuardianSpeechSegmenter.TAIL_MS, "vadMaxInputGain" to 64,
-      "gtcrnMaxModelGain" to if (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY) 6 else 0,
-      "asrInput" to "TRUTH", "gtcrnRole" to if (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY) "PAIRED_RECORDING_ONLY" else "DISABLED_ORIGINAL_PCM",
+      "gtcrnMaxModelGain" to if (continuousStudy || (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY)) 6 else 0,
+      "asrInput" to "TRUTH", "gtcrnRole" to if (continuousStudy) "CONTINUOUS_SHADOW_NO_ALERT" else if (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY) "PAIRED_RECORDING_ONLY" else "DISABLED_ORIGINAL_PCM",
       "gtcrnMaxWaitMs" to 0, "maxSegmentMs" to 8000,
       "rolloverStrategy" to "NEURAL_PAUSE_FIRST",
       "rolloverMinPauseMs" to GuardianSpeechSegmenter.MIN_ROLLOVER_PAUSE_MS,
@@ -2238,6 +2242,7 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
         diagnosticWavDirectory = diagnosticWavDirectory,
         speechOnlyGain = speechGainCandidate,
         confirmedGainMaximum = segmentGainMaximum,
+        continuousStudy = continuousStudy,
         listener = object : GuardianQwenPrimaryAudioProcessor.Listener {
             override fun onSpeechStarted() {
                 if (isCurrentVoiceSession()) asrListener.onSpeechStarted()
@@ -2388,7 +2393,7 @@ try {
  * Ces décisions appartiennent au service et doivent être
  * calculées AVANT la construction de GuardianAudioEngine.Configuration.
  */
-val gtcrnAllowedForSession = diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY // Paired recording only; original admission/ASR unchanged.
+val gtcrnAllowedForSession = !continuousStudy && diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY // Paired recording only; original admission/ASR unchanged.
 
 Log.i(TAG, "VOICE_PROFILE=$voiceProfile neuralEnhancementRecommended=${audioCapabilities.neuralEnhancementAllowed}")
 
@@ -3023,6 +3028,7 @@ val audio =
                 frameDurationMs = 50,
                 adaptiveGainEnabled = !speechGainCandidate,
                 voiceFocusHoldDuringSpeech = speechGainCandidate,
+                voiceFocusQualityScoring = qualityStudy,
 
                 /*
                  * C5 :

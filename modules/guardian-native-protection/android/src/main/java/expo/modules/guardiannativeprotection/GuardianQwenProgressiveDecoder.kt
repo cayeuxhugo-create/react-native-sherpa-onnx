@@ -79,6 +79,7 @@ class GuardianQwenProgressiveDecoder(
         val acousticEvidence: AcousticEvidence,
         val generation: Long,
         val queuedAtMs: Long = SystemClock.elapsedRealtime(),
+        val diagnosticLane: String? = null,
     )
 
     private val lock = Any()
@@ -91,6 +92,7 @@ class GuardianQwenProgressiveDecoder(
     }
     private val pendingFinals = ArrayDeque<Job>()
     private var pendingPartial: Job? = null
+    private var pendingDiagnostic: Job? = null
     private var generation = 0L
     private var pumping = false
     private var currentRevision = 0L
@@ -173,6 +175,19 @@ class GuardianQwenProgressiveDecoder(
         return true
     }
 
+    /** Diagnostic only, lower priority, one pending slot, shared native model.
+     * Never invokes product listeners; caller must have neural confirmation. */
+    internal fun offerDiagnostic(segmentId: Long, pcm: FloatArray, lane: String): Boolean {
+        if (!validLength(pcm, true) || pcm.any { !it.isFinite() }) return false
+        synchronized(lock) {
+            if (closed.get() || pendingDiagnostic != null) return false
+            pendingDiagnostic = Job(segmentId, 0, pcm.copyOf(), true, null,
+                AcousticEvidence.NEURAL_CONFIRMED, generation, diagnosticLane=lane)
+            scheduleLocked()
+        }
+        return true
+    }
+
     private fun validLength(pcm: FloatArray, final: Boolean): Boolean {
         val durationMs = pcm.size.toLong() * 1_000L / configuration.sampleRate
         return durationMs >= (if (final) configuration.minFinalWindowMs else configuration.minPartialWindowMs) &&
@@ -196,12 +211,14 @@ class GuardianQwenProgressiveDecoder(
                 if (closed.get()) {
                     pendingFinals.clear()
                     pendingPartial = null
+                    pendingDiagnostic = null
                     pumping = false
                     return
                 }
                 when {
                     pendingFinals.isNotEmpty() -> pendingFinals.removeFirst()
                     pendingPartial != null -> pendingPartial.also { pendingPartial = null }
+                    pendingDiagnostic != null -> pendingDiagnostic.also { pendingDiagnostic = null }
                     else -> {
                         pumping = false
                         return
@@ -209,6 +226,21 @@ class GuardianQwenProgressiveDecoder(
                 }
             } ?: continue
 
+            if (job.diagnosticLane != null) {
+                val start = SystemClock.elapsedRealtime()
+                val result = runCatching { qwen.decode(job.samples) }.getOrNull()
+                synchronized(lock) {
+                    diagnostics?.event("STUDY_QWEN_RESULT",
+                        "eligible" to (!closed.get() && job.generation == generation),
+                        "segment" to job.segmentId, "lane" to job.diagnosticLane,
+                        "success" to (result != null), "text" to if (!closed.get() && job.generation == generation) result?.text else null,
+                        "queueWaitMs" to start-job.queuedAtMs,
+                        "decodeWallMs" to SystemClock.elapsedRealtime()-start,
+                        "audioMs" to job.samples.size*1000L/configuration.sampleRate,
+                        "role" to "SHADOW_NO_ALERT")
+                }
+                continue
+            }
             // Après un FINAL, aucun ancien PARTIAL du même segment ne doit sortir.
             val decodeStartedAtMs = SystemClock.elapsedRealtime()
             diagnostics?.event("QWEN_START", "segment" to job.segmentId, "revision" to job.revision,
@@ -323,6 +355,7 @@ class GuardianQwenProgressiveDecoder(
             diagnostics?.event("QWEN_RESET", "generation" to generation)
             pendingFinals.clear()
             pendingPartial = null
+            pendingDiagnostic = null
             activeSegmentId = null
             lastPartialText = null
             lastPartialSegmentId = null
@@ -339,6 +372,7 @@ class GuardianQwenProgressiveDecoder(
         synchronized(lock) {
             pendingFinals.clear()
             pendingPartial = null
+            pendingDiagnostic = null
         }
         try {
             worker.execute { qwen.release() }

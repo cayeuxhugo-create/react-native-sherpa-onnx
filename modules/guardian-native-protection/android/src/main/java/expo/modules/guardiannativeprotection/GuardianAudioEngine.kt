@@ -70,6 +70,7 @@ class GuardianAudioEngine(
         val voiceFocusMode: GuardianVoiceFocusMode =
             GuardianVoiceFocusMode.OFF,
         val voiceFocusHoldDuringSpeech: Boolean = false,
+        val voiceFocusQualityScoring: Boolean = false,
 
         val internalBufferMultiplier: Int = DEFAULT_INTERNAL_BUFFER_MULTIPLIER,
         val queueCapacity: Int = DEFAULT_QUEUE_CAPACITY,
@@ -1231,6 +1232,7 @@ private var enhancementProcessingTimesCount: Int =
                     configuration.spatialInputTrustName,
                 voiceFocusMode = configuration.voiceFocusMode,
                 holdDuringSpeech = configuration.voiceFocusHoldDuringSpeech,
+                qualityScoring = configuration.voiceFocusQualityScoring,
          )
 
     private val frameQueue = ArrayBlockingQueue<PooledFrame>(configuration.queueCapacity)

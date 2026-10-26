@@ -71,5 +71,28 @@ fun decoderTests() {
         } finally { allow.countDown(); decoder.close(); check(qwen.released.await(3, TimeUnit.SECONDS)) }
         count++; println("PASS long partial skipped, early decode retained, full eight-second final preserved")
     }
+    run {
+        val entered=CountDownLatch(1); val allow=CountDownLatch(1)
+        val done=CountDownLatch(1); val calls=java.util.Collections.synchronizedList(mutableListOf<Int>())
+        val qwen=GuardianQwenRescueRecognizer { pcm ->
+            calls.add(pcm.size)
+            if (calls.size==1) { entered.countDown(); check(allow.await(3,TimeUnit.SECONDS)) }
+            if (calls.size==3) done.countDown()
+            GuardianQwenRescueRecognizer.Result("DIAGNOSTIC_OR_PRODUCT")
+        }
+        val result=Results(); val decoder=GuardianQwenProgressiveDecoder(qwen,result)
+        try {
+            check(decoder.offerDiagnostic(9,FloatArray(16000),"TEST"))
+            check(entered.await(3,TimeUnit.SECONDS))
+            check(decoder.offerDiagnostic(10,FloatArray(24000),"TEST"))
+            check(!decoder.offerDiagnostic(11,FloatArray(24000),"TEST"))
+            check(decoder.offerFinal(1,FloatArray(32000),"PRODUCT",evidence))
+            allow.countDown(); check(done.await(3,TimeUnit.SECONDS))
+            check(result.finalReady.await(3,TimeUnit.SECONDS))
+            check(calls==listOf(16000,32000,24000))
+        } finally { allow.countDown();decoder.close();check(qwen.released.await(3,TimeUnit.SECONDS)) }
+        check(result.finals.size==1 && result.partials.isEmpty())
+        count++;println("PASS diagnostic ASR never publishes, one pending slot and product priority")
+    }
     println("$count decoder concurrency tests passed")
 }
