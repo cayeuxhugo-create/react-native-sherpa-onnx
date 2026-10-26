@@ -1,0 +1,62 @@
+[
+  {
+    "method": "original",
+    "datasets": {
+      "quiet1m": {
+        "expected": 3,
+        "exact": 3,
+        "captions": 3
+      },
+      "quiet3m": {
+        "expected": 3,
+        "exact": 3,
+        "captions": 3
+      },
+      "vacuum3m": {
+        "expected": 3,
+        "exact": 1,
+        "captions": 2
+      }
+    }
+  },
+  {
+    "method": "wiener-o1-f0.5",
+    "datasets": {
+      "quiet1m": {
+        "expected": 3,
+        "exact": 3,
+        "captions": 3
+      },
+      "quiet3m": {
+        "expected": 3,
+        "exact": 3,
+        "captions": 3
+      },
+      "vacuum3m": {
+        "expected": 3,
+        "exact": 1,
+        "captions": 4
+      }
+    }
+  },
+  {
+    "method": "wiener-o0.5-f0.75",
+    "datasets": {
+      "quiet1m": {
+        "expected": 3,
+        "exact": 3,
+        "captions": 3
+      },
+      "quiet3m": {
+        "expected": 3,
+        "exact": 3,
+        "captions": 3
+      },
+      "vacuum3m": {
+        "expected": 3,
+        "exact": 2,
+        "captions": 4
+      }
+    }
+  }
+]

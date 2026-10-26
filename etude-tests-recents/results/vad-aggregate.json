@@ -1,0 +1,122 @@
+[
+  {
+    "model": "silero",
+    "maxGain": 1,
+    "method": "original",
+    "speechWindows": 9,
+    "admittedSpeech": 3,
+    "negativeWindows": 5,
+    "admittedNegative": 0,
+    "modelSha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+  },
+  {
+    "model": "silero",
+    "maxGain": 16,
+    "method": "original",
+    "speechWindows": 9,
+    "admittedSpeech": 6,
+    "negativeWindows": 5,
+    "admittedNegative": 2,
+    "modelSha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+  },
+  {
+    "model": "silero",
+    "maxGain": 64,
+    "method": "original",
+    "speechWindows": 9,
+    "admittedSpeech": 6,
+    "negativeWindows": 5,
+    "admittedNegative": 2,
+    "modelSha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+  },
+  {
+    "model": "ten",
+    "maxGain": 1,
+    "method": "original",
+    "speechWindows": 9,
+    "admittedSpeech": 0,
+    "negativeWindows": 5,
+    "admittedNegative": 1,
+    "modelSha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+  },
+  {
+    "model": "ten",
+    "maxGain": 16,
+    "method": "original",
+    "speechWindows": 9,
+    "admittedSpeech": 3,
+    "negativeWindows": 5,
+    "admittedNegative": 1,
+    "modelSha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+  },
+  {
+    "model": "ten",
+    "maxGain": 64,
+    "method": "original",
+    "speechWindows": 9,
+    "admittedSpeech": 5,
+    "negativeWindows": 5,
+    "admittedNegative": 4,
+    "modelSha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+  },
+  {
+    "model": "silero",
+    "maxGain": 1,
+    "method": "phone-gtcrn-mix1",
+    "speechWindows": 9,
+    "admittedSpeech": 9,
+    "negativeWindows": 5,
+    "admittedNegative": 0,
+    "modelSha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+  },
+  {
+    "model": "silero",
+    "maxGain": 16,
+    "method": "phone-gtcrn-mix1",
+    "speechWindows": 9,
+    "admittedSpeech": 9,
+    "negativeWindows": 5,
+    "admittedNegative": 2,
+    "modelSha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+  },
+  {
+    "model": "silero",
+    "maxGain": 64,
+    "method": "phone-gtcrn-mix1",
+    "speechWindows": 9,
+    "admittedSpeech": 9,
+    "negativeWindows": 5,
+    "admittedNegative": 2,
+    "modelSha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+  },
+  {
+    "model": "ten",
+    "maxGain": 1,
+    "method": "phone-gtcrn-mix1",
+    "speechWindows": 9,
+    "admittedSpeech": 8,
+    "negativeWindows": 5,
+    "admittedNegative": 0,
+    "modelSha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+  },
+  {
+    "model": "ten",
+    "maxGain": 16,
+    "method": "phone-gtcrn-mix1",
+    "speechWindows": 9,
+    "admittedSpeech": 9,
+    "negativeWindows": 5,
+    "admittedNegative": 0,
+    "modelSha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+  },
+  {
+    "model": "ten",
+    "maxGain": 64,
+    "method": "phone-gtcrn-mix1",
+    "speechWindows": 9,
+    "admittedSpeech": 9,
+    "negativeWindows": 5,
+    "admittedNegative": 0,
+    "modelSha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+  }
+]

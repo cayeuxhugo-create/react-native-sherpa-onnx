@@ -1,0 +1,203 @@
+{
+  "qwen-grid": {
+    "model": "qwen",
+    "inputMaxGain": 1.0,
+    "sherpaVersion": "1.13.8",
+    "modelFiles": {
+      "conv_frontend.onnx": {
+        "bytes": 44148281,
+        "sha256": "d22dc4423e0940e49884e903d2ea2f7e5567c14fc1aed97e4e26d6b8f208ef9e"
+      },
+      "encoder.int8.onnx": {
+        "bytes": 182491662,
+        "sha256": "60748d3e6744a57c9c91e1b17424a6c2990567e8adceb0783940c03ed98fa9d9"
+      },
+      "decoder.int8.onnx": {
+        "bytes": 755914231,
+        "sha256": "4f6885be5959ae26af3089d38ee7972c5fafbeeb1cf8d5e76eab6d8b61ca5771"
+      },
+      "tokenizer/merges.txt": {
+        "bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      "tokenizer/tokenizer_config.json": {
+        "bytes": 12487,
+        "sha256": "4942d005604266809309cabc9f4e9cb89ce855d59b14681fdc0e1cc62ea26c4c"
+      },
+      "tokenizer/vocab.json": {
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    },
+    "loadSeconds": 3.46297598304227,
+    "numThreads": 2,
+    "provider": "cpu",
+    "language": "French",
+    "qwenMaxTotalLen": 512,
+    "qwenMaxNewTokens": 256,
+    "warmupSeconds": 0.6543585349572822,
+    "peakProcessRssKiB": 1820704
+  },
+  "parakeet-baseline": {
+    "model": "parakeet-v3",
+    "inputMaxGain": 1.0,
+    "sherpaVersion": "1.13.8",
+    "modelFiles": {
+      "encoder.int8.onnx": {
+        "bytes": 652184281,
+        "sha256": "acfc2b4456377e15d04f0243af540b7fe7c992f8d898d751cf134c3a55fd2247"
+      },
+      "decoder.int8.onnx": {
+        "bytes": 11845275,
+        "sha256": "179e50c43d1a9de79c8a24149a2f9bac6eb5981823f2a2ed88d655b24248db4e"
+      },
+      "joiner.int8.onnx": {
+        "bytes": 6355277,
+        "sha256": "3164c13fc2821009440d20fcb5fdc78bff28b4db2f8d0f0b329101719c0948b3"
+      },
+      "tokens.txt": {
+        "bytes": 93939,
+        "sha256": "d58544679ea4bc6ac563d1f545eb7d474bd6cfa467f0a6e2c1dc1c7d37e3c35d"
+      }
+    },
+    "loadSeconds": 1.6881952539552003,
+    "numThreads": 2,
+    "provider": "cpu",
+    "language": "automatic",
+    "qwenMaxTotalLen": null,
+    "qwenMaxNewTokens": null,
+    "warmupSeconds": 0.23214907001238316,
+    "peakProcessRssKiB": 1072504
+  },
+  "turbo-baseline": {
+    "model": "whisper-turbo",
+    "inputMaxGain": 1.0,
+    "sherpaVersion": "1.13.8",
+    "modelFiles": {
+      "turbo-encoder.int8.onnx": {
+        "bytes": 674716297,
+        "sha256": "b02dcdf54f348741e93fe732b67d933c8dcb6735655f710640143081db38878b"
+      },
+      "turbo-decoder.int8.onnx": {
+        "bytes": 361080764,
+        "sha256": "20accd02388482eb3a46bd615631adfdc85e1eb2c7db9ea3f02a40ffe6b81547"
+      },
+      "turbo-tokens.txt": {
+        "bytes": 816730,
+        "sha256": "b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126"
+      }
+    },
+    "loadSeconds": 1.7920352760702372,
+    "numThreads": 2,
+    "provider": "cpu",
+    "language": "French",
+    "qwenMaxTotalLen": null,
+    "qwenMaxNewTokens": null,
+    "warmupSeconds": 3.918025754042901,
+    "peakProcessRssKiB": 1682440
+  },
+  "small-baseline": {
+    "model": "whisper-small",
+    "inputMaxGain": 1.0,
+    "sherpaVersion": "1.13.8",
+    "modelFiles": {
+      "small-encoder.int8.onnx": {
+        "bytes": 112442483,
+        "sha256": "4cbe7b22fa9026b843b60a68640c747de05bafb1a11b57edc0e66c232d9f33a9"
+      },
+      "small-decoder.int8.onnx": {
+        "bytes": 262226114,
+        "sha256": "acad50b5c782696e91b55914cc5ab4f756f1532f76e22aa6fc615f39fb69a8ee"
+      },
+      "small-tokens.txt": {
+        "bytes": 816730,
+        "sha256": "b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126"
+      }
+    },
+    "loadSeconds": 1.8066565310582519,
+    "numThreads": 2,
+    "provider": "cpu",
+    "language": "French",
+    "qwenMaxTotalLen": null,
+    "qwenMaxNewTokens": null,
+    "warmupSeconds": 1.2323166099376976,
+    "peakProcessRssKiB": 992004
+  },
+  "fr2025-baseline": {
+    "model": "fr2025",
+    "language": "French model",
+    "loadSeconds": 2.510295334039256,
+    "sherpaVersion": "1.13.8",
+    "files": {
+      "encoder.onnx": {
+        "bytes": 70092599,
+        "sha256": "e02facae1daf6f1f13da67ea3ace7c722516d0868d1768d78c0580bc22cc0c5b"
+      },
+      "decoder.onnx": {
+        "bytes": 617488,
+        "sha256": "6aed547570e3ab5afc05429a017cedd3a056c16df3baa5703f02461cefa25bac"
+      },
+      "joiner.onnx": {
+        "bytes": 336817,
+        "sha256": "a51eec759bcdcaae2614686fa2a8b57417b2d420dd55a5a5558b388d35a9b2b6"
+      },
+      "tokens.txt": {
+        "bytes": 5415,
+        "sha256": "fedfb9c844bfb2bf14171f8184863e3d617b815a8667bdd9fc9a3149fde73298"
+      }
+    },
+    "tailPaddingSeconds": 0.8
+  },
+  "fr2023": {
+    "model": "fr2023",
+    "language": "French model",
+    "loadSeconds": 0.6417867389973253,
+    "sherpaVersion": "1.13.8",
+    "files": {
+      "encoder-epoch-29-avg-9-with-averaged-model.int8.onnx": {
+        "bytes": 111502643,
+        "sha256": "9a7e83bbb25d627f8c501c6abe91d36bdc7fc106fb7cd6ee8fa5744f316fc6f7"
+      },
+      "decoder-epoch-29-avg-9-with-averaged-model.onnx": {
+        "bytes": 2092272,
+        "sha256": "3ef2840b684440e26382af87b2174d25732a9f113f1965cd8abba7ffc5d033fb"
+      },
+      "joiner-epoch-29-avg-9-with-averaged-model.int8.onnx": {
+        "bytes": 259572,
+        "sha256": "fc2f3bb851a15a532c6f2422d53eecd1ca949f12b0897e07a852021c30481711"
+      },
+      "tokens.txt": {
+        "bytes": 4819,
+        "sha256": "37fb3f2a7bcb85e5fff3f1f66be04e6fbb05077a22f56d177fe85704e945fb31"
+      }
+    },
+    "tailPaddingSeconds": 0.8
+  },
+  "fr2025-beam4": {
+    "model": "fr2025",
+    "decodingMethod": "modified_beam_search",
+    "maxActivePaths": 4,
+    "language": "French model",
+    "loadSeconds": 3.5449914149940014,
+    "sherpaVersion": "1.13.8",
+    "files": {
+      "encoder.onnx": {
+        "bytes": 70092599,
+        "sha256": "e02facae1daf6f1f13da67ea3ace7c722516d0868d1768d78c0580bc22cc0c5b"
+      },
+      "decoder.onnx": {
+        "bytes": 617488,
+        "sha256": "6aed547570e3ab5afc05429a017cedd3a056c16df3baa5703f02461cefa25bac"
+      },
+      "joiner.onnx": {
+        "bytes": 336817,
+        "sha256": "a51eec759bcdcaae2614686fa2a8b57417b2d420dd55a5a5558b388d35a9b2b6"
+      },
+      "tokens.txt": {
+        "bytes": 5415,
+        "sha256": "fedfb9c844bfb2bf14171f8184863e3d617b815a8667bdd9fc9a3149fde73298"
+      }
+    },
+    "tailPaddingSeconds": 0.8
+  }
+}

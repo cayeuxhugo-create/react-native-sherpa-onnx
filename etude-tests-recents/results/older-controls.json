@@ -1,0 +1,26 @@
+{
+  "older-quiet-qwen/wiener-o1-f0.5": {
+    "expected": 15,
+    "exact": 13,
+    "admittedSpeech": 15,
+    "negativeWindows": 1,
+    "admittedNegative": 1,
+    "admittedNegativeTexts": 1
+  },
+  "extra-controls-qwen/original": {
+    "expected": 15,
+    "exact": 15,
+    "admittedSpeech": 15,
+    "negativeWindows": 1,
+    "admittedNegative": 0,
+    "admittedNegativeTexts": 0
+  },
+  "extra-controls-qwen/wiener-o1-f0.5": {
+    "expected": 0,
+    "exact": 0,
+    "admittedSpeech": 0,
+    "negativeWindows": 7,
+    "admittedNegative": 0,
+    "admittedNegativeTexts": 0
+  }
+}

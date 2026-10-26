@@ -1,0 +1,227 @@
+[
+  {
+    "name": "original",
+    "family": "reference"
+  },
+  {
+    "name": "gain2",
+    "family": "gain",
+    "segmented": true,
+    "gain": 2
+  },
+  {
+    "name": "gain4",
+    "family": "gain",
+    "segmented": true,
+    "gain": 4
+  },
+  {
+    "name": "gain8",
+    "family": "gain",
+    "segmented": true,
+    "gain": 8
+  },
+  {
+    "name": "hp100",
+    "family": "highpass",
+    "hz": 100
+  },
+  {
+    "name": "hp150",
+    "family": "highpass",
+    "hz": 150
+  },
+  {
+    "name": "hp300",
+    "family": "highpass",
+    "hz": 300
+  },
+  {
+    "name": "hp450",
+    "family": "highpass",
+    "hz": 450
+  },
+  {
+    "name": "wiener-o0.5-f0.25",
+    "family": "wiener",
+    "over": 0.5,
+    "floor": 0.25
+  },
+  {
+    "name": "wiener-o0.5-f0.5",
+    "family": "wiener",
+    "over": 0.5,
+    "floor": 0.5
+  },
+  {
+    "name": "wiener-o0.5-f0.75",
+    "family": "wiener",
+    "over": 0.5,
+    "floor": 0.75
+  },
+  {
+    "name": "wiener-o1-f0.25",
+    "family": "wiener",
+    "over": 1,
+    "floor": 0.25
+  },
+  {
+    "name": "wiener-o1-f0.5",
+    "family": "wiener",
+    "over": 1,
+    "floor": 0.5
+  },
+  {
+    "name": "wiener-o1-f0.75",
+    "family": "wiener",
+    "over": 1,
+    "floor": 0.75
+  },
+  {
+    "name": "wiener-o2-f0.25",
+    "family": "wiener",
+    "over": 2,
+    "floor": 0.25
+  },
+  {
+    "name": "wiener-o2-f0.5",
+    "family": "wiener",
+    "over": 2,
+    "floor": 0.5
+  },
+  {
+    "name": "wiener-o2-f0.75",
+    "family": "wiener",
+    "over": 2,
+    "floor": 0.75
+  },
+  {
+    "name": "dd-a0.92-f0.15",
+    "family": "dd",
+    "alpha": 0.92,
+    "floor": 0.15
+  },
+  {
+    "name": "dd-a0.92-f0.4",
+    "family": "dd",
+    "alpha": 0.92,
+    "floor": 0.4
+  },
+  {
+    "name": "dd-a0.98-f0.15",
+    "family": "dd",
+    "alpha": 0.98,
+    "floor": 0.15
+  },
+  {
+    "name": "dd-a0.98-f0.4",
+    "family": "dd",
+    "alpha": 0.98,
+    "floor": 0.4
+  },
+  {
+    "name": "notch3",
+    "family": "notch"
+  },
+  {
+    "name": "speex-6",
+    "family": "speex",
+    "db": -6
+  },
+  {
+    "name": "speex-12",
+    "family": "speex",
+    "db": -12
+  },
+  {
+    "name": "speex-24",
+    "family": "speex",
+    "db": -24
+  },
+  {
+    "name": "speex-36",
+    "family": "speex",
+    "db": -36
+  },
+  {
+    "name": "rnnoise-v01",
+    "family": "rnnoise"
+  },
+  {
+    "name": "rnnoise-mix50",
+    "family": "rnnoise",
+    "blend": 0.5
+  },
+  {
+    "name": "phone-gtcrn-mix1",
+    "family": "phone-gtcrn",
+    "blend": 1
+  },
+  {
+    "name": "phone-gtcrn-mix0.25",
+    "family": "phone-gtcrn",
+    "blend": 0.25
+  },
+  {
+    "name": "phone-gtcrn-mix0.5",
+    "family": "phone-gtcrn",
+    "blend": 0.5
+  },
+  {
+    "name": "phone-gtcrn-mix0.75",
+    "family": "phone-gtcrn",
+    "blend": 0.75
+  },
+  {
+    "name": "df3-g8-a6",
+    "family": "df",
+    "segmented": true,
+    "gain": 8,
+    "atten": 6
+  },
+  {
+    "name": "df3-g8-a9",
+    "family": "df",
+    "segmented": true,
+    "gain": 8,
+    "atten": 9
+  },
+  {
+    "name": "df3-g8-a12",
+    "family": "df",
+    "segmented": true,
+    "gain": 8,
+    "atten": 12
+  },
+  {
+    "name": "df3-g16-a18",
+    "family": "df",
+    "segmented": true,
+    "gain": 16,
+    "atten": 18
+  },
+  {
+    "name": "df3-g16-a24",
+    "family": "df",
+    "segmented": true,
+    "gain": 16,
+    "atten": 24
+  },
+  {
+    "name": "df3ll-g16-a12",
+    "family": "df",
+    "segmented": true,
+    "gain": 16,
+    "atten": 12,
+    "model": "3ll"
+  },
+  {
+    "name": "ulunas",
+    "family": "ulunas"
+  },
+  {
+    "name": "ulunas-mix50",
+    "family": "ulunas",
+    "blend": 0.5
+  }
+]
