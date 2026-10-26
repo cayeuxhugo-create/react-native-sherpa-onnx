@@ -1,0 +1,21 @@
+{
+  "version": "guardian-voice-v3.4.5-adaptive-channels",
+  "date": "2026-10-26",
+  "autoChannels": true,
+  "manualMonoControlsRespected": true,
+  "channelIndexDiscovery": "1..4 plus Android-advertised counts representable by 1..30 channel index masks",
+  "selection": "all opened channels; sustained 3dB/200ms advantage; 500ms dwell; 10ms guarded transition",
+  "voiceDetection": "unchanged FireRed; acoustic channel ranking is not neural admission",
+  "hostTestPassLines": 47,
+  "captureApiCompilation": "passed against real Android API 35 framework signatures",
+  "routePolicyTypeCheck": "passed",
+  "collectorSimulatedCases": [
+    "ok",
+    "adaptive-dropped",
+    "adaptive-missing-channel",
+    "float-corrupt"
+  ],
+  "apkBuilt": false,
+  "deviceTested": false,
+  "bestPhysicalMicrophoneGuaranteed": false
+}

@@ -54,6 +54,9 @@ class GuardianAudioEngine(
          * au pipeline existant selon stereoChannelSelection.
          */
         val inputChannelMask: Int = AudioFormat.CHANNEL_IN_MONO,
+        val inputChannelIndexMask: Int? = null,
+        val adaptiveChannelsEnabled: Boolean = false,
+        val channelDiagnosticDirectory: File? = null,
         val stereoChannelSelection: Int = STEREO_CHANNEL_LEFT,
         val stereoDiagnosticCaptureEnabled: Boolean = false,
 
@@ -147,6 +150,7 @@ class GuardianAudioEngine(
         val stopJoinTimeoutMs: Long = DEFAULT_STOP_JOIN_TIMEOUT_MS,
     ) {
         init {
+            require(inputChannelIndexMask == null || Integer.bitCount(inputChannelIndexMask) in 1..30)
             require(sampleRateHz in 8_000..48_000)
             require(frameDurationMs in 20..500)
             require(
@@ -1470,6 +1474,7 @@ fun clearAudioEnhancer(): Boolean =
         lastSpeechLevel.name
 
     @Volatile private var externalNeuralSpeechHint = false
+    @Volatile private var adaptiveRouteGeneration = 0L
 
     fun setVoiceActivityHint(active: Boolean) {
         // Acoustic activity is NOT independent lexical evidence.
@@ -2672,6 +2677,7 @@ if (
         }
 
         runtimeSpatialTrustInvalidated = true
+        adaptiveRouteGeneration++
         spatialAudio.invalidateRuntimeSteering(reason)
 
         Log.w(
@@ -3036,34 +3042,35 @@ if (
 }
 
     private fun readAudioFrames(recorder: AudioRecord): SessionResult {
-        val stereoActive =
-            configuration.inputChannelMask ==
-                AudioFormat.CHANNEL_IN_STEREO
-
+        val actualChannels = recorder.channelCount
+        require(actualChannels in 1..30)
+        var adaptive = if (configuration.adaptiveChannelsEnabled && actualChannels>1)
+            GuardianAdaptiveChannels(actualChannels,configuration.sampleRateHz) else null
+        Log.i(TAG,"ADAPTIVE_CHANNELS_READY channels=$actualChannels enabled=${adaptive!=null} indexMask=${configuration.inputChannelIndexMask}")
+        val channelDiagnostic = if (adaptive!=null) configuration.channelDiagnosticDirectory?.let {
+            GuardianChannelDiagnostics(it,actualChannels)
+        } else null
+        var channelFrames=0L
+        val stereoActive = actualChannels==2
         val pcmBuffer =
             ShortArray(
-                if (stereoActive) {
-                    frameSampleCount * 2
-                } else {
-                    frameSampleCount
-                }
+                frameSampleCount * actualChannels + actualChannels - 1
             )
 
         val monoBuffer =
-            if (stereoActive) {
-                ShortArray(frameSampleCount)
+            if (actualChannels>1) {
+                ShortArray(frameSampleCount+1)
             } else {
                 pcmBuffer
             }
 
+        var carry=0
+        var routeGeneration=adaptiveRouteGeneration
+        try {
         while (!shouldStop()) {
-            val readCount =
-                recorder.read(
-                    pcmBuffer,
-                    0,
-                    pcmBuffer.size,
-                    AudioRecord.READ_BLOCKING
-                )
+            val incoming = recorder.read(pcmBuffer,carry,frameSampleCount*actualChannels,AudioRecord.READ_BLOCKING)
+            val readCount = if (incoming>0) incoming+carry else incoming
+
 
             when {
                 readCount > 0 -> {
@@ -3082,7 +3089,24 @@ if (
                         captureReadEndedAtElapsedRealtimeNanos
                     )
 
-                    if (stereoActive) {
+                    if (adaptive!=null) {
+                        if (routeGeneration!=adaptiveRouteGeneration) {
+                            adaptive=GuardianAdaptiveChannels(actualChannels,configuration.sampleRateHz)
+                            routeGeneration=adaptiveRouteGeneration
+                            Log.i(TAG,"ADAPTIVE_CHANNELS_RESET routeChanged=true")
+                        }
+                        val complete=readCount-readCount%actualChannels
+                        val selectionStarted=SystemClock.elapsedRealtimeNanos()
+                        val result=adaptive.process(pcmBuffer,complete,externalNeuralSpeechHint)
+                        val selectionMs=(SystemClock.elapsedRealtimeNanos()-selectionStarted)/1000000.0
+                        channelFrames++
+                        channelDiagnostic?.offer(pcmBuffer,complete,channelFrames,captureReadEndedAtElapsedRealtimeNanos,result)
+                        if (channelFrames%20L==0L || result.transitioned) Log.i(TAG,
+                            "ADAPTIVE_CHANNELS frame=$channelFrames channels=$actualChannels selected=${result.selected} selectionMs=$selectionMs scores=${result.scores} valid=${result.valid} changed=${result.transitioned} transition=${result.transition} speechHint=$externalNeuralSpeechHint")
+                        if (result.pcm.isNotEmpty()) enqueuePcmFrame(result.pcm,result.pcm.size,captureReadEndedAtElapsedRealtimeNanos)
+                        carry=readCount-complete
+                        if (carry>0) pcmBuffer.copyInto(pcmBuffer,0,complete,readCount)
+                    } else if (stereoActive) {
                         val evenSampleCount =
                             readCount - (readCount % 2)
 
@@ -3218,6 +3242,7 @@ if (
         }
 
         return SessionResult.STOPPED
+        } finally { channelDiagnostic?.close() }
     }
 
     private fun stereoChannelSelectionName(): String =
@@ -6139,17 +6164,25 @@ lastOutputRms =
 }
 
     private fun createAudioRecord(): AudioRecord {
+        if (!configuration.adaptiveChannelsEnabled) return createAudioRecordFormat(configuration.inputChannelIndexMask,configuration.inputChannelMask)
+        val formats=listOf(configuration.inputChannelIndexMask to configuration.inputChannelMask,
+            null to AudioFormat.CHANNEL_IN_STEREO, null to AudioFormat.CHANNEL_IN_MONO).distinct()
+        var failure: Throwable?=null
+        for ((index,mask) in formats) {
+            try { return createAudioRecordFormat(index,mask) }
+            catch (error: Throwable) { failure=error; Log.w(TAG,"ADAPTIVE_CHANNELS_OPEN_FAILED index=$index mask=$mask; trying next format",error) }
+        }
+        throw failure ?: IllegalStateException("No capture format")
+    }
+
+    private fun createAudioRecordFormat(indexMask: Int?, channelMask: Int): AudioRecord {
         if (!hasRecordAudioPermission()) {
             throw SecurityException(
                 "La permission RECORD_AUDIO a été retirée."
             )
         }
 
-        val channelMask =
-            configuration.inputChannelMask
-
-        val inputChannelCount =
-            if (
+        val inputChannelCount = indexMask?.let { Integer.bitCount(it) } ?: if (
                 channelMask ==
                     AudioFormat.CHANNEL_IN_STEREO
             ) {
@@ -6198,9 +6231,10 @@ lastOutputRms =
                         .setSampleRate(
                             configuration.sampleRateHz
                         )
-                        .setChannelMask(
-                            channelMask
-                        )
+                        .apply {
+                            if (indexMask != null) setChannelIndexMask(indexMask)
+                            else setChannelMask(channelMask)
+                        }
                         .build(),
                 )
                 .setBufferSizeInBytes(

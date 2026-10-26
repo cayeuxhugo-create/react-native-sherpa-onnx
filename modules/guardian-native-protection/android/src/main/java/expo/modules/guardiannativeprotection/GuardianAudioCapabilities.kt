@@ -986,7 +986,10 @@ if (
     Build.VERSION.SDK_INT >=
     Build.VERSION_CODES.M
 ) {
-    for (channelCount in 1..4) {
+    val advertisedCounts=runCatching {
+        audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS).flatMap { it.channelCounts.toList() }
+    }.getOrDefault(emptyList())
+    for (channelCount in ((1..4).toList()+advertisedCounts).filter { it in 1..30 }.distinct().sorted()) {
 
         val channelIndexMask =
             (1 shl channelCount) - 1

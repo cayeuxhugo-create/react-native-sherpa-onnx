@@ -1319,13 +1319,13 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.4-continuous-study",
+      "engineRevision" to "guardian-voice-v3.4.5-adaptive-channels",
       "processingMode" to processingMode,
       "continuousStudy" to continuousStudy,
-      "voiceFocusQualityScoring" to qualityStudy,
+      "legacyVoiceFocusQualityScoring" to qualityStudy,
       "segmentGainMaximum" to segmentGainMaximum,
       "captureGainMode" to if (speechGainCandidate) "UNITY_SEGMENT_GAIN_AFTER_CONFIRMATION" else "LEGACY",
-      "focusHoldDuringSpeech" to speechGainCandidate,
+      "legacyFocusHoldDuringSpeech" to speechGainCandidate,
       "diagnosticControlRevision" to 3,
       "wavStageCount" to 5,
       "decoderMode" to "FINAL_ONLY",
@@ -2933,12 +2933,33 @@ val selectedMultiMic =
  * par MIC + STEREO. Lorsqu'un mode LEFT/RIGHT/MIX est demandé, cette
  * session diagnostic force donc MIC. OFF conserve le comportement normal.
  */
+// AUTO channel capture is structural discovery, not a claim of ASR superiority.
+// Explicit mono/source controls remain authoritative for reproducible tests.
+val allChannelsProbe = if (!requestedMultiMic.explicitOverride && !selectedAudioSource.explicitOverride) {
+    audioProbeResults.filter { probe ->
+        probe.initialized && probe.recordingStarted &&
+            (probe.channelCount ?: 0)>1 &&
+            (probe.routeQualification?.independentChannelCount ?: 0)>1 &&
+            (probe.channelIndexMask != null || probe.channelMask==AudioFormat.CHANNEL_IN_STEREO)
+    }.sortedWith(compareByDescending<GuardianAudioCapabilities.CaptureProbeResult> {
+        it.routeQualification?.independentChannelCount ?: 0
+    }.thenByDescending { it.routeQualification?.usableChannelCount ?: 0 }
+        .thenByDescending { it.channelCount ?: 0 }
+        .thenBy { if (it.source==MediaRecorder.AudioSource.MIC) 0 else 1 }
+        .thenBy { if (it.channelIndexMask==null) 0 else 1 }).firstOrNull()
+} else null
+val adaptiveChannelSelection = allChannelsProbe!=null ||
+    (selectedMultiMic.enabled && selectedMultiMic.channelSelection==GuardianAudioEngine.STEREO_CHANNEL_VOICE_FOCUS)
+val requestedCaptureChannels=allChannelsProbe?.channelCount ?: if (selectedMultiMic.enabled) 2 else 1
+Log.i(TAG,"ADAPTIVE_CHANNELS_PLAN enabled=$adaptiveChannelSelection requested=$requestedCaptureChannels source=${allChannelsProbe?.source} indexMask=${allChannelsProbe?.channelIndexMask} structuralOnly=true")
+
 val effectiveAudioSource =
     when {
         /*
          * Compatibilité historique : un override LEFT/RIGHT/MIX/ALIGNED_MIX
          * reste explicitement attaché à MIC + STEREO.
          */
+        allChannelsProbe != null -> allChannelsProbe.source
         selectedMultiMic.enabled &&
             selectedMultiMic.explicitOverride ->
             MediaRecorder.AudioSource.MIC
@@ -2962,7 +2983,7 @@ if (
     )
 }
 
-activeAudioEvidenceRouteKey =
+activeAudioEvidenceRouteKey = if (allChannelsProbe != null) null else
     runtimeAudioEvidenceRouteKey(
         audioSource =
             effectiveAudioSource,
@@ -2995,13 +3016,13 @@ val spatialCaptureConstraints =
             source =
                 effectiveAudioSource,
             channelMask =
-                if (selectedMultiMic.enabled) {
+                allChannelsProbe?.channelMask ?: if (selectedMultiMic.enabled) {
                     AudioFormat.CHANNEL_IN_STEREO
                 } else {
                     AudioFormat.CHANNEL_IN_MONO
                 },
             channelIndexMask =
-                null,
+                allChannelsProbe?.channelIndexMask,
         )
 
 Log.i(
@@ -3029,6 +3050,10 @@ val audio =
                 adaptiveGainEnabled = !speechGainCandidate,
                 voiceFocusHoldDuringSpeech = speechGainCandidate,
                 voiceFocusQualityScoring = qualityStudy,
+                adaptiveChannelsEnabled = adaptiveChannelSelection,
+                inputChannelIndexMask = allChannelsProbe?.channelIndexMask,
+                channelDiagnosticDirectory = if (adaptiveChannelSelection && diagnosticWavDirectory!=null)
+                    File(diagnosticWavDirectory,"adaptive-channels/"+voiceDiagnostics?.sessionId) else null,
 
                 /*
                  * C5 :
@@ -3040,7 +3065,7 @@ val audio =
                     effectiveAudioSource,
 
                 inputChannelMask =
-                    if (selectedMultiMic.enabled) {
+                    if (allChannelsProbe?.channelMask==AudioFormat.CHANNEL_IN_STEREO || selectedMultiMic.enabled) {
                         AudioFormat.CHANNEL_IN_STEREO
                     } else {
                         AudioFormat.CHANNEL_IN_MONO
@@ -3159,7 +3184,10 @@ Log.i(TAG, "GTCRN capture : requested=$gtcrnAllowedForSession installed=$gtcrnIn
 
 voiceDiagnostics?.event("CAPTURE_CONFIG",
     "audioSource" to effectiveAudioSource,
-    "channels" to if (selectedMultiMic.enabled) 2 else 1,
+    "channels" to requestedCaptureChannels,
+    "adaptiveChannels" to adaptiveChannelSelection,
+    "channelSwitchDuringSpeech" to adaptiveChannelSelection,
+    "requestedChannelIndexMask" to allChannelsProbe?.channelIndexMask,
     "gtcrnEnabled" to gtcrnInstalledForSession,
     "gtcrnRequested" to gtcrnAllowedForSession,
     "gtcrnRecommended" to audioCapabilities.neuralEnhancementAllowed,
