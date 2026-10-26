@@ -187,6 +187,8 @@ fun main() {
     println("$tests core tests passed")
     fireRedPolicyTests()
     fireRedStreamPolicyTests()
+    wienerEnhancerTests()
+    wienerStudyTests()
     adaptiveChannelsTests()
     continuousStudyTests()
     decoderTests()

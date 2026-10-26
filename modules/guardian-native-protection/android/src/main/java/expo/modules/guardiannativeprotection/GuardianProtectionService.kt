@@ -1306,9 +1306,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val diagnosticWavDirectory = diagnosticOptions.wavDirectory
     val processingMode = if (diagnosticWavDirectory != null) runCatching {
       File(applicationContext.filesDir, "guardian-voice-processing.txt").readText().trim()
-        .takeIf { it in setOf("CANDIDATE", "CANDIDATE_GAIN2", "CANDIDATE_GAIN4", "CONTINUOUS_STUDY", "CONTINUOUS_QUALITY_STUDY") }
+        .takeIf { it in setOf("CANDIDATE", "CANDIDATE_GAIN2", "CANDIDATE_GAIN4", "CONTINUOUS_STUDY", "CONTINUOUS_QUALITY_STUDY", "WIENER_STUDY") }
     }.getOrNull() ?: "ORIGINAL" else "ORIGINAL"
-    val continuousStudy = processingMode.startsWith("CONTINUOUS_")
+    val wienerStudy = processingMode == "WIENER_STUDY"
+    val continuousStudy = processingMode.startsWith("CONTINUOUS_") || wienerStudy
     val qualityStudy = processingMode == "CONTINUOUS_QUALITY_STUDY"
     val speechGainCandidate = processingMode != "ORIGINAL"
     val segmentGainMaximum = when (processingMode) {
@@ -1319,9 +1320,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.5-adaptive-channels",
+      "engineRevision" to "guardian-voice-v3.4.6-wiener-study",
       "processingMode" to processingMode,
       "continuousStudy" to continuousStudy,
+      "studyModel" to if(wienerStudy) "WIENER_DD_ADAPTIVE" else if(continuousStudy) "GTCRN" else "DISABLED",
       "legacyVoiceFocusQualityScoring" to qualityStudy,
       "segmentGainMaximum" to segmentGainMaximum,
       "captureGainMode" to if (speechGainCandidate) "UNITY_SEGMENT_GAIN_AFTER_CONFIRMATION" else "LEGACY",
@@ -1339,8 +1341,8 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
       "vadMinSpeechMs" to 80, "preRollMs" to GuardianSpeechSegmenter.PRE_ROLL_MS,
       "endSilenceMs" to GuardianSpeechSegmenter.END_SILENCE_MS,
       "tailMs" to GuardianSpeechSegmenter.TAIL_MS, "vadMaxInputGain" to 64,
-      "gtcrnMaxModelGain" to if (continuousStudy || (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY)) 6 else 0,
-      "asrInput" to "TRUTH", "gtcrnRole" to if (continuousStudy) "CONTINUOUS_SHADOW_NO_ALERT" else if (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY) "PAIRED_RECORDING_ONLY" else "DISABLED_ORIGINAL_PCM",
+      "gtcrnMaxModelGain" to if (!wienerStudy && (continuousStudy || (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY))) 6 else 0,
+      "asrInput" to "TRUTH", "gtcrnRole" to if (wienerStudy) "DISABLED_WIENER_COMPARISON" else if (continuousStudy) "CONTINUOUS_SHADOW_NO_ALERT" else if (diagnosticWavDirectory != null && voiceProfile == GuardianVoiceProfile.NOISY) "PAIRED_RECORDING_ONLY" else "DISABLED_ORIGINAL_PCM",
       "gtcrnMaxWaitMs" to 0, "maxSegmentMs" to 8000,
       "rolloverStrategy" to "NEURAL_PAUSE_FIRST",
       "rolloverMinPauseMs" to GuardianSpeechSegmenter.MIN_ROLLOVER_PAUSE_MS,
@@ -2243,6 +2245,7 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
         speechOnlyGain = speechGainCandidate,
         confirmedGainMaximum = segmentGainMaximum,
         continuousStudy = continuousStudy,
+        studyModel = if(wienerStudy) "WIENER_DD_ADAPTIVE" else "GTCRN",
         listener = object : GuardianQwenPrimaryAudioProcessor.Listener {
             override fun onSpeechStarted() {
                 if (isCurrentVoiceSession()) asrListener.onSpeechStarted()

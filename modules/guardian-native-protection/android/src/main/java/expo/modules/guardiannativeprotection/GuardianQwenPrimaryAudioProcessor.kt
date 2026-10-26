@@ -20,6 +20,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val speechOnlyGain: Boolean = false,
     private val confirmedGainMaximum: Float = 1f,
     continuousStudy: Boolean = false,
+    studyModel: String = "GTCRN",
 ) : GuardianAudioEngine.AudioProcessor {
     interface Listener {
         fun onSpeechStarted()
@@ -45,7 +46,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val comparison = if (!continuousStudy && diagnosticWavDirectory != null && profile == GuardianVoiceProfile.NOISY)
         GuardianGtcrnComparison(java.io.File(diagnosticWavDirectory, "gtcrn-comparison"), profile, diagnostics) else null
     private val study = if (continuousStudy && diagnosticWavDirectory != null)
-        GuardianContinuousStudy(context.applicationContext, diagnosticWavDirectory, diagnostics, decoder) else null
+        GuardianContinuousStudy(context.applicationContext, diagnosticWavDirectory, diagnostics, decoder, studyModel) else null
+    private val earlyStudyCalibrationGuard = studyModel == "WIENER_DD_ADAPTIVE"
     private val closed = AtomicBoolean(false)
     private val discontinuity = AtomicBoolean(false)
     private val pendingTasks = AtomicInteger(0)
@@ -138,6 +140,10 @@ internal class GuardianQwenPrimaryAudioProcessor(
             wav?.write("vad", GuardianNeuralInputGain.forVad(decoderPcm, 64f), frame.key.sequence, frame.key.capturedAtNanos)
             val streamResult = streamingVad.accept(decoderPcm)
             val speech = streamResult.speech
+            // A noise profile must not wait for the segmenter's 8-frame start
+            // hysteresis before noticing voice at the calibration boundary.
+            // This conservative guard affects only shadow calibration.
+            val studyCalibrationSpeech = speech || (earlyStudyCalibrationGuard && streamResult.peak >= .5f)
             val now = SystemClock.elapsedRealtime()
             if (diagnostics?.enabled == true) {
                 if (previousVad != speech) {
@@ -148,6 +154,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 if (lastDiagnosticFrameMs == Long.MIN_VALUE || now - lastDiagnosticFrameMs >= 250L || previousVad != speech) {
                     diagnostics.event("AUDIO_FRAME", "sequence" to frame.key.sequence,
                         "capturedAtNs" to frame.key.capturedAtNanos,
+                        "captureChannelRevision" to frame.captureChannelRevision,
                         "captureAgeMs" to (now - frame.key.capturedAtNanos / 1000000L).coerceAtLeast(0),
                         "inputWaitMs" to (now - frame.queuedAtMs).coerceAtLeast(0),
                         "route" to "TRUTH",
@@ -155,6 +162,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                         "streamVadPeakProbability" to streamResult.peak,
                         "streamVadFrames" to streamResult.frames,
                         "streamVadElapsedMs" to streamResult.elapsedMs,
+                        "studyCalibrationSpeech" to studyCalibrationSpeech,
                         "rawVadMaxInputGain" to 64,
                         "enhancementExpected" to frame.enhancementExpected,
                         "observedAtElapsedRealtimeMs" to now,
@@ -173,7 +181,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 }
             }
             previousVad = speech
-            study?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos)
+            study?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos,studyCalibrationSpeech,frame.captureChannelRevision)
             segmenter.accept(decoderPcm, speech)
             if (now - lastMetricsAtMs >= 5_000L) {
                 Log.i(TAG, "VOICE_INPUT profile=$profile truthFrames=$truthFrames gtcrnFrames=$enhancedFrames")
@@ -214,6 +222,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
             preGainRms = frame.acousticRms,
             preGainNoiseRms = frame.acousticNoiseFloorRms,
             estimatedSnrDb = frame.snrDb,
+            captureChannelRevision = frame.captureChannelRevision,
         )
         val preGain = if (wav != null) frame.detectorSamples.copyOf(
             frame.detectorSampleCount.coerceIn(0, frame.detectorSamples.size)) else null

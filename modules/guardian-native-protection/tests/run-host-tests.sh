@@ -5,6 +5,11 @@ source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotect
 build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 sources=(
+  "$source_dir/GuardianWienerEnhancer.kt"
+  "$source_dir/GuardianWienerStudyStream.kt"
+  "$module_dir/tests/host/WienerEnhancerTest.kt"
+  "$module_dir/tests/host/WienerStudyTest.kt"
+  "$module_dir/tests/host/CaptureChannelRevisionTest.kt"
   "$source_dir/GuardianAdaptiveChannels.kt"
   "$module_dir/tests/host/AdaptiveChannelsTest.kt"
   "$source_dir/GuardianStudyBuffer.kt"
@@ -47,3 +52,5 @@ else
     -no-stdlib -no-reflect -classpath "$KOTLIN_STDLIB" -d "$build_dir/tests.jar" "${sources[@]}"
   java -cp "$build_dir/tests.jar:$KOTLIN_STDLIB" expo.modules.guardiannativeprotection.VoiceCoreTestKt
 fi
+
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.CaptureChannelRevisionTest

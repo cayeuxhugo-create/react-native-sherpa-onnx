@@ -19,6 +19,7 @@ internal class GuardianVoiceInputRouter(
         val preGainRms: Float? = null,
         val preGainNoiseRms: Float? = null,
         val estimatedSnrDb: Float? = null,
+        val captureChannelRevision: Long = 0L,
     )
     private val pending = ArrayDeque<Input>()
     private val enhanced = linkedMapOf<Key, FloatArray>()

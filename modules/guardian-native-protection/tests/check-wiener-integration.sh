@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Opt-in, offline integration. Keep manifest and ARTIFACT_DIR outside the checkout.
+# The FireRed assets and host JNI library must already be present; nothing is downloaded.
+set -euo pipefail
+module_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotection"
+: "${ASSETS:?Set ASSETS to the asset directory containing firered/}"
+: "${JNI_DIR:?Set JNI_DIR to the host libguardian_firered_vad.so directory}"
+: "${ARTIFACT_DIR:?Set ARTIFACT_DIR to a fresh private output directory}"
+[[ $# == 1 && -f "$1" ]] || { printf 'Usage: ASSETS=... JNI_DIR=... ARTIFACT_DIR=... %s manifest.tsv\n' "$0" >&2; exit 2; }
+[[ -f "$JNI_DIR/libguardian_firered_vad.so" && -d "$ASSETS/firered" ]] || { printf 'Missing local FireRed JNI library or assets\n' >&2; exit 2; }
+build_dir="$(mktemp -d)"
+trap 'rm -rf "$build_dir"' EXIT
+cat > "$build_dir/GtcrnMustNotLoad.kt" <<'KOTLIN'
+package expo.modules.guardiannativeprotection
+/** Any accidental neural denoiser initialization fails this Wiener-only test. */
+internal class GuardianGtcrnEnhancer(context: android.content.Context) {
+    init { error("GTCRN must not be instantiated in a Wiener study") }
+    val frameShiftInSamples: Int get() = error("GTCRN unavailable")
+    fun process(pcm: FloatArray, count: Int, rate: Int): GuardianAudioEngine.EnhancementResult = error("GTCRN unavailable")
+    fun release() {}
+}
+KOTLIN
+sources=(
+  "$source_dir/GuardianQwenPrimaryAudioProcessor.kt"
+  "$source_dir/GuardianQwenProgressiveDecoder.kt"
+  "$source_dir/GuardianContinuousStudy.kt"
+  "$source_dir/GuardianWienerEnhancer.kt"
+  "$source_dir/GuardianWienerStudyStream.kt"
+  "$source_dir/GuardianStudyBuffer.kt"
+  "$source_dir/GuardianFireRedStreaming.kt"
+  "$source_dir/GuardianFireRedConfirmation.kt"
+  "$source_dir/GuardianFireRedPolicy.kt"
+  "$source_dir/GuardianNeuralInputGain.kt"
+  "$source_dir/GuardianSpeechSegmentGain.kt"
+  "$source_dir/GuardianSpeechSegmenter.kt"
+  "$source_dir/GuardianVoiceInputRouter.kt"
+  "$source_dir/GuardianVoiceProfile.kt"
+  "$source_dir/GuardianVoiceDiagnostics.kt"
+  "$source_dir/GuardianDiagnosticWavWriter.kt"
+  "$source_dir/GuardianGtcrnComparison.kt"
+  "$module_dir/tests/host/WienerPrimaryIntegration.kt"
+  "$module_dir/tests/host/stubs/AndroidContext.kt"
+  "$module_dir/tests/host/stubs/AndroidAssets.kt"
+  "$module_dir/tests/host/stubs/AndroidClock.kt"
+  "$module_dir/tests/host/stubs/AndroidLog.kt"
+  "$module_dir/tests/host/stubs/AudioEngineContract.kt"
+  "$module_dir/tests/host/stubs/QwenRecognizer.kt"
+  "$build_dir/GtcrnMustNotLoad.kt"
+)
+if command -v kotlinc >/dev/null 2>&1; then
+  kotlinc "${sources[@]}" -include-runtime -d "$build_dir/integration.jar"
+  runtime_cp="$build_dir/integration.jar"
+else
+  : "${KOTLIN_COMPILER_CP:?Install Kotlin or set KOTLIN_COMPILER_CP to local compiler jars}"
+  : "${KOTLIN_STDLIB:?Set KOTLIN_STDLIB to the local kotlin-stdlib.jar}"
+  java -cp "$KOTLIN_COMPILER_CP" org.jetbrains.kotlin.cli.jvm.K2JVMCompiler \
+    -no-stdlib -no-reflect -classpath "$KOTLIN_STDLIB" -d "$build_dir/integration.jar" "${sources[@]}"
+  runtime_cp="$build_dir/integration.jar:$KOTLIN_STDLIB"
+fi
+java -Dguardian.test.assets="$ASSETS" -Djava.library.path="$JNI_DIR" \
+  -cp "$runtime_cp" expo.modules.guardiannativeprotection.WienerPrimaryIntegration "$1" "$ARTIFACT_DIR"

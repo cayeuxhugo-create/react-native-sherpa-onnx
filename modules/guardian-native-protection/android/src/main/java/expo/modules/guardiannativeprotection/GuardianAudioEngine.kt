@@ -382,6 +382,8 @@ enum class FarVoicePhase {
 
     val adaptiveGain: Float,
     val enhancementExpected: Boolean = false,
+    // Diagnostic capture identity; follows the original selected microphone stream.
+    val captureChannelRevision: Long = 0L,
 )
 
     data class Statistics(
@@ -530,6 +532,28 @@ data class RuntimeAudioProfile(
             }
     }
 
+    /** Deduplicates recording/routing callbacks without tying capture identity to spatial trust. */
+    internal class CaptureRouteTracker<Signature : Any> {
+        private var signature: Signature? = null
+        private val changes = AtomicLong(0L)
+        val generation: Long get() = changes.get()
+
+        @Synchronized
+        fun baseline(signature: Signature?) {
+            this.signature = signature
+        }
+
+        /** Returns the replaced signature only for an effective capture-path change. */
+        @Synchronized
+        fun update(current: Signature): Signature? {
+            val previous = signature
+            signature = current
+            if (previous == null || previous == current) return null
+            changes.incrementAndGet()
+            return previous
+        }
+    }
+
     data class EnhancedAudioFrame(
         val samples: FloatArray,
         val sampleCount: Int,
@@ -640,6 +664,7 @@ data class EnhancementResult(
     var sampleCount: Int = 0,
     var capturedAtElapsedRealtimeNanos: Long = 0L,
     var sequenceNumber: Long = 0L,
+    var captureChannelRevision: Long = 0L,
 
     /*
      * Analyse acoustique calculée AVANT GTCRN.
@@ -773,6 +798,8 @@ private enum class EnhancementRoute {
     private val droppedFrameCount = AtomicLong(0L)
     private val capturedSampleCount = AtomicLong(0L)
     private val sequenceNumber = AtomicLong(0L)
+    // Kept across AudioRecord restarts; never consulted for an already queued frame.
+    private val captureChannelRevision = AtomicLong(0L)
 
     @Volatile private var state: State = State.IDLE
     @Volatile private var audioRecord: AudioRecord? = null
@@ -1046,9 +1073,7 @@ private var lastStatistics: Statistics? = null
     private val runtimeCaptureChangeCount =
         AtomicLong(0L)
 
-    @Volatile
-    private var runtimeCaptureSignature:
-        RuntimeCaptureSignature? = null
+    private val runtimeCaptureRoute = CaptureRouteTracker<RuntimeCaptureSignature>()
 
     @Volatile
     private var runtimeSpatialTrustInvalidated =
@@ -1474,7 +1499,6 @@ fun clearAudioEnhancer(): Boolean =
         lastSpeechLevel.name
 
     @Volatile private var externalNeuralSpeechHint = false
-    @Volatile private var adaptiveRouteGeneration = 0L
 
     fun setVoiceActivityHint(active: Boolean) {
         // Acoustic activity is NOT independent lexical evidence.
@@ -1586,7 +1610,7 @@ fun clearAudioEnhancer(): Boolean =
         lastStatistics = null
         runtimeAudioProfile = null
         runtimeCaptureChangeCount.set(0L)
-        runtimeCaptureSignature = null
+        runtimeCaptureRoute.baseline(null)
         // Une route invalide reste invalide dans CETTE instance.
         // Seul un nouveau moteur construit après probe peut la réarmer.
         audioRecordingCallback = null
@@ -2112,6 +2136,7 @@ lastOutputRms =
                     adaptiveGain =
                         adaptiveGain,
                     enhancementExpected = enhancementExpected,
+                    captureChannelRevision = pooledFrame.captureChannelRevision,
 
                     acousticRms =
                         currentFrameMetadata.frameRms,
@@ -2574,7 +2599,7 @@ if (
         recorder: AudioRecord,
     ) {
         val signature = buildRuntimeCaptureSignature(recorder)
-        runtimeCaptureSignature = signature
+        runtimeCaptureRoute.baseline(signature)
 
         if (signature != null) {
             Log.i(
@@ -2594,8 +2619,6 @@ if (
             return
         }
 
-        val previous = runtimeCaptureSignature
-
         refreshRuntimeAudioProfile(
             recorder = recorder,
             microphoneControls = microphoneControls,
@@ -2604,16 +2627,9 @@ if (
         val current = buildRuntimeCaptureSignature(recorder)
             ?: return
 
-        if (previous == null) {
-            runtimeCaptureSignature = current
-            return
-        }
-
-        if (current == previous) {
-            return
-        }
-
-        runtimeCaptureSignature = current
+        // A recorder can be replaced while the platform snapshot is being collected.
+        if (audioRecord !== recorder || shouldStop()) return
+        val previous = runtimeCaptureRoute.update(current) ?: return
 
         val changeNumber =
             runtimeCaptureChangeCount.incrementAndGet()
@@ -2677,7 +2693,6 @@ if (
         }
 
         runtimeSpatialTrustInvalidated = true
-        adaptiveRouteGeneration++
         spatialAudio.invalidateRuntimeSteering(reason)
 
         Log.w(
@@ -2722,6 +2737,13 @@ if (
                 emptyList()
             }
 
+        val routedDevice =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                runCatching { recorder.routedDevice }.getOrNull()
+            } else {
+                null
+            }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val recordingConfiguration =
                 runCatching {
@@ -2729,7 +2751,8 @@ if (
                 }.getOrNull()
 
             if (recordingConfiguration != null) {
-                val device = recordingConfiguration.audioDevice
+                // The routing callback can precede the recording-configuration update.
+                val device = routedDevice ?: recordingConfiguration.audioDevice
                 val hardwareFormat = recordingConfiguration.format
                 val clientFormat = recordingConfiguration.clientFormat
 
@@ -2753,13 +2776,6 @@ if (
                 )
             }
         }
-
-        val routedDevice =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                runCatching { recorder.routedDevice }.getOrNull()
-            } else {
-                null
-            }
 
         return RuntimeCaptureSignature(
             clientSilenced = false,
@@ -3044,6 +3060,7 @@ if (
     private fun readAudioFrames(recorder: AudioRecord): SessionResult {
         val actualChannels = recorder.channelCount
         require(actualChannels in 1..30)
+        var channelRevision = captureChannelRevision.incrementAndGet()
         var adaptive = if (configuration.adaptiveChannelsEnabled && actualChannels>1)
             GuardianAdaptiveChannels(actualChannels,configuration.sampleRateHz) else null
         Log.i(TAG,"ADAPTIVE_CHANNELS_READY channels=$actualChannels enabled=${adaptive!=null} indexMask=${configuration.inputChannelIndexMask}")
@@ -3065,7 +3082,7 @@ if (
             }
 
         var carry=0
-        var routeGeneration=adaptiveRouteGeneration
+        var routeGeneration=runtimeCaptureRoute.generation
         try {
         while (!shouldStop()) {
             val incoming = recorder.read(pcmBuffer,carry,frameSampleCount*actualChannels,AudioRecord.READ_BLOCKING)
@@ -3089,21 +3106,27 @@ if (
                         captureReadEndedAtElapsedRealtimeNanos
                     )
 
-                    if (adaptive!=null) {
-                        if (routeGeneration!=adaptiveRouteGeneration) {
+                    val currentRouteGeneration = runtimeCaptureRoute.generation
+                    if (routeGeneration != currentRouteGeneration) {
+                        routeGeneration = currentRouteGeneration
+                        channelRevision = captureChannelRevision.incrementAndGet()
+                        if (adaptive != null) {
                             adaptive=GuardianAdaptiveChannels(actualChannels,configuration.sampleRateHz)
-                            routeGeneration=adaptiveRouteGeneration
                             Log.i(TAG,"ADAPTIVE_CHANNELS_RESET routeChanged=true")
                         }
+                    }
+
+                    if (adaptive!=null) {
                         val complete=readCount-readCount%actualChannels
                         val selectionStarted=SystemClock.elapsedRealtimeNanos()
                         val result=adaptive.process(pcmBuffer,complete,externalNeuralSpeechHint)
+                        if (result.transitioned) channelRevision=captureChannelRevision.incrementAndGet()
                         val selectionMs=(SystemClock.elapsedRealtimeNanos()-selectionStarted)/1000000.0
                         channelFrames++
                         channelDiagnostic?.offer(pcmBuffer,complete,channelFrames,captureReadEndedAtElapsedRealtimeNanos,result)
                         if (channelFrames%20L==0L || result.transitioned) Log.i(TAG,
                             "ADAPTIVE_CHANNELS frame=$channelFrames channels=$actualChannels selected=${result.selected} selectionMs=$selectionMs scores=${result.scores} valid=${result.valid} changed=${result.transitioned} transition=${result.transition} speechHint=$externalNeuralSpeechHint")
-                        if (result.pcm.isNotEmpty()) enqueuePcmFrame(result.pcm,result.pcm.size,captureReadEndedAtElapsedRealtimeNanos)
+                        if (result.pcm.isNotEmpty()) enqueuePcmFrame(result.pcm,result.pcm.size,captureReadEndedAtElapsedRealtimeNanos,channelRevision)
                         carry=readCount-complete
                         if (carry>0) pcmBuffer.copyInto(pcmBuffer,0,complete,readCount)
                     } else if (stereoActive) {
@@ -3187,6 +3210,7 @@ if (
         sampleCount = publishedFrameCount,
         captureReadEndedAtElapsedRealtimeNanos =
             captureReadEndedAtElapsedRealtimeNanos,
+        captureChannelRevision = channelRevision,
     )
 }
 
@@ -3197,6 +3221,7 @@ if (
                             sampleCount = readCount,
                             captureReadEndedAtElapsedRealtimeNanos =
                                 captureReadEndedAtElapsedRealtimeNanos,
+                            captureChannelRevision = channelRevision,
                         )
                     }
                 }
@@ -5769,6 +5794,7 @@ if (result.applied) {
         pcmBuffer: ShortArray,
         sampleCount: Int,
         captureReadEndedAtElapsedRealtimeNanos: Long,
+        captureChannelRevision: Long = 0L,
     ) {
         val pooledFrame = framePool.poll()
             ?: frameQueue.poll()?.also { droppedFrameCount.incrementAndGet() }
@@ -5953,6 +5979,7 @@ lastOutputRms =
                 .coerceAtLeast(0L)
 
         pooledFrame.sequenceNumber = sequenceNumber.incrementAndGet()
+        pooledFrame.captureChannelRevision = captureChannelRevision
         capturedFrameCount.incrementAndGet()
         capturedSampleCount.addAndGet(boundedSampleCount.toLong())
 
@@ -6345,6 +6372,9 @@ lastOutputRms =
         0L
 
     frame.sequenceNumber =
+        0L
+
+    frame.captureChannelRevision =
         0L
 
     frame.frameRms =

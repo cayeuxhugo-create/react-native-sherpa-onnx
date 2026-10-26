@@ -1,0 +1,71 @@
+{
+  "version": "guardian-voice-v3.4.6-wiener-study",
+  "date": "2026-10-26",
+  "base": "guardian-voice-v3.4.5-adaptive-channels",
+  "scope": "opt-in shadow-only Wiener comparison; primary original FireRed segmentation and Qwen decisions",
+  "wiener": {
+    "config": "adaptive-dd-a0.98-f0.5",
+    "fft": 512,
+    "hop": 256,
+    "sampleRate": 16000,
+    "noiseProfileSeconds": [
+      0.5,
+      3.0
+    ],
+    "originalStartupSeconds": 3.0,
+    "fadeSeconds": 0.1,
+    "unflushedTailSamples": [
+      256,
+      511
+    ],
+    "rawFrameProbabilityCalibrationGuard": 0.5,
+    "channelAndRouteRevisionReset": true,
+    "wholeWindowOriginalFallback": true
+  },
+  "numericalParity": {
+    "cases": 15,
+    "chunkSizesPerCase": 3,
+    "runs": 45,
+    "maxAbsError": 7.450580596923828e-09,
+    "chunkInvariant": true,
+    "startupBitExact": true,
+    "additionalCorpusRecordings": 13,
+    "additionalCorpusWindows": 37
+  },
+  "realNativePrimaryIntegration": {
+    "fireRed": "real host JNI",
+    "qwen": "fake callback isolation only; real Qwen evaluated separately",
+    "normal": {
+      "originalExactFinals": 3,
+      "originalNativeRejections": 1,
+      "alignedPairs": 4,
+      "diagnosticDecodes": 3,
+      "diagnosticProductCallbacks": 0
+    },
+    "afterDiscontinuity": {
+      "originalExactFinals": 3,
+      "originalNativeRejections": 1,
+      "pairs": 0
+    }
+  },
+  "realQwenHostCorpus": {
+    "freshDecodes": 37,
+    "speechWindows": 24,
+    "kotlinPortExactAdmitted": 21,
+    "pythonStudyExactAdmitted": 23,
+    "originalHostExactAdmitted": 22,
+    "negativeWindows": 13,
+    "negativeAdmitted": 0,
+    "controlledABBARechecks": 8,
+    "notes": "fixed raw candidate windows and clean-calibration core only; excludes automatic channel switching and conservative calibration epochs. Tiny NumPy SIMD magnitude rounding differences produce stable ASR differences on two windows, despite identical PCM16. Not Android/device accuracy."
+  },
+  "hostSuite": "passed including calibration, channel epochs and async capture revisions",
+  "adapterApiCompilation": "passed against Sherpa reference signatures, Android replaced with test stubs",
+  "captureApiCompilation": "passed against real Android API 35 signatures",
+  "collectorSimulatedCases": 12,
+  "apkBuilt": false,
+  "deviceTested": false,
+  "productionSuperiorityEstablished": false,
+  "privateAudioPublished": false,
+  "captureRouteGenerationRegressions": 3
+}

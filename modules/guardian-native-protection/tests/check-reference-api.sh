@@ -34,6 +34,8 @@ else
     '0a426f3f12edb5c2dff486ddc7accb6675a666bf6c852f48d28ce37f49afc69f  DenoisedAudio.kt' | sha256sum --check --status)
 fi
 sources=(
+  "$source_dir/GuardianWienerEnhancer.kt"
+  "$source_dir/GuardianWienerStudyStream.kt"
   "$source_dir/GuardianContinuousStudy.kt"
   "$source_dir/GuardianStudyBuffer.kt"
   "$source_dir/GuardianChannelQualityScores.kt"

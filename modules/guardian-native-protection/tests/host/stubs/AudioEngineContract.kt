@@ -122,6 +122,7 @@ enum class FarVoicePhase {
 
     val adaptiveGain: Float,
     val enhancementExpected: Boolean = false,
+    val captureChannelRevision: Long = 0L,
 )
 
 
