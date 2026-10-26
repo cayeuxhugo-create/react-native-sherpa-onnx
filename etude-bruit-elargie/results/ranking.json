@@ -1,0 +1,692 @@
+[
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.9-l0.01-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.06818181818181818
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.95-l0.03-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.06818181818181818
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.95-l0.003-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.11363636363636363
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.9-l0.01-r1",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.36363636363636365
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.97-l0.01-r1",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.36363636363636365
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.8-l0.003-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.36363636363636365
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.97-l0.1-r1",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.38636363636363635
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.85-l0.003-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.38636363636363635
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.85-l0.03-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.38636363636363635
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.8-l0.03-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.4318181818181818
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mwf-m1-r0",
+    "family": "mwf",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.11363636363636363
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.97-l0.1-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.13636363636363635
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.9-l0.1-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.1590909090909091
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.97-l0.01-r0",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.18181818181818182
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mwf-m0.5-r1",
+    "family": "mwf",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.29545454545454547
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mwf-m1-r1",
+    "family": "mwf",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.3409090909090909
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-a0.9-l0.1-r1",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.3409090909090909
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-base-blend0.75",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.4090909090909091
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "channel0",
+    "family": "channel",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.4318181818181818
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mvdr-base-blend0.5",
+    "family": "mvdr",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.45454545454545453
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mwf-m2-r1",
+    "family": "mwf",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.5
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mwf-m2-r0",
+    "family": "mwf",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.25
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mwf-m0.5-r0",
+    "family": "mwf",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.2727272727272727
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "channel1",
+    "family": "channel",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.6136363636363636
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "focus343",
+    "family": "reference",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.6590909090909091
+  },
+  {
+    "dataset": "noise-stereo",
+    "method": "mean",
+    "family": "mean",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.7272727272727273
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g8-a9",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.20454545454545456
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g8-a12",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.20454545454545456
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g16-a6",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.22727272727272727
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g16-a12",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.2727272727272727
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g32-a9",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 2,
+    "meanWER": 0.36363636363636365
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g16-a18",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 1,
+    "meanWER": 0.06818181818181818
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g16-a9",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 4,
+    "robustPhrases": 1,
+    "meanWER": 0.18181818181818182
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g32-a12",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.18181818181818182
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o2-f0.5",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.3181818181818182
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-speex24-g8",
+    "family": "speex",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.3409090909090909
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o0.5-f0.5",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.3409090909090909
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "notch3",
+    "family": "notch",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.3409090909090909
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o0.5-f0.75",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 3,
+    "robustPhrases": 1,
+    "meanWER": 0.36363636363636365
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o2-f0.75",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.36363636363636365
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "original",
+    "family": "reference",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.38636363636363635
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o1-f0.5",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.4318181818181818
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "speex-36",
+    "family": "speex",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.4318181818181818
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "speex-24",
+    "family": "speex",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.45454545454545453
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "speex-12",
+    "family": "speex",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.5227272727272727
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "gtcrn-mix50",
+    "family": "gtcrn",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.5227272727272727
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "speex-6",
+    "family": "speex",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.5454545454545454
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g4-a9",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 2,
+    "robustPhrases": 1,
+    "meanWER": 0.5454545454545454
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o1-f0.75",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.3181818181818182
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "dd-a0.98-f0.4",
+    "family": "dd",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.3409090909090909
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o0.5-f0.25",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.38636363636363635
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o1-f0.25",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.38636363636363635
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "hp150",
+    "family": "highpass",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.4318181818181818
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "sub-o0.5",
+    "family": "subtract",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.45454545454545453
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "wiener-o2-f0.25",
+    "family": "wiener",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.5
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "dd-a0.92-f0.4",
+    "family": "dd",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.5
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g16-a24",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.5
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "rnnoise-mix50",
+    "family": "rnnoise",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 1,
+    "robustPhrases": 0,
+    "meanWER": 0.6590909090909091
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3ll",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.6590909090909091
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "sub-o1",
+    "family": "subtract",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.6818181818181818
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g16-a100",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.6818181818181818
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-lowthresh",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.6818181818181818
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "dd-a0.98-f0.15",
+    "family": "dd",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.7272727272727273
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "dd-a0.92-f0.15",
+    "family": "dd",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.75
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "hp300",
+    "family": "highpass",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.7954545454545454
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "gtcrn",
+    "family": "gtcrn",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 0.8636363636363636
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "hp450",
+    "family": "highpass",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 1.0227272727272727
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "rnnoise-v01",
+    "family": "rnnoise",
+    "segmented": false,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 1.0454545454545454
+  },
+  {
+    "dataset": "noise-vr",
+    "method": "seg-df3-g1-a100",
+    "family": "df",
+    "segmented": true,
+    "windows": 6,
+    "exactWindows": 0,
+    "robustPhrases": 0,
+    "meanWER": 1.1818181818181819
+  }
+]

@@ -1,0 +1,78 @@
+[
+  {
+    "method": "original",
+    "groups": {
+      "negative": {
+        "expected": 0,
+        "exact": 0,
+        "captions": 0
+      },
+      "quiet": {
+        "expected": 15,
+        "exact": 15,
+        "captions": 15
+      },
+      "noise": {
+        "expected": 9,
+        "exact": 1,
+        "captions": 4
+      }
+    }
+  },
+  {
+    "method": "wiener-o2-f0.5",
+    "groups": {
+      "negative": {
+        "expected": 0,
+        "exact": 0,
+        "captions": 0
+      },
+      "quiet": {
+        "expected": 15,
+        "exact": 14,
+        "captions": 16
+      },
+      "noise": {
+        "expected": 9,
+        "exact": 3,
+        "captions": 8
+      }
+    }
+  },
+  {
+    "method": "spatial-channel0",
+    "exact": 1,
+    "expected": 3,
+    "captions": 3
+  },
+  {
+    "method": "spatial-channel1",
+    "exact": 0,
+    "expected": 3,
+    "captions": 1
+  },
+  {
+    "method": "spatial-focus343",
+    "exact": 1,
+    "expected": 3,
+    "captions": 2
+  },
+  {
+    "method": "spatial-mvdr-a0.9-l0.01-r0",
+    "exact": 2,
+    "expected": 3,
+    "captions": 9
+  },
+  {
+    "method": "spatial-mvdr-a0.95-l0.03-r0",
+    "exact": 2,
+    "expected": 3,
+    "captions": 8
+  },
+  {
+    "method": "spatial-mwf-m1-r0",
+    "exact": 1,
+    "expected": 3,
+    "captions": 11
+  }
+]
