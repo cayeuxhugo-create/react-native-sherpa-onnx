@@ -22,6 +22,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     continuousStudy: Boolean = false,
     studyModel: String = "GTCRN",
     private val requireFsmnConfirmation: Boolean = false,
+    referenceNoiseStudy: Boolean = false,
 ) : GuardianAudioEngine.AudioProcessor {
     interface Listener {
         fun onSpeechStarted()
@@ -53,11 +54,13 @@ internal class GuardianQwenPrimaryAudioProcessor(
             null
         }
     }
-    private val comparison = if (!continuousStudy && diagnosticWavDirectory != null && profile == GuardianVoiceProfile.NOISY)
+    private val comparison = if (!continuousStudy && !referenceNoiseStudy && diagnosticWavDirectory != null && profile == GuardianVoiceProfile.NOISY)
         GuardianGtcrnComparison(java.io.File(diagnosticWavDirectory, "gtcrn-comparison"), profile, diagnostics) else null
     private val study = if (continuousStudy && diagnosticWavDirectory != null)
         GuardianContinuousStudy(context.applicationContext, diagnosticWavDirectory, diagnostics, decoder, studyModel) else null
-    private val earlyStudyCalibrationGuard = studyModel == "WIENER_DD_ADAPTIVE"
+    private val referenceStudy = if (referenceNoiseStudy && diagnosticWavDirectory != null)
+        GuardianReferenceNoiseStudy(context.applicationContext, diagnosticWavDirectory, diagnostics, decoder) else null
+    private val earlyStudyCalibrationGuard = studyModel == "WIENER_DD_ADAPTIVE" || referenceNoiseStudy
     private val closed = AtomicBoolean(false)
     private val discontinuity = AtomicBoolean(false)
     private val pendingTasks = AtomicInteger(0)
@@ -133,6 +136,9 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN)
             Log.i(TAG, "FIRERED_RESULT segment=$id accepted=$finalAdmission originalAccepted=${validation.decision.accepted} admission=$admissionReason")
             study?.window(id, pcm, endSample, finalAdmission)
+            // The reference-channel lane records its own decisions and forced
+            // diagnostic decodes. It cannot replace this original admission.
+            referenceStudy?.window(id, pcm, endSample, finalAdmission)
             if (!finalAdmission) {
                 diagnostics?.event("SEGMENT_WINDOW", "segment" to id, "final" to final,
                     "reason" to reason, "samples" to pcm.size, "accepted" to false,
@@ -227,6 +233,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
             previousVad = speech
             study?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos,studyCalibrationSpeech,
                 frame.captureChannelRevision,frame.captureChannels)
+            referenceStudy?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos,
+                studyCalibrationSpeech, frame.captureChannelRevision, frame.captureChannels)
             segmenter.accept(decoderPcm, speech)
             if (now - lastMetricsAtMs >= 5_000L) {
                 Log.i(TAG, "VOICE_INPUT profile=$profile truthFrames=$truthFrames gtcrnFrames=$enhancedFrames")
@@ -338,6 +346,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
         diagnostics?.event("PIPELINE_RESET")
         previousVad = null
         study?.invalidate("PRIMARY_DISCONTINUITY")
+        referenceStudy?.invalidate("PRIMARY_DISCONTINUITY")
         decoder.reset()
         streamingVad.reset()
         segmenter.reset()
@@ -449,6 +458,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
         if (!closed.compareAndSet(false, true)) return
         diagnostics?.event("SESSION_END", "droppedInputTasks" to droppedInputTasks.get())
         study?.close()
+        referenceStudy?.close()
         comparison?.close()
         decoder.close()
         // Same worker as VAD inference: no native release during a VAD call.

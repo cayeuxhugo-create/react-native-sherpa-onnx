@@ -1,0 +1,53 @@
+{
+  "version": "guardian-voice-v3.5.0-reference-noise-study",
+  "baseRevision": "553a222ecd8c11f58b115303d141ccc6d6d0f372",
+  "scope": "OPT_IN_DIAGNOSTIC_ONLY",
+  "validation": {
+    "hostSuitePassed": true,
+    "referenceEnhancerSyntheticGroups": 6,
+    "dspPrototypeComparedStreams": 6,
+    "dspPrototypeByteExactStreams": 5,
+    "dspPrototypeMaximumAbsoluteDifference": 4.547473508864641e-13,
+    "realVadIntegrationReplays": 2,
+    "capabilityIntegrationScenarios": 4,
+    "originalPcmAndCallbacksUnchanged": true,
+    "referenceExportValidationScenarios": 16,
+    "actualWorkerExportSetsVerified": 6,
+    "actualWorkerExportPairWindowsVerified": 20,
+    "collectorSimulatedScenarios": 7,
+    "upstreamKotlinApiCompilationPassed": true,
+    "nativeAssetsUnchangedFromBase": true,
+    "unchangedNativeAndModelFiles": 29,
+    "nativeAbiCount": 4,
+    "actualWorkerDspStreamsByteExactToCoreReplay": 4,
+    "powershellSyntaxPassed": true
+  },
+  "behavior": {
+    "primaryOriginalGatesPreserved": true,
+    "primaryCallbacksFromReferenceLane": false,
+    "gtcrnDisabledInReferenceMode": true,
+    "monoWienerRetained": "WIENER_DD_ADAPTIVE",
+    "newReferenceModel": "WIENER_CROSS_CHANNEL_REFERENCE",
+    "profiles": [
+      "SHORT_0P5_3",
+      "LONG_2_15"
+    ],
+    "profileSpeechObservationsAreNotProofOfSilence": true,
+    "pairSelection": "FIRST_TWO_AVAILABLE_INDICES_STABLE",
+    "diagnosticAsr": "LONG_EXACT_AND_END_PLUS_2S_EVEN_IF_FILTERED_VAD_REJECTS",
+    "productionEligible": false,
+    "maxAsrSamples": 128000,
+    "realContextSamples": 32000,
+    "syntheticPadding": false
+  },
+  "limits": [
+    "Prototype settings were selected on the same recordings; no independent noise qualification.",
+    "The first noisy phrase still fails FSMN confirmation despite successful forced Qwen replay.",
+    "A pair of exposed channels is not proof of two independent identified physical microphones.",
+    "Missing channel payload, route changes, insufficient future context and queue pressure can prevent comparison.",
+    "Closing the primary decoder can decline late study ASR offers explicitly; declined or missing work is not silence.",
+    "DSP frame counters exclude acoustic model confirmation and Qwen cost.",
+    "New Android APK not built in this host environment; new mode not yet measured on device.",
+    "Short-word, multilingual, multi-phone and thermal/energy regression qualification remain open."
+  ]
+}
