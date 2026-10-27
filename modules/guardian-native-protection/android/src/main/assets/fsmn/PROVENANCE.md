@@ -56,19 +56,61 @@ NCNN 20260113, commit `e956fbf9bd97fe945df35d736747dc816f8b5f42`, is
 BSD-3-Clause (`NCNN_LICENSE.txt`). The Android source archive is
 `ncnn-20260113-android.zip`, SHA-256
 `c05263ca7f1f25bde9ac5172b696a40c55eb931b863b8820be98276ee2eaf7e5`.
-`tests/native/build_fsmn_android.py` builds the isolated
-`libguardian_fsmn_vad.so` with NDK r27c, API 24, one FP32 CPU thread, no Vulkan,
-static NCNN/OpenMP/C++ runtime, 16 KB ELF alignment, and four ABIs. An explicit
-export map exposes only the three FSMN JNI functions. Existing FireRed native
-code and libraries are not modified.
+The current FSMN library is rebuilt from the pinned source commit with
+`tests/native/build_fsmn_ncnn.py`: `NCNN_OPENMP=OFF`, `NCNN_SIMPLEOMP=OFF`,
+CPU dispatch enabled, and only the eight graph operators plus five standard
+matrix helper operators. No OpenMP shim or runtime is substituted. The
+precompiled Android archive above remains provenance for the earlier build;
+it is no longer linked into FSMN.
 
-The model-only synthetic comparison against the pinned ONNX model includes
-1/3/20/71/799 frames: maximum absolute error 0.000001133 across all 248
-posteriors, 0.000001103 for silence class zero. Full audio/JNI decision parity
-is validated separately. The 61-case frontend comparison has 58 nonempty
-inputs: maximum normalized feature error 0.00025332 and silence-posterior
-error 0.0000152587890625, with no speech-frame classification or upstream
-segment changes. Real JNI replay over 132 views, repeated in reverse order,
-has no admission or completed-segment-count differences from upstream.
-These measurements do not assert bit identity with ONNX or validation of
-this new library on a physical Android device.
+`tests/native/build_fsmn_android.py` verifies the serial build metadata/archive
+hash, then builds isolated `libguardian_fsmn_vad.so` with NDK r27c, API 24,
+one FP32 CPU thread, no Vulkan, static NCNN/C++ runtime, 16 KB ELF alignment,
+and four ABIs. The native frontend keeps `-ffp-contract=off`; NCNN retains its
+upstream Release FP32 CPU arithmetic and dispatch. Runtime FP16/BF16/INT8
+inference remains disabled, and model/CMVN bytes remain unchanged.
+
+The export map exposes four FSMN JNI entries. `executionBackend()` reports
+`NCNN_SERIAL_CPU` only after compile-time serial checks, and Kotlin verifies
+this before accepting a handle. Existing FireRed native code and libraries
+are not modified.
+
+## v3.4.9 restart crash correction
+
+The previous Android library aborted inside LLVM OpenMP's affinity startup:
+`__kmp_create_affinity_none_places` asserted that `__kmp_avail_proc` equals
+the detected topology's hardware-thread count. This occurred during
+`InnerProduct_arm::forward`, even though the requested inference thread count
+was one. The repeating `NetPrivate::forward_layer` frames were the normal
+graph traversal. Exact symbolication used a rebuilt unstripped library whose
+`.text` section matched the shipped library byte for byte.
+
+The serial rebuild removes that runtime and its affinity initialization.
+Build checks reject OpenMP references in the archives/libraries; merely
+setting an environment variable or replacing OpenMP functions with stubs
+would not provide the same guarantee.
+
+The serial host comparison covers 132 views / 82,231 posterior frames:
+maximum absolute silence-posterior change from the previous host library
+is 0.0000010132789611816406, with no upstream admission or completed-segment
+count differences. The 58 nonempty frontend/reference inputs have maximum
+silence-posterior error 0.000014841556549072266 and zero speech-frame
+classification differences. Forty fresh worker sessions (20 with the normal
+CPU mask and 20 restricted to one CPU) create on the main thread, then infer
+and destroy on a new worker: 240 native calls pass with repeat posteriors
+bit exact and original PCM unchanged. These host tests do not reproduce
+Android's LLVM affinity runtime; the original device abort is independently
+proved by exact symbolication.
+
+`tests/results/fsmn-serial-restart.json` records the checks, binary/archive
+hashes, four JNI exports, 16 KB alignment, and absence of OpenMP runtime
+references for every ABI. Physical-device stop/start confirmation remains
+necessary.
+
+The current serial checks export all 132 views once per library for direct
+old-host versus serial posterior comparison, and independently verify the
+upstream admission and completed-segment count on each call. The 40 fresh
+worker sessions provide the repeated-call and teardown checks described
+above; this serial test does not claim a separate reverse-order 132-view
+pass. No measurement asserts bit identity with ONNX or validation of this
+new library on a physical Android device.

@@ -241,8 +241,11 @@ internal class GuardianQwenPrimaryAudioProcessor(
         diagnostics?.event("FIRERED_READY", "model" to GuardianFireRedConfirmation.MODEL_ID,
             "threshold" to GuardianFireRedPolicy.THRESHOLD, "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN,
             "candidateVad" to GuardianFireRedStreaming.MODEL_ID)
+        if (requireFsmnConfirmation) Log.i(TAG,
+            "FSMN_READY model=${GuardianFsmnConfirmation.MODEL_ID} executionBackend=${GuardianFsmnConfirmation.EXECUTION_BACKEND}")
         if (requireFsmnConfirmation) diagnostics?.event("FSMN_READY",
             "model" to GuardianFsmnConfirmation.MODEL_ID, "required" to true,
+            "executionBackend" to GuardianFsmnConfirmation.EXECUTION_BACKEND,
             "source" to "PRIMARY_ORIGINAL_PCM", "targetPeak" to GuardianFsmnConfirmation.TARGET_PEAK,
             "maxInputGain" to GuardianFsmnConfirmation.MAX_INPUT_GAIN, "minInputGain" to 1f,
             "frameLength" to GuardianFsmnConfirmation.FRAME_LENGTH,

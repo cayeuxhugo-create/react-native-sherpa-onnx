@@ -1,5 +1,6 @@
 {
   global:
+    Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend;
     Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create;
     Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer;
     Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy;

@@ -47,6 +47,7 @@ internal class GuardianFsmnConfirmation private constructor(private var handle: 
 
     companion object {
         const val MODEL_ID = "FSMN_OFFLINE_NCNN_FP32"
+        const val EXECUTION_BACKEND = "NCNN_SERIAL_CPU"
         const val TARGET_PEAK = .4f
         const val MAX_INPUT_GAIN = 64f
         const val FRAME_LENGTH = 400
@@ -77,6 +78,12 @@ internal class GuardianFsmnConfirmation private constructor(private var handle: 
                     check(actual == hash) { "FSMN asset SHA-256 mismatch: $name" }
                 }
             }
+            // The original Android OpenMP runtime aborted on a later session's
+            // inference worker. Require the serial native build explicitly;
+            // a stale JNI library must fail closed before microphone startup.
+            check(GuardianFsmnNative.executionBackend() == EXECUTION_BACKEND) {
+                "FSMN requires the serial CPU native backend"
+            }
             val handle = GuardianFsmnNative.create(assets[0], assets[1], assets[2])
             check(handle != 0L) { "FSMN native initialization failed" }
             return GuardianFsmnConfirmation(handle)
@@ -86,6 +93,7 @@ internal class GuardianFsmnConfirmation private constructor(private var handle: 
 
 internal object GuardianFsmnNative {
     init { System.loadLibrary("guardian_fsmn_vad") }
+    external fun executionBackend(): String
     external fun create(param: ByteArray, model: ByteArray, cmvn: ByteArray): Long
     external fun infer(handle: Long, pcm: FloatArray): FloatArray
     external fun destroy(handle: Long)

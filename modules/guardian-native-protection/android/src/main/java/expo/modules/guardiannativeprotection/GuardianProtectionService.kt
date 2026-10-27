@@ -1320,9 +1320,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.8-fsmn-confirmation",
+      "engineRevision" to "guardian-voice-v3.4.9-fsmn-restart",
       "fsmnConfirmationRequired" to true,
       "fsmnModel" to GuardianFsmnConfirmation.MODEL_ID,
+      "fsmnExecutionBackend" to GuardianFsmnConfirmation.EXECUTION_BACKEND,
       "fsmnTargetPeak" to GuardianFsmnConfirmation.TARGET_PEAK,
       "fsmnMaxInputGain" to GuardianFsmnConfirmation.MAX_INPUT_GAIN,
       "channelAdmission" to "ORIGINAL_AND_COHERENT_ORIGINAL_CHANNEL",

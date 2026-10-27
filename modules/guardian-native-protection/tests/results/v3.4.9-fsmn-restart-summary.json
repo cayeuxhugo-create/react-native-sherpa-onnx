@@ -1,0 +1,61 @@
+{
+  "version": "guardian-voice-v3.4.9-fsmn-restart",
+  "date": "2026-10-27",
+  "base": "guardian-voice-v3.4.8-fsmn-confirmation",
+  "problem": "Native SIGABRT on a later voice activation inside LLVM OpenMP CPU-affinity initialization during FSMN inference; three identical observed traces.",
+  "fix": "Pinned-source NCNN CPU FP32 serial build for FSMN, OpenMP/SIMPLEOMP compiled out; native backend handshake before create.",
+  "executionBackend": "NCNN_SERIAL_CPU",
+  "modelAssetsUnchanged": true,
+  "fireRedNativeUnchanged": true,
+  "primarySignalAndPolicyUnchanged": true,
+  "validation": {
+    "hostSuitePassed": true,
+    "kotlinApiCompilationPassed": true,
+    "collectorSimulatedScenarios": 25,
+    "nativeOpenmpReferences": 0,
+    "nativeAbiCount": 4,
+    "native16KBAlignment": true,
+    "nativeExportCount": 4,
+    "restartCycles": 40,
+    "restartCalls": 240,
+    "restartNewWorkerEverySession": true,
+    "singleCpuCycles": 20,
+    "posteriorCases": 132,
+    "posteriorFrames": 82231,
+    "posteriorMaxAbsP0ChangeVsPreviousHost": 1.0132789611816406e-06,
+    "posteriorAdmissionDisagreements": 0,
+    "posteriorSegmentDisagreements": 0,
+    "frontendNonemptyCases": 58,
+    "frontendMaxAbsP0ChangeVsOnnx": 1.4841556549072266e-05,
+    "frontendSpeechFrameDisagreements": 0,
+    "backendCompatibility": {
+      "legacyJniRejected": true,
+      "incompatibleBackendRejectedBeforeCreate": true,
+      "serialBackendAccepted": true,
+      "assetsVerifiedBeforeNativeBackend": true
+    },
+    "primaryReplay": {
+      "finals": 3,
+      "byteExactAsrInputs": true,
+      "previousFalseWindowsRejected": 2,
+      "diagnosticProductCallbacks": 0
+    },
+    "monoRegression": {
+      "recordings": 13,
+      "byteExactFinals": 23,
+      "shortWordsPreserved": 6,
+      "oldFiveMetrePhrasesPreserved": 3
+    },
+    "integrationAsr": "simulated callback fixture with real FireRed/FSMN; original PCM compared byte for byte to validated baseline",
+    "installer": "archive/local PowerShell checks performed separately before publication"
+  },
+  "limits": [
+    "Host restart tests do not recreate the affected Android LLVM runtime; original crash is identified by byte-exact symbolication.",
+    "Corrected APK still requires repeated stop/start validation on the affected phone.",
+    "No new measurement of Qwen memory use, battery consumption or thermal behavior.",
+    "Recognition coverage remains the previously documented French corpus; no universal false-alarm or device guarantee."
+  ],
+  "apkBuilt": false,
+  "newNativeDeviceTested": false,
+  "privateAudioOrTranscriptsPublished": false
+}

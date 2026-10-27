@@ -1,5 +1,9 @@
 {
   "ncnnVersion": "20260113",
+  "ncnnSourceCommit": "e956fbf9bd97fe945df35d736747dc816f8b5f42",
+  "executionBackend": "NCNN_SERIAL_CPU",
+  "openmp": false,
+  "simpleomp": false,
   "ndk": "r27c",
   "api": 24,
   "fp32Only": true,
@@ -7,12 +11,18 @@
   "jniLibraries": [
     {
       "abi": "arm64-v8a",
-      "bytes": 4446960,
-      "sha256": "fac44f2ef5b55c7e2bbdbbb8d5c65234cc16c27d1113e23f80d5980c9b69483e",
+      "bytes": 759720,
+      "sha256": "2a1f7059ecac91470add8b2a5e5339b0f02806d16b56a24405d33b2878bcf94e",
+      "ncnnArchiveSha256": "c84f82046618ffc1ef66a2cdc9ad714ae4042e5c7b2d2b2e4b8845fdd2345139",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
       "exports": [
-        "00000000000748b0 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
-        "00000000000775dc T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
-        "0000000000075e58 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+        "0000000000022264 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "0000000000022d8c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "0000000000022250 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "000000000002298c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
       ],
       "needed": [
         "0x0000000000000001 (NEEDED)       Shared library: [liblog.so]",
@@ -25,12 +35,18 @@
     },
     {
       "abi": "armeabi-v7a",
-      "bytes": 2328076,
-      "sha256": "444efb1be6004138923fe9629a1c456ef4457095d10d1882bfc0f49d64633dce",
+      "bytes": 415340,
+      "sha256": "34cd417a17f92bd55d71f75185567fc5cf1c962655b174188fb0f5b4e7d41a3e",
+      "ncnnArchiveSha256": "8bc6aeea4b1821aeaa392bc41f04b4e230d149e80ff84a5d7e7f9e3bc808f1ef",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
       "exports": [
-        "000257c4 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
-        "000280cc T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
-        "00026cd4 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+        "0000f57c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "0001008c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "0000f564 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "0000fc88 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
       ],
       "needed": [
         "0x00000001 (NEEDED)       Shared library: [liblog.so]",
@@ -43,12 +59,18 @@
     },
     {
       "abi": "x86",
-      "bytes": 9063544,
-      "sha256": "57b58926bdb5d9bfd454bec72d3bbf824070827a0a546b732628af2c17cd524e",
+      "bytes": 2079336,
+      "sha256": "60cb22a9685cac7271d0776ce15f323c3a645c0ef1e619ac7f9dd5b4908b37a2",
+      "ncnnArchiveSha256": "e1c96d6f2ed5c5fadb7c56947675d92bed3d31900b2b1fbf8c3dd08af7fe643d",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
       "exports": [
-        "0008ce10 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
-        "00090500 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
-        "0008e7d0 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+        "00030030 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "00030d20 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "00030000 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "00030880 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
       ],
       "needed": [
         "0x00000001 (NEEDED)       Shared library: [liblog.so]",
@@ -61,12 +83,18 @@
     },
     {
       "abi": "x86_64",
-      "bytes": 8908072,
-      "sha256": "32e2f6d0c038e0fe3a1e267d70c4ad64a9895e8226326c49cd047fe15fd2e2b9",
+      "bytes": 1951216,
+      "sha256": "4ac9f771e58b737062f499398d996ddcf6f11be1428098bed310043a7d769250",
+      "ncnnArchiveSha256": "8bfd16bcf2448d473714a66fb898dd0531b033f4fe2b5ee209bdcfe35a08376d",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
       "exports": [
-        "00000000000a5610 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
-        "00000000000a8a40 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
-        "00000000000a6d00 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+        "000000000002d9a0 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "000000000002e580 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "000000000002d980 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "000000000002e110 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
       ],
       "needed": [
         "0x0000000000000001 (NEEDED)       Shared library: [liblog.so]",

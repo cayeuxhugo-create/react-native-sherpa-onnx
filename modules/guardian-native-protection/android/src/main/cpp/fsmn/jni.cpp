@@ -17,6 +17,16 @@ std::vector<unsigned char> bytes(JNIEnv* env, jbyteArray value) {
 }
 }  // namespace
 
+extern "C" JNIEXPORT jstring JNICALL
+Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend(JNIEnv* env, jobject) {
+#if !defined(NCNN_OPENMP) || NCNN_OPENMP != 0 || defined(_OPENMP) || NCNN_SIMPLEOMP
+  fail(env, "FSMN requires NCNN_OPENMP=0; refusing an affinity-managed backend");
+  return nullptr;
+#else
+  return env->NewStringUTF("NCNN_SERIAL_CPU");
+#endif
+}
+
 extern "C" JNIEXPORT jlong JNICALL
 Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create(
     JNIEnv* env, jobject, jbyteArray param, jbyteArray weights, jbyteArray cmvn) {

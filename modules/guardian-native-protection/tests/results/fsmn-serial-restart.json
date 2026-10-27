@@ -1,0 +1,167 @@
+{
+  "executionBackend": "NCNN_SERIAL_CPU",
+  "rootCause": {
+    "signal": "SIGABRT",
+    "component": "LLVM OpenMP affinity initialization",
+    "function": "__kmp_create_affinity_none_places",
+    "assertion": "__kmp_avail_proc == __kmp_topology->get_num_hw_threads()",
+    "symbolicationTextByteExact": true,
+    "repeatedForwardLayerFrames": "Normal NCNN graph traversal"
+  },
+  "fix": {
+    "sourceCommit": "e956fbf9bd97fe945df35d736747dc816f8b5f42",
+    "openmpCompiledOut": true,
+    "noOpenmpStubOrEnvironmentWorkaround": true,
+    "modelAssetsUnchanged": true,
+    "frontendAndPolicyUnchanged": true,
+    "cpuThreads": 1,
+    "cpuDispatch": true,
+    "runtimeFp16Bf16Int8": false,
+    "ndk": "r27c",
+    "androidApi": 24,
+    "fireRedNativeUnchanged": true
+  },
+  "posteriorParity": {
+    "cases": 132,
+    "posteriorFrames": 82231,
+    "maxAbsP0DifferenceVsOldHost": 1.0132789611816406e-06,
+    "rmsP0DifferenceVsOldHost": 2.0103338222760287e-07,
+    "differingPosteriorValues": 70075,
+    "upstreamAdmissionsAndSegmentsMatch": true
+  },
+  "frontendParity": {
+    "nonemptyFrontendCases": 58,
+    "maxAbsP0DifferenceVsOnnxReference": 1.4841556549072266e-05,
+    "speechFrameDisagreements": 0
+  },
+  "restartTests": {
+    "normalAffinity": {
+      "mode": "restart",
+      "legacyReferenceOnly": false,
+      "cases": 132,
+      "sessions": 20,
+      "calls": 120,
+      "upstreamDecisionsMatch": true,
+      "sourceUnchanged": true
+    },
+    "singleCpuAffinity": {
+      "mode": "restart",
+      "legacyReferenceOnly": false,
+      "cases": 132,
+      "sessions": 20,
+      "calls": 120,
+      "upstreamDecisionsMatch": true,
+      "sourceUnchanged": true
+    },
+    "totalFreshWorkerSessions": 40,
+    "totalNativeCalls": 240,
+    "createOnMainInferAndDestroyOnFreshWorker": true,
+    "posteriorRepeatBitExact": true
+  },
+  "jniLibraries": [
+    {
+      "abi": "arm64-v8a",
+      "bytes": 759720,
+      "sha256": "2a1f7059ecac91470add8b2a5e5339b0f02806d16b56a24405d33b2878bcf94e",
+      "ncnnArchiveSha256": "c84f82046618ffc1ef66a2cdc9ad714ae4042e5c7b2d2b2e4b8845fdd2345139",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
+      "exports": [
+        "0000000000022264 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "0000000000022d8c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "0000000000022250 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "000000000002298c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x0000000000000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libm.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    },
+    {
+      "abi": "armeabi-v7a",
+      "bytes": 415340,
+      "sha256": "34cd417a17f92bd55d71f75185567fc5cf1c962655b174188fb0f5b4e7d41a3e",
+      "ncnnArchiveSha256": "8bc6aeea4b1821aeaa392bc41f04b4e230d149e80ff84a5d7e7f9e3bc808f1ef",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
+      "exports": [
+        "0000f57c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "0001008c T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "0000f564 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "0000fc88 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x00000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x00000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x00000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x00000001 (NEEDED)       Shared library: [libm.so]",
+        "0x00000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    },
+    {
+      "abi": "x86",
+      "bytes": 2079336,
+      "sha256": "60cb22a9685cac7271d0776ce15f323c3a645c0ef1e619ac7f9dd5b4908b37a2",
+      "ncnnArchiveSha256": "e1c96d6f2ed5c5fadb7c56947675d92bed3d31900b2b1fbf8c3dd08af7fe643d",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
+      "exports": [
+        "00030030 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "00030d20 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "00030000 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "00030880 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x00000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x00000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x00000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x00000001 (NEEDED)       Shared library: [libm.so]",
+        "0x00000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    },
+    {
+      "abi": "x86_64",
+      "bytes": 1951216,
+      "sha256": "4ac9f771e58b737062f499398d996ddcf6f11be1428098bed310043a7d769250",
+      "ncnnArchiveSha256": "8bfd16bcf2448d473714a66fb898dd0531b033f4fe2b5ee209bdcfe35a08376d",
+      "ncnnOpenmp": false,
+      "ncnnSimpleomp": false,
+      "cpuDispatch": true,
+      "archiveAndLibraryOpenmpRuntimeReferences": false,
+      "exports": [
+        "000000000002d9a0 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "000000000002e580 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "000000000002d980 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_executionBackend",
+        "000000000002e110 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x0000000000000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libm.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    }
+  ],
+  "host": {
+    "sha256": "00d4f3fea7808af3b063ebccdf9f6ccfbad6f13bbf9f346dcb93683aab657554",
+    "openmpRuntimeReferences": false
+  },
+  "limitations": [
+    "Host tests do not reproduce Android LLVM OpenMP affinity behavior; the original Android abort is proved by exact symbolication.",
+    "Physical-device stop/start confirmation remains required."
+  ]
+}

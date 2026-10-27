@@ -15,6 +15,9 @@ class Model {
  public:
   Model(const std::string& param, const std::vector<unsigned char>& weights,
         const std::vector<double>& cmvn) : weights_(weights), frontend_(cmvn) {
+#if !defined(NCNN_OPENMP) || NCNN_OPENMP != 0 || defined(_OPENMP) || NCNN_SIMPLEOMP
+    throw std::runtime_error("FSMN requires a serial NCNN build (NCNN_OPENMP=0)");
+#endif
     if (param.empty() || weights.empty()) throw std::invalid_argument("FSMN assets empty");
     net_.opt.num_threads = 1;
     net_.opt.use_vulkan_compute = false;
