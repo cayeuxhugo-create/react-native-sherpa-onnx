@@ -1320,7 +1320,11 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.7-channel-coherence",
+      "engineRevision" to "guardian-voice-v3.4.8-fsmn-confirmation",
+      "fsmnConfirmationRequired" to true,
+      "fsmnModel" to GuardianFsmnConfirmation.MODEL_ID,
+      "fsmnTargetPeak" to GuardianFsmnConfirmation.TARGET_PEAK,
+      "fsmnMaxInputGain" to GuardianFsmnConfirmation.MAX_INPUT_GAIN,
       "channelAdmission" to "ORIGINAL_AND_COHERENT_ORIGINAL_CHANNEL",
       "channelPreprocessing" to "CONTINUOUS_PER_SOURCE_HP097",
       "wienerCalibrationScope" to if(wienerStudy) "PER_CHANNEL_PHYSICAL_ROUTE" else "DISABLED",
@@ -2249,6 +2253,7 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
         confirmedGainMaximum = segmentGainMaximum,
         continuousStudy = continuousStudy,
         studyModel = if(wienerStudy) "WIENER_DD_ADAPTIVE" else "GTCRN",
+        requireFsmnConfirmation = true,
         listener = object : GuardianQwenPrimaryAudioProcessor.Listener {
             override fun onSpeechStarted() {
                 if (isCurrentVoiceSession()) asrListener.onSpeechStarted()
@@ -2263,7 +2268,7 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
     ).also { qwenPrimaryProcessor = it } } catch (error: Throwable) {
         // The decoder owns Qwen; release it if native admission cannot start.
         decoder.close()
-        voiceDiagnostics?.event("FIRERED_START_FAILED", "error" to error.javaClass.simpleName)
+        voiceDiagnostics?.event("VOICE_GATE_START_FAILED", "error" to error.javaClass.simpleName)
         throw error
     }
 }

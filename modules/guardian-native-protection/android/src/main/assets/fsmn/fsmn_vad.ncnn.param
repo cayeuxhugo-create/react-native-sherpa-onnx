@@ -1,0 +1,41 @@
+7767517
+39 43
+Input speech 0 1 speech
+InnerProduct input_affine1 1 1 speech input_affine1 0=140 1=1 2=56000
+InnerProduct input_affine2 1 1 input_affine1 input_affine2 0=250 1=1 2=35000
+ReLU input_relu 1 1 input_affine2 input_relu
+InnerProduct fsmn0_projection 1 1 input_relu fsmn0_projection 0=128 1=0 2=32000
+Permute fsmn0_transpose 1 1 fsmn0_projection fsmn0_transpose 0=1
+Split fsmn0_split 1 2 fsmn0_transpose fsmn0_memory fsmn0_residual
+ConvolutionDepthWise1D fsmn0_left 1 1 fsmn0_memory fsmn0_left 0=128 1=20 2=1 3=1 4=19 15=0 5=0 6=2560 7=128
+BinaryOp fsmn0_add 2 1 fsmn0_residual fsmn0_left fsmn0_add 0=0
+Permute fsmn0_restore 1 1 fsmn0_add fsmn0_restore 0=1
+InnerProduct fsmn0_affine 1 1 fsmn0_restore fsmn0_affine 0=250 1=1 2=32000
+ReLU fsmn0_relu 1 1 fsmn0_affine fsmn0_relu
+InnerProduct fsmn1_projection 1 1 fsmn0_relu fsmn1_projection 0=128 1=0 2=32000
+Permute fsmn1_transpose 1 1 fsmn1_projection fsmn1_transpose 0=1
+Split fsmn1_split 1 2 fsmn1_transpose fsmn1_memory fsmn1_residual
+ConvolutionDepthWise1D fsmn1_left 1 1 fsmn1_memory fsmn1_left 0=128 1=20 2=1 3=1 4=19 15=0 5=0 6=2560 7=128
+BinaryOp fsmn1_add 2 1 fsmn1_residual fsmn1_left fsmn1_add 0=0
+Permute fsmn1_restore 1 1 fsmn1_add fsmn1_restore 0=1
+InnerProduct fsmn1_affine 1 1 fsmn1_restore fsmn1_affine 0=250 1=1 2=32000
+ReLU fsmn1_relu 1 1 fsmn1_affine fsmn1_relu
+InnerProduct fsmn2_projection 1 1 fsmn1_relu fsmn2_projection 0=128 1=0 2=32000
+Permute fsmn2_transpose 1 1 fsmn2_projection fsmn2_transpose 0=1
+Split fsmn2_split 1 2 fsmn2_transpose fsmn2_memory fsmn2_residual
+ConvolutionDepthWise1D fsmn2_left 1 1 fsmn2_memory fsmn2_left 0=128 1=20 2=1 3=1 4=19 15=0 5=0 6=2560 7=128
+BinaryOp fsmn2_add 2 1 fsmn2_residual fsmn2_left fsmn2_add 0=0
+Permute fsmn2_restore 1 1 fsmn2_add fsmn2_restore 0=1
+InnerProduct fsmn2_affine 1 1 fsmn2_restore fsmn2_affine 0=250 1=1 2=32000
+ReLU fsmn2_relu 1 1 fsmn2_affine fsmn2_relu
+InnerProduct fsmn3_projection 1 1 fsmn2_relu fsmn3_projection 0=128 1=0 2=32000
+Permute fsmn3_transpose 1 1 fsmn3_projection fsmn3_transpose 0=1
+Split fsmn3_split 1 2 fsmn3_transpose fsmn3_memory fsmn3_residual
+ConvolutionDepthWise1D fsmn3_left 1 1 fsmn3_memory fsmn3_left 0=128 1=20 2=1 3=1 4=19 15=0 5=0 6=2560 7=128
+BinaryOp fsmn3_add 2 1 fsmn3_residual fsmn3_left fsmn3_add 0=0
+Permute fsmn3_restore 1 1 fsmn3_add fsmn3_restore 0=1
+InnerProduct fsmn3_affine 1 1 fsmn3_restore fsmn3_affine 0=250 1=1 2=32000
+ReLU fsmn3_relu 1 1 fsmn3_affine fsmn3_relu
+InnerProduct output_affine1 1 1 fsmn3_relu output_affine1 0=140 1=1 2=35000
+InnerProduct output_affine2 1 1 output_affine1 output_affine2 0=248 1=1 2=34720
+Softmax logits 1 1 output_affine2 logits 0=1 1=1

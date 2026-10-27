@@ -34,6 +34,8 @@ else
     '0a426f3f12edb5c2dff486ddc7accb6675a666bf6c852f48d28ce37f49afc69f  DenoisedAudio.kt' | sha256sum --check --status)
 fi
 sources=(
+  "$source_dir/GuardianFsmnConfirmation.kt"
+  "$source_dir/GuardianFsmnPolicy.kt"
   "$source_dir/GuardianCaptureChannelFrame.kt"
   "$source_dir/GuardianChannelWindowHistory.kt"
   "$source_dir/GuardianWienerChannelBank.kt"

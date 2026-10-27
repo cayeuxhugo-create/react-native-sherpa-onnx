@@ -1,0 +1,81 @@
+{
+  "ncnnVersion": "20260113",
+  "ndk": "r27c",
+  "api": 24,
+  "fp32Only": true,
+  "newOrtDependency": false,
+  "jniLibraries": [
+    {
+      "abi": "arm64-v8a",
+      "bytes": 4446960,
+      "sha256": "fac44f2ef5b55c7e2bbdbbb8d5c65234cc16c27d1113e23f80d5980c9b69483e",
+      "exports": [
+        "00000000000748b0 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "00000000000775dc T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "0000000000075e58 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x0000000000000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libm.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    },
+    {
+      "abi": "armeabi-v7a",
+      "bytes": 2328076,
+      "sha256": "444efb1be6004138923fe9629a1c456ef4457095d10d1882bfc0f49d64633dce",
+      "exports": [
+        "000257c4 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "000280cc T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "00026cd4 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x00000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x00000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x00000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x00000001 (NEEDED)       Shared library: [libm.so]",
+        "0x00000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    },
+    {
+      "abi": "x86",
+      "bytes": 9063544,
+      "sha256": "57b58926bdb5d9bfd454bec72d3bbf824070827a0a546b732628af2c17cd524e",
+      "exports": [
+        "0008ce10 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "00090500 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "0008e7d0 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x00000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x00000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x00000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x00000001 (NEEDED)       Shared library: [libm.so]",
+        "0x00000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    },
+    {
+      "abi": "x86_64",
+      "bytes": 8908072,
+      "sha256": "32e2f6d0c038e0fe3a1e267d70c4ad64a9895e8226326c49cd047fe15fd2e2b9",
+      "exports": [
+        "00000000000a5610 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_create",
+        "00000000000a8a40 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_destroy",
+        "00000000000a6d00 T Java_expo_modules_guardiannativeprotection_GuardianFsmnNative_infer"
+      ],
+      "needed": [
+        "0x0000000000000001 (NEEDED)       Shared library: [liblog.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libandroid.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libdl.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libm.so]",
+        "0x0000000000000001 (NEEDED)       Shared library: [libc.so]"
+      ],
+      "allLoadAlignment16384": true
+    }
+  ]
+}

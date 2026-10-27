@@ -5,6 +5,10 @@ source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotect
 build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 sources=(
+  "$source_dir/GuardianFsmnConfirmation.kt"
+  "$source_dir/GuardianFsmnPolicy.kt"
+  "$module_dir/tests/host/FsmnConditioningTest.kt"
+  "$module_dir/tests/host/FsmnPolicyTest.kt"
   "$source_dir/GuardianCaptureChannelFrame.kt"
   "$source_dir/GuardianChannelPreprocessor.kt"
   "$source_dir/GuardianChannelWindowHistory.kt"
@@ -63,3 +67,5 @@ fi
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.CaptureChannelRevisionTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.ChannelPreprocessorTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.ChannelWindowHistoryTest
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.FsmnConditioningTest
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.FsmnPolicyTest

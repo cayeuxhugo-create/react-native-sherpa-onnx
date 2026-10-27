@@ -21,6 +21,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val confirmedGainMaximum: Float = 1f,
     continuousStudy: Boolean = false,
     studyModel: String = "GTCRN",
+    private val requireFsmnConfirmation: Boolean = false,
 ) : GuardianAudioEngine.AudioProcessor {
     interface Listener {
         fun onSpeechStarted()
@@ -34,6 +35,15 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val fireRed = try {
         GuardianFireRedConfirmation.load { name -> context.applicationContext.assets.open(name).use { it.readBytes() } }
     } catch (error: Throwable) { streamingVad.close(); throw error }
+    private val fsmn = if (requireFsmnConfirmation) try {
+        GuardianFsmnConfirmation.load { name -> context.applicationContext.assets.open(name).use { it.readBytes() } }
+    } catch (error: Throwable) {
+        diagnostics?.event("FSMN_START_FAILED", "model" to GuardianFsmnConfirmation.MODEL_ID,
+            "required" to true, "error" to error.javaClass.simpleName)
+        try { fireRed.close() } catch (_: Throwable) { }
+        try { streamingVad.close() } catch (_: Throwable) { }
+        throw error
+    } else null
     private val wav = diagnosticWavDirectory?.let { directory ->
         try {
             GuardianDiagnosticWavWriter(directory, profile.name,
@@ -90,24 +100,43 @@ internal class GuardianQwenPrimaryAudioProcessor(
             }
             val coherent = if (validation.decision.accepted) confirmCoherentChannel(id, pcm, endSample, validation)
                 else ChannelAdmission(false, false, "ORIGINAL_FIRERED_REJECT")
-            val finalAdmission = validation.decision.accepted && coherent.accepted
+            val priorRejection = when {
+                !validation.decision.accepted -> "SKIPPED_ORIGINAL_REJECT"
+                !coherent.accepted -> "SKIPPED_COHERENT_REJECT"
+                else -> null
+            }
+            val fsmnAdmission = confirmFsmn(id, pcm, priorRejection)
+            val finalAdmission = validation.decision.accepted && coherent.accepted && fsmnAdmission.accepted
+            val admissionReason = when {
+                !validation.decision.accepted -> "FIRERED_REJECT"
+                !coherent.accepted -> "COHERENT_CHANNEL_REJECT"
+                !fsmnAdmission.accepted -> if (fsmnAdmission.error) "FSMN_ERROR" else "FSMN_REJECT"
+                else -> "NEURAL_CONFIRMED"
+            }
             diagnostics?.event("FIRERED_RESULT", "segment" to id, "model" to GuardianFireRedConfirmation.MODEL_ID,
                 "accepted" to finalAdmission, "originalAccepted" to validation.decision.accepted,
-                "elapsedMs" to validation.elapsedMs + coherent.elapsedMs,
-                "originalElapsedMs" to validation.elapsedMs,
+                "confirmationMs" to validation.elapsedMs,
+                "coherentGateMs" to coherent.elapsedMs,
+                "fsmnConfirmationMs" to fsmnAdmission.confirmationMs,
+                "admissionConfirmationMs" to validation.elapsedMs + coherent.elapsedMs + fsmnAdmission.confirmationMs,
                 "channelGateRequired" to coherent.required, "channelGateReason" to coherent.reason,
                 "channelAcceptedIndex" to coherent.channel,
+                "coherentEvaluated" to validation.decision.accepted,
+                "coherentAccepted" to if (validation.decision.accepted) coherent.accepted else null,
+                "fsmnConfirmationRequired" to requireFsmnConfirmation,
+                "fsmnAccepted" to if (requireFsmnConfirmation && priorRejection == null) fsmnAdmission.accepted else null,
+                "admissionReason" to admissionReason,
                 "peakProbability" to validation.decision.peakProbability,
                 "longestPositiveFrames" to validation.decision.longestPositiveFrames,
                 "audioMs" to pcm.size.toLong() * 1000 / 16000,
                 "threshold" to GuardianFireRedPolicy.THRESHOLD,
                 "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN)
-            Log.i(TAG, "FIRERED_RESULT segment=$id accepted=$finalAdmission originalAccepted=${validation.decision.accepted} channelGate=${coherent.reason}")
+            Log.i(TAG, "FIRERED_RESULT segment=$id accepted=$finalAdmission originalAccepted=${validation.decision.accepted} admission=$admissionReason")
             study?.window(id, pcm, endSample, finalAdmission)
             if (!finalAdmission) {
                 diagnostics?.event("SEGMENT_WINDOW", "segment" to id, "final" to final,
                     "reason" to reason, "samples" to pcm.size, "accepted" to false,
-                    "admission" to if (validation.decision.accepted) "COHERENT_CHANNEL_REJECT" else "FIRERED_REJECT")
+                    "admission" to admissionReason)
                 return
             }
             val segmentGain = if (speechOnlyGain) GuardianSpeechSegmentGain.apply(pcm, confirmed=true, maximumGain=confirmedGainMaximum) else null
@@ -212,6 +241,12 @@ internal class GuardianQwenPrimaryAudioProcessor(
         diagnostics?.event("FIRERED_READY", "model" to GuardianFireRedConfirmation.MODEL_ID,
             "threshold" to GuardianFireRedPolicy.THRESHOLD, "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN,
             "candidateVad" to GuardianFireRedStreaming.MODEL_ID)
+        if (requireFsmnConfirmation) diagnostics?.event("FSMN_READY",
+            "model" to GuardianFsmnConfirmation.MODEL_ID, "required" to true,
+            "source" to "PRIMARY_ORIGINAL_PCM", "targetPeak" to GuardianFsmnConfirmation.TARGET_PEAK,
+            "maxInputGain" to GuardianFsmnConfirmation.MAX_INPUT_GAIN, "minInputGain" to 1f,
+            "frameLength" to GuardianFsmnConfirmation.FRAME_LENGTH,
+            "frameShift" to GuardianFsmnConfirmation.FRAME_SHIFT)
     }
 
     override fun onAudioFrame(frame: GuardianAudioEngine.AudioFrame) {
@@ -320,7 +355,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "startSample" to endSample-original.size, "endSample" to endSample,
                 "routeRevision" to window.routeRevision, "openedChannels" to window.openedChannels,
                 "candidateChannels" to window.channels.map { it.index }, "attemptedChannels" to attempted,
-                "acceptedChannel" to channel, "elapsedMs" to elapsedMs,
+                "acceptedChannel" to channel, "coherentGateMs" to elapsedMs,
                 "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL", "asrSource" to "UNCHANGED_PRIMARY_PCM")
             return ChannelAdmission(accepted, window.required, reason, channel, elapsedMs)
         }
@@ -347,7 +382,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "reusedOriginalDecision" to reused,
                 "peakProbability" to confirmation.decision.peakProbability,
                 "longestPositiveFrames" to confirmation.decision.longestPositiveFrames,
-                "elapsedMs" to if (reused) 0L else confirmation.elapsedMs,
+                "confirmationMs" to if (reused) 0L else confirmation.elapsedMs,
                 "inputPeak" to peak, "inputGain" to gain, "conditionedPeak" to peak*gain,
                 "contributedSamples" to channel.contributedSamples, "usableSamples" to channel.usableSamples,
                 "startSample" to endSample-original.size, "endSample" to endSample,
@@ -355,6 +390,47 @@ internal class GuardianQwenPrimaryAudioProcessor(
             if (confirmation.decision.accepted) return result(true, "COHERENT_CHANNEL_CONFIRMED", channel.index)
         }
         return result(false, "NO_COHERENT_CHANNEL_CONFIRMED")
+    }
+
+    private data class FsmnAdmission(val accepted: Boolean, val confirmationMs: Long = 0L, val error: Boolean = false)
+
+    private fun confirmFsmn(segment: Long, original: FloatArray, priorRejection: String?): FsmnAdmission {
+        if (!requireFsmnConfirmation) return FsmnAdmission(true)
+        if (priorRejection != null) {
+            diagnostics?.event("FSMN_RESULT", "segment" to segment,
+                "model" to GuardianFsmnConfirmation.MODEL_ID, "source" to "PRIMARY_ORIGINAL_PCM",
+                "evaluated" to false, "success" to false, "accepted" to false, "reason" to priorRejection)
+            return FsmnAdmission(false)
+        }
+        val started = System.nanoTime()
+        val cpuStarted = SystemClock.currentThreadTimeMillis()
+        val result = try { checkNotNull(fsmn) { "Required FSMN unavailable" }.confirm(original) }
+        catch (error: Throwable) {
+            val confirmationMs = (System.nanoTime() - started) / 1_000_000L
+            diagnostics?.event("FSMN_ERROR", "segment" to segment, "model" to GuardianFsmnConfirmation.MODEL_ID,
+                "source" to "PRIMARY_ORIGINAL_PCM", "error" to error.javaClass.simpleName)
+            diagnostics?.event("FSMN_RESULT", "segment" to segment,
+                "model" to GuardianFsmnConfirmation.MODEL_ID, "source" to "PRIMARY_ORIGINAL_PCM",
+                "evaluated" to true, "success" to false, "accepted" to false, "reason" to "INFERENCE_ERROR",
+                "confirmationMs" to confirmationMs,
+                "confirmationCpuMs" to SystemClock.currentThreadTimeMillis() - cpuStarted,
+                "error" to error.javaClass.simpleName)
+            warn("FSMN indisponible : aucune admission pour ce segment")
+            return FsmnAdmission(false, confirmationMs, true)
+        }
+        diagnostics?.event("FSMN_RESULT", "segment" to segment,
+            "model" to GuardianFsmnConfirmation.MODEL_ID, "source" to "PRIMARY_ORIGINAL_PCM",
+            "evaluated" to true, "success" to true, "accepted" to result.decision.accepted,
+            "reason" to if (result.decision.accepted) "CONFIRMED" else "REJECTED",
+            "inputGain" to result.inputGain, "inputPeak" to result.inputPeak,
+            "conditionedPeak" to result.conditionedPeak, "posteriorFrames" to result.posteriorFrames,
+            "silencePosteriorMin" to result.silencePosteriorMin,
+            "silencePosteriorMax" to result.silencePosteriorMax,
+            "silencePosteriorMean" to result.silencePosteriorMean,
+            "speechFrames" to result.decision.speechFrames, "detectedSegments" to result.decision.detectedSegments,
+            "confirmationMs" to result.confirmationMs, "inferenceMs" to result.inferenceMs,
+            "confirmationCpuMs" to result.confirmationCpuMs)
+        return FsmnAdmission(result.decision.accepted, result.confirmationMs)
     }
 
     private fun warn(message: String) {
@@ -376,7 +452,9 @@ internal class GuardianQwenPrimaryAudioProcessor(
         worker.execute {
             try {
                 router.reset()
-                try { streamingVad.close() } finally { try { fireRed.close() } finally { wav?.close() } }
+                try { fsmn?.close() } finally {
+                    try { streamingVad.close() } finally { try { fireRed.close() } finally { wav?.close() } }
+                }
             } finally { worker.shutdownNow() }
         }
     }

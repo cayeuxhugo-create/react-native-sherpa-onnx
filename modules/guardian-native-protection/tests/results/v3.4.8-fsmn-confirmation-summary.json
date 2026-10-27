@@ -1,0 +1,87 @@
+{
+  "version": "guardian-voice-v3.4.8-fsmn-confirmation",
+  "date": "2026-10-27",
+  "base": "guardian-voice-v3.4.7-channel-coherence",
+  "primaryPolicy": "FireRed original AND coherent original channel where required AND independent FSMN on unchanged primary original PCM",
+  "fsmnConditioning": {
+    "targetPeak": 0.4,
+    "maxGain": 64,
+    "minGain": 1,
+    "float32ExactReference": true,
+    "doesNotModifyQwenPcm": true
+  },
+  "fsmnModel": "FSMN_OFFLINE_NCNN_FP32",
+  "native": "isolated NCNN FP32, no added ONNX Runtime; four ABIs, API24, 16KB ELF alignment",
+  "diagnostics": {
+    "maxGlobalQueuedJobs": 2,
+    "inflightPreemptible": false,
+    "finalPriority": true,
+    "rotatingPhysicalChannelOrder": true,
+    "explicitTerminalStatuses": true
+  },
+  "validation": {
+    "hostSuite": "passed including conditioning, upstream policy, segmentation, channel history and diagnostic concurrency",
+    "fsmnPolicyUpstreamComparisons": 226,
+    "fsmnFrontendCases": 61,
+    "fsmnFrontendNonemptyCases": 58,
+    "maxFrontendPosteriorAbsoluteError": 1.52587890625e-05,
+    "frontendFrameDisagreements": 0,
+    "realJniParityCases": 132,
+    "realJniParityCalls": 264,
+    "realJniAdmissionAndSegmentDisagreements": 0,
+    "primaryStudyIntegrationScenarios": 4,
+    "missingChannelPayloadScenario": true,
+    "requiredModelMissingScenario": true,
+    "inferenceErrorFailsClosedScenario": true,
+    "latestFullReplay": {
+      "expectedPrimaryFinals": 3,
+      "primaryFinals": 3,
+      "confirmedFalsePrimaryFinalsBefore": 2,
+      "confirmedFalsePrimaryFinalsAfter": 0,
+      "diagnosticChannel0Decodes": 5,
+      "diagnosticChannel1Decodes": 5,
+      "diagnosticProductCallbacks": 0,
+      "originalAsrBytePreserved": true
+    },
+    "monoRegression": {
+      "recordings": 13,
+      "byteExactFinals": 23,
+      "shortWordsPreserved": 6,
+      "oldFiveMetrePhrasesPreserved": 3
+    },
+    "referenceRecognitionCorpus": {
+      "positiveWindows": 27,
+      "existingCorrectAdmissionsPreserved": 26,
+      "preexistingNoisyPositiveMiss": 1,
+      "negativeWindows": 16,
+      "combinedFalseAdmissions": 0,
+      "scope": "selected primary windows only, not all alternative physical views"
+    },
+    "extendedNoiseControls": {
+      "windows": 65,
+      "seconds": 500,
+      "combinedFalseAdmissions": 0,
+      "correlatedConditionsNotAnHourlyFalseAlarmRate": true
+    },
+    "realQwenReuse": {
+      "byteExactVerifiedInputs": 13,
+      "primaryInputs": 3,
+      "previouslyDecodedPrimaryPhrasesExact": 3,
+      "scope": "gate/PCM parity with previously real-decoded Qwen; integration decoder simulated for callback isolation"
+    },
+    "collectorSimulatedScenarios": 21,
+    "adapterApiCompilation": "passed against public Sherpa signatures with Android stubs",
+    "nativeAbiBuild": "arm64-v8a,armeabi-v7a,x86,x86_64 compiled and audited",
+    "installer": "verified separately before publication"
+  },
+  "knownLimits": [
+    "some alternative second-channel original/filtered nonspeech views still fool FSMN; no all-channel or universal guarantee",
+    "French recognition corpus only; FSMN documented Chinese training corpus does not establish European-language coverage",
+    "preexisting noisy speech miss remains",
+    "streaming VAD may still propose rejected nonspeech windows",
+    "new native library not yet tested on a physical Android device"
+  ],
+  "apkBuilt": false,
+  "newNativeDeviceTested": false,
+  "privateAudioOrTranscriptsPublished": false
+}

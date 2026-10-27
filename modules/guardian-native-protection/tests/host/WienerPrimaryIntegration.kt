@@ -21,6 +21,7 @@ import kotlin.system.exitProcess
  * Segment IDs are explicit; the rejected column may be empty.
  */
 object WienerPrimaryIntegration {
+    private val requireFsmn = System.getProperty("guardian.test.requireFsmn", "true").toBoolean()
     private data class Replay(val input: File, val accepted: Map<Long, FloatArray>, val rejected: Map<Long, FloatArray>)
     private data class Event(val raw: String) {
         fun value(key: String): String? = Regex("\"${Regex.escape(key)}\":(\"([^\"]*)\"|[^,}]+)")
@@ -59,12 +60,75 @@ object WienerPrimaryIntegration {
                 runReplay(replay, input, File(artifacts, "case-${index + 1}-channels-discontinuity"), invalidate = true, coherentPayload = true)
             }
             missingChannelPayload(File(artifacts, "missing-channel-payload"))
-            println("PASS Wiener production primary integration: ${cases.size} replay(s), real FireRed JNI, exact primary PCM, shadow-only decoding, aligned WAV pairs, discontinuity isolation")
+            if (requireFsmn) {
+                fsmnFailuresFailClosed(File(artifacts, "fsmn-failures"), cases.first().accepted.values.first())
+            }
+            println("PASS Wiener production primary integration: ${cases.size} replay(s), real FireRed JNI, FSMN required=$requireFsmn, exact primary PCM, shadow-only decoding, aligned WAV pairs, discontinuity isolation")
         } catch (error: Throwable) {
             File(artifacts, "failure-private.txt").writeText(error.stackTraceToString())
             System.err.println("FAIL Wiener primary integration (${error.javaClass.simpleName}); details are in the private artifact directory")
             exitProcess(1)
         }
+    }
+
+    private fun fsmnFailuresFailClosed(directory: File, confirmedOriginal: FloatArray) {
+        check(directory.mkdirs())
+        val records = Collections.synchronizedList(mutableListOf<Event>())
+        val diagnostics = GuardianVoiceDiagnostics(true, "HOST", { records.add(Event(it)) }, "fsmn-failures")
+        val callbacks = AtomicInteger()
+        val decodes = AtomicInteger()
+        val qwen = GuardianQwenRescueRecognizer { decodes.incrementAndGet(); null }
+        val decoder = GuardianQwenProgressiveDecoder(qwen, object : GuardianQwenProgressiveDecoder.Listener {
+            override fun onPartial(hypothesis: GuardianQwenProgressiveDecoder.Hypothesis) { callbacks.incrementAndGet() }
+            override fun onFinal(hypothesis: GuardianQwenProgressiveDecoder.Hypothesis) { callbacks.incrementAndGet() }
+            override fun onDecoderUnavailable(segmentId: Long, isFinal: Boolean) { callbacks.incrementAndGet() }
+            override fun onBackpressure(segmentId: Long, pendingFinalCount: Int) { callbacks.incrementAndGet() }
+        }, diagnostics = diagnostics)
+        fun primary() = GuardianQwenPrimaryAudioProcessor(Context(), decoder,
+            object : GuardianQwenPrimaryAudioProcessor.Listener {
+                override fun onSpeechStarted() {}
+                override fun onSpeechEnded() {}
+                override fun onWarning(message: String) {}
+            }, diagnostics = diagnostics, requireFsmnConfirmation = true)
+        val assetsProperty = checkNotNull(System.getProperty("guardian.test.assets"))
+        val invalidAssets = File(directory, "invalid-assets")
+        check(File(invalidAssets, "firered").mkdirs())
+        for (asset in File(assetsProperty, "firered").listFiles()!!.filter { it.isFile }) {
+            asset.copyTo(File(invalidAssets, "firered/${asset.name}"))
+        }
+        try {
+            System.setProperty("guardian.test.assets", invalidAssets.absolutePath)
+            check(runCatching { primary() }.isFailure) { "Missing required FSMN assets silently disabled confirmation" }
+        } finally { System.setProperty("guardian.test.assets", assetsProperty) }
+        check(synchronized(records) { records.count { it.name == "FSMN_START_FAILED" } } == 1)
+
+        // Close the real loaded model, then send a genuinely FireRed-admitted
+        // original through the production completed-window callback. No capture
+        // inference is needed to test this completed-window failure path.
+        val processor = primary()
+        try {
+            (checkNotNull(field(processor, "fsmn")) as AutoCloseable).close()
+            (field(processor, "channelHistory") as GuardianChannelWindowHistory).append(confirmedOriginal.size, null)
+            val segmenter = checkNotNull(field(processor, "segmenter"))
+            val sink = field(segmenter, "sink") as GuardianSpeechSegmenter.Sink
+            val before = confirmedOriginal.copyOf()
+            sink.onWindowAt(1, confirmedOriginal, true, "HOST_CONFIRMED_WINDOW", confirmedOriginal.size.toLong())
+            check(confirmedOriginal.contentEquals(before)) { "Failed confirmation changed original PCM" }
+            val result = synchronized(records) { records.single { it.name == "FSMN_RESULT" } }
+            check(result.flag("evaluated") && !result.flag("success") && !result.flag("accepted") &&
+                result.value("reason") == "INFERENCE_ERROR")
+            val gate = synchronized(records) { records.single { it.name == "FIRERED_RESULT" } }
+            check(gate.flag("originalAccepted") && !gate.flag("accepted") && gate.value("admissionReason") == "FSMN_ERROR") {
+                "FSMN inference failure permitted a confirmed original into ASR"
+            }
+            check(callbacks.get() == 0 && decodes.get() == 0) { "Failed confirmation reached Qwen or a product callback" }
+        } finally {
+            processor.close()
+            check(qwen.released.await(30, TimeUnit.SECONDS))
+            check((field(processor, "worker") as ExecutorService).awaitTermination(30, TimeUnit.SECONDS))
+            synchronized(records) { File(directory, "events-private.jsonl").writeText(records.joinToString("\n") { it.raw } + "\n") }
+        }
+        println("PASS required FSMN failures: missing model rejects startup; inference error rejects admission without Qwen")
     }
 
     /** A lost physical-channel block cannot turn an established multi-mic
@@ -149,7 +213,7 @@ object WienerPrimaryIntegration {
                 override fun onWarning(message: String) { warnings.incrementAndGet() }
             }, diagnostics = diagnostics, diagnosticWavDirectory = directory,
             speechOnlyGain = true, confirmedGainMaximum = 1f,
-            continuousStudy = true, studyModel = "WIENER_DD_ADAPTIVE")
+            continuousStudy = true, studyModel = "WIENER_DD_ADAPTIVE", requireFsmnConfirmation = requireFsmn)
         val worker = field(primary, "worker") as ExecutorService
         val study = checkNotNull(field(primary, "study"))
         val queue = field(study, "queue") as java.util.concurrent.BlockingQueue<*>
@@ -198,6 +262,10 @@ object WienerPrimaryIntegration {
             check(ready.value("model") == "WIENER_DD_ADAPTIVE" && ready.long("calibrationSamples") == 48000L)
             check(ready.value("alignment") in setOf("WIENER_FINALIZED_SAMPLE_CLOCK", "WIENER_PER_CHANNEL_FINALIZED_SAMPLE_CLOCK"))
             check(events("FIRERED_READY").single().value("model") == GuardianFireRedConfirmation.MODEL_ID)
+            if (requireFsmn) {
+                val fsmnReady = events("FSMN_READY").single()
+                check(fsmnReady.flag("required") && fsmnReady.value("source") == "PRIMARY_ORIGINAL_PCM")
+            }
             if (invalidate) {
                 repeat(4) { send(FloatArray(800)) }
                 send(input.copyOfRange(0, minOf(800, input.size)), skipSequence = true)
@@ -229,6 +297,16 @@ object WienerPrimaryIntegration {
             check(gates.keys == replay.accepted.keys + replay.rejected.keys) { "Native window set changed" }
             for (id in replay.accepted.keys) check(gates.getValue(id).flag("accepted")) { "Expected primary admission changed" }
             for (id in replay.rejected.keys) check(!gates.getValue(id).flag("accepted")) { "Rejected native window entered primary ASR" }
+            if (requireFsmn) {
+                val fsmn = events("FSMN_RESULT").associateBy { it.long("segment") }
+                for (id in replay.accepted.keys) {
+                    val result = fsmn.getValue(id)
+                    check(result.flag("evaluated") && result.flag("success") && result.flag("accepted")) {
+                        "Expected original speech failed FSMN confirmation"
+                    }
+                }
+                check(events("FSMN_ERROR").isEmpty() && events("FSMN_UNAVAILABLE").isEmpty())
+            }
             for (id in replay.accepted.keys) {
                 val gate = gates.getValue(id)
                 check(gate.flag("channelGateRequired") == coherentPayload) { "Coherent source gate obligation changed" }
@@ -257,6 +335,9 @@ object WienerPrimaryIntegration {
             check(nativeWorkerClosed.awaitTermination(30, TimeUnit.SECONDS)) { "Native primary worker did not release" }
             check(field(checkNotNull(field(primary, "streamingVad")), "handle") == 0L &&
                 field(checkNotNull(field(primary, "fireRed")), "handle") == 0L) { "Native primary handles remain open" }
+            if (requireFsmn) check(field(checkNotNull(field(primary, "fsmn")), "handle") == 0L) {
+                "FSMN native handle remains open"
+            }
             await("Study release") { events("CONTINUOUS_STUDY_END").isNotEmpty() }
             synchronized(records) { File(directory, "events-private.jsonl").writeText(records.joinToString("\n") { it.raw } + "\n") }
         }

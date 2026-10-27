@@ -64,6 +64,7 @@ internal class GuardianContinuousStudy(
         var channelPairs = 0
         var filteredCandidates = 0
         var diagnosticOffers = 0
+        val diagnosticOrder = GuardianQwenProgressiveDecoder.DiagnosticChannelOrder()
         var outputPeak = 0f
         var outputClips = 0L
         var monoUsed = false
@@ -134,13 +135,21 @@ internal class GuardianContinuousStudy(
                 "originalConfirmationMs" to original?.elapsedMs, "confirmationMs" to enhanced?.elapsedMs,
                 "enhancedNearClipSamples" to clean.count { kotlin.math.abs(it) >= .979f },
                 "enhancedPeak" to clean.maxOfOrNull { kotlin.math.abs(it) }, "role" to "SHADOW_NO_ALERT")
-            if (enhancedAccepted && !bypass && !closed.get()) {
+            if (enhancedAccepted && !bypass) {
                 val lane = if (channel >= 0) "WIENER_DD_ADAPTIVE_CHANNEL_$channel" else "WIENER_DD_ADAPTIVE_MONO"
-                val offered = decoder.offerDiagnostic(w.id, clean, lane)
-                if (offered) diagnosticOffers++
+                val studyClosed = closed.get()
+                val offerStatus = if (studyClosed) GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.CLOSED
+                    else decoder.offerDiagnosticStatus(w.id, clean, lane)
+                val offered = offerStatus == GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.QUEUED
+                if (offered) {
+                    diagnosticOffers++
+                    if (channel >= 0) diagnosticOrder.accepted(channel)
+                }
                 diagnostics?.event("CONTINUOUS_STUDY_ASR_OFFER", "segment" to w.id, "channelIndex" to channel,
                     "lane" to lane, "accepted" to offered, "channelOriginalAccepted" to originalAccepted,
-                    "rawRejectedFilteredAccepted" to rawRejectedFilteredAccepted)
+                    "rawRejectedFilteredAccepted" to rawRejectedFilteredAccepted,
+                    "status" to offerStatus.name, "reason" to if (studyClosed) "STUDY_CLOSED" else offerStatus.name,
+                    "pendingDiagnostics" to decoder.pendingDiagnosticCount())
             }
         }
         try {
@@ -154,6 +163,7 @@ internal class GuardianContinuousStudy(
                 "alignment" to "WIENER_PER_CHANNEL_FINALIZED_SAMPLE_CLOCK", "frameShift" to 256,
                 "calibrationSamples" to 48000, "stableStartSamples" to 49600, "lookaheadSamples" to 512,
                 "maxChannels" to 30, "maxGlobalWindows" to 64,
+                "maxPendingDiagnostics" to 2, "diagnosticChannelOrder" to "AFTER_LAST_ACCEPTED_PHYSICAL_CHANNEL",
                 "calibrationSpeechGuard" to "RAW_FRAME_PROBABILITY_GE_0.5_OR_ACTIVE",
                 "recalibration" to "ROUTE_OR_MISSING_CHANNEL_OR_TAINTED_QUIET_BOUNDARY",
                 "selectionChangesResetFilter" to false)
@@ -256,7 +266,7 @@ internal class GuardianContinuousStudy(
                     }
                     if (mode.third) {
                         var found = false
-                        for (channel in bank.channelIndices) {
+                        for (channel in diagnosticOrder.ordered(bank.channelIndices)) {
                             val candidate = bank.window(channel, start, w.end)
                             if (candidate == null) {
                                 diagnostics?.event("CONTINUOUS_STUDY_CHANNEL_WINDOW_SKIPPED", "segment" to w.id,
@@ -396,9 +406,16 @@ internal class GuardianContinuousStudy(
                         "captureChannelRevision" to status?.channelRevision,
                         "confirmationMs" to result?.elapsedMs,"enhancedNearClipSamples" to clean.count { kotlin.math.abs(it)>=.979f },
                         "enhancedPeak" to clean.maxOfOrNull { kotlin.math.abs(it) },"role" to "SHADOW_NO_ALERT")
-                    if (enhancedAccepted && !bypass && !closed.get()) {
-                        val offered=decoder.offerDiagnostic(w.id,clean,if(wiener!=null) "WIENER_DD_ADAPTIVE" else "GTCRN_CONTINUOUS")
-                        diagnostics?.event("CONTINUOUS_STUDY_ASR_OFFER","segment" to w.id,"accepted" to offered)
+                    if (enhancedAccepted && !bypass) {
+                        val lane = if(wiener!=null) "WIENER_DD_ADAPTIVE" else "GTCRN_CONTINUOUS"
+                        val studyClosed = closed.get()
+                        val status = if (studyClosed) GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.CLOSED
+                            else decoder.offerDiagnosticStatus(w.id, clean, lane)
+                        diagnostics?.event("CONTINUOUS_STUDY_ASR_OFFER", "segment" to w.id,
+                            "channelIndex" to -1, "lane" to lane,
+                            "accepted" to (status == GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.QUEUED),
+                            "status" to status.name, "reason" to if (studyClosed) "STUDY_CLOSED" else status.name,
+                            "pendingDiagnostics" to decoder.pendingDiagnosticCount())
                     }
                 }
             }

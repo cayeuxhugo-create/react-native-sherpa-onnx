@@ -50,6 +50,28 @@ class GuardianQwenProgressiveDecoder(
         CLEAR_CONFIRMED, FAR_CONFIRMED, CANDIDATE_ONLY, NEURAL_CONFIRMED
     }
 
+    internal enum class DiagnosticOfferStatus {
+        QUEUED, QUEUE_FULL, CLOSED, EMPTY_PCM, INVALID_LENGTH, INVALID_PCM, INVALID_SEGMENT, INVALID_LANE
+    }
+
+    /** Physical-channel fairness, independent of candidate IDs or unsuccessful offers. */
+    internal class DiagnosticChannelOrder {
+        private var lastAcceptedChannel: Int? = null
+
+        fun ordered(channels: List<Int>): List<Int> {
+            require(channels.size <= 30 && channels.all { it in 0..29 })
+            val sorted = channels.distinct().sorted()
+            val last = lastAcceptedChannel ?: return sorted
+            val start = sorted.indexOfFirst { it > last }.takeIf { it >= 0 } ?: 0
+            return sorted.drop(start) + sorted.take(start)
+        }
+
+        fun accepted(channel: Int) {
+            require(channel in 0..29)
+            lastAcceptedChannel = channel
+        }
+    }
+
     data class Hypothesis(
         val segmentId: Long,
         val revision: Long,
@@ -92,7 +114,7 @@ class GuardianQwenProgressiveDecoder(
     }
     private val pendingFinals = ArrayDeque<Job>()
     private var pendingPartial: Job? = null
-    private var pendingDiagnostic: Job? = null
+    private val pendingDiagnostics = ArrayDeque<Job>()
     private var generation = 0L
     private var pumping = false
     private var currentRevision = 0L
@@ -175,17 +197,48 @@ class GuardianQwenProgressiveDecoder(
         return true
     }
 
-    /** Diagnostic only, lower priority, one pending slot, shared native model.
+    /** Diagnostic only, lower priority, two global FIFO slots, shared native model.
      * Never invokes product listeners; caller must have neural confirmation. */
-    internal fun offerDiagnostic(segmentId: Long, pcm: FloatArray, lane: String): Boolean {
-        if (!validLength(pcm, true) || pcm.any { !it.isFinite() }) return false
+    internal fun offerDiagnostic(segmentId: Long, pcm: FloatArray, lane: String): Boolean =
+        offerDiagnosticStatus(segmentId, pcm, lane) == DiagnosticOfferStatus.QUEUED
+
+    internal fun pendingDiagnosticCount(): Int = synchronized(lock) { pendingDiagnostics.size }
+
+    internal fun offerDiagnosticStatus(segmentId: Long, pcm: FloatArray, lane: String): DiagnosticOfferStatus =
         synchronized(lock) {
-            if (closed.get() || pendingDiagnostic != null) return false
-            pendingDiagnostic = Job(segmentId, 0, pcm.copyOf(), true, null,
-                AcousticEvidence.NEURAL_CONFIRMED, generation, diagnosticLane=lane)
-            scheduleLocked()
+            val status = when {
+                closed.get() -> DiagnosticOfferStatus.CLOSED
+                segmentId <= 0L -> DiagnosticOfferStatus.INVALID_SEGMENT
+                lane.isBlank() -> DiagnosticOfferStatus.INVALID_LANE
+                pcm.isEmpty() -> DiagnosticOfferStatus.EMPTY_PCM
+                !validLength(pcm, true) -> DiagnosticOfferStatus.INVALID_LENGTH
+                pcm.any { !it.isFinite() } -> DiagnosticOfferStatus.INVALID_PCM
+                pendingDiagnostics.size >= MAX_PENDING_DIAGNOSTICS -> DiagnosticOfferStatus.QUEUE_FULL
+                else -> DiagnosticOfferStatus.QUEUED
+            }
+            if (status == DiagnosticOfferStatus.QUEUED) {
+                pendingDiagnostics.addLast(Job(segmentId, 0, pcm.copyOf(), true, null,
+                    AcousticEvidence.NEURAL_CONFIRMED, generation, diagnosticLane = lane))
+                scheduleLocked()
+            }
+            diagnostics?.event("STUDY_QWEN_OFFER", "segment" to segmentId, "lane" to lane,
+                "accepted" to (status == DiagnosticOfferStatus.QUEUED), "status" to status.name,
+                "pendingDiagnostics" to pendingDiagnostics.size,
+                "maxPendingDiagnostics" to MAX_PENDING_DIAGNOSTICS, "role" to "SHADOW_NO_ALERT")
+            status
         }
-        return true
+
+    /** Accepted jobs get one terminal diagnostic record even when never decoded. */
+    private fun dropPendingDiagnosticsLocked(reason: String) {
+        while (pendingDiagnostics.isNotEmpty()) {
+            val job = pendingDiagnostics.removeFirst()
+            diagnostics?.event("STUDY_QWEN_RESULT", "segment" to job.segmentId,
+                "lane" to job.diagnosticLane, "eligible" to false, "success" to false,
+                "status" to "DROPPED", "reason" to reason, "text" to null,
+                "started" to false, "queueWaitMs" to (SystemClock.elapsedRealtime() - job.queuedAtMs).coerceAtLeast(0),
+                "decodeWallMs" to 0, "audioMs" to job.samples.size * 1000L / configuration.sampleRate,
+                "role" to "SHADOW_NO_ALERT")
+        }
     }
 
     private fun validLength(pcm: FloatArray, final: Boolean): Boolean {
@@ -211,14 +264,14 @@ class GuardianQwenProgressiveDecoder(
                 if (closed.get()) {
                     pendingFinals.clear()
                     pendingPartial = null
-                    pendingDiagnostic = null
+                    dropPendingDiagnosticsLocked("DECODER_CLOSED")
                     pumping = false
                     return
                 }
                 when {
                     pendingFinals.isNotEmpty() -> pendingFinals.removeFirst()
                     pendingPartial != null -> pendingPartial.also { pendingPartial = null }
-                    pendingDiagnostic != null -> pendingDiagnostic.also { pendingDiagnostic = null }
+                    pendingDiagnostics.isNotEmpty() -> pendingDiagnostics.removeFirst()
                     else -> {
                         pumping = false
                         return
@@ -230,10 +283,24 @@ class GuardianQwenProgressiveDecoder(
                 val start = SystemClock.elapsedRealtime()
                 val result = runCatching { qwen.decode(job.samples) }.getOrNull()
                 synchronized(lock) {
+                    val eligible = !closed.get() && job.generation == generation
+                    val status = when {
+                        !eligible -> "DROPPED"
+                        result == null -> "FAILED"
+                        result.text.isBlank() -> "EMPTY"
+                        else -> "DECODED"
+                    }
+                    val reason = when {
+                        closed.get() -> "DECODER_CLOSED"
+                        job.generation != generation -> "RESET"
+                        result == null -> "DECODE_FAILED"
+                        result.text.isBlank() -> "EMPTY_TEXT"
+                        else -> null
+                    }
                     diagnostics?.event("STUDY_QWEN_RESULT",
-                        "eligible" to (!closed.get() && job.generation == generation),
+                        "eligible" to eligible, "status" to status, "reason" to reason, "started" to true,
                         "segment" to job.segmentId, "lane" to job.diagnosticLane,
-                        "success" to (result != null), "text" to if (!closed.get() && job.generation == generation) result?.text else null,
+                        "success" to (eligible && result != null), "text" to if (eligible) result?.text else null,
                         "queueWaitMs" to start-job.queuedAtMs,
                         "decodeWallMs" to SystemClock.elapsedRealtime()-start,
                         "audioMs" to job.samples.size*1000L/configuration.sampleRate,
@@ -355,7 +422,7 @@ class GuardianQwenProgressiveDecoder(
             diagnostics?.event("QWEN_RESET", "generation" to generation)
             pendingFinals.clear()
             pendingPartial = null
-            pendingDiagnostic = null
+            dropPendingDiagnosticsLocked("RESET")
             activeSegmentId = null
             lastPartialText = null
             lastPartialSegmentId = null
@@ -372,7 +439,7 @@ class GuardianQwenProgressiveDecoder(
         synchronized(lock) {
             pendingFinals.clear()
             pendingPartial = null
-            pendingDiagnostic = null
+            dropPendingDiagnosticsLocked("DECODER_CLOSED")
         }
         try {
             worker.execute { qwen.release() }
@@ -385,5 +452,6 @@ class GuardianQwenProgressiveDecoder(
 
     companion object {
         private const val TAG = "GuardianQwenProgressive"
+        private const val MAX_PENDING_DIAGNOSTICS = 2
     }
 }

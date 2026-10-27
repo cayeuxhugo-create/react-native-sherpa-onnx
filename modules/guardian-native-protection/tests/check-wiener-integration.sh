@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Opt-in, offline integration. Keep manifest and ARTIFACT_DIR outside the checkout.
-# The FireRed assets and host JNI library must already be present; nothing is downloaded.
+# The FireRed/FSMN assets and host JNI libraries must already be present; nothing is downloaded.
 set -euo pipefail
 module_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotection"
@@ -9,6 +9,10 @@ source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotect
 : "${ARTIFACT_DIR:?Set ARTIFACT_DIR to a fresh private output directory}"
 [[ $# == 1 && -f "$1" ]] || { printf 'Usage: ASSETS=... JNI_DIR=... ARTIFACT_DIR=... %s manifest.tsv\n' "$0" >&2; exit 2; }
 [[ -f "$JNI_DIR/libguardian_firered_vad.so" && -d "$ASSETS/firered" ]] || { printf 'Missing local FireRed JNI library or assets\n' >&2; exit 2; }
+require_fsmn="${REQUIRE_FSMN:-true}"
+if [[ "$require_fsmn" == true ]]; then
+  [[ -f "$JNI_DIR/libguardian_fsmn_vad.so" && -d "$ASSETS/fsmn" ]] || { printf 'Missing local FSMN JNI library or assets\n' >&2; exit 2; }
+fi
 build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 cat > "$build_dir/GtcrnMustNotLoad.kt" <<'KOTLIN'
@@ -36,6 +40,8 @@ sources=(
   "$source_dir/GuardianFireRedStreaming.kt"
   "$source_dir/GuardianFireRedConfirmation.kt"
   "$source_dir/GuardianFireRedPolicy.kt"
+  "$source_dir/GuardianFsmnConfirmation.kt"
+  "$source_dir/GuardianFsmnPolicy.kt"
   "$source_dir/GuardianNeuralInputGain.kt"
   "$source_dir/GuardianSpeechSegmentGain.kt"
   "$source_dir/GuardianSpeechSegmenter.kt"
@@ -45,6 +51,7 @@ sources=(
   "$source_dir/GuardianDiagnosticWavWriter.kt"
   "$source_dir/GuardianGtcrnComparison.kt"
   "$module_dir/tests/host/WienerPrimaryIntegration.kt"
+  "$module_dir/tests/host/FsmnIntegration.kt"
   "$module_dir/tests/host/stubs/AndroidContext.kt"
   "$module_dir/tests/host/stubs/AndroidAssets.kt"
   "$module_dir/tests/host/stubs/AndroidClock.kt"
@@ -69,5 +76,5 @@ else
     -no-stdlib -no-reflect -classpath "$KOTLIN_STDLIB" -d "$build_dir/integration.jar" "${sources[@]}"
   runtime_cp="$build_dir/integration.jar:$KOTLIN_STDLIB"
 fi
-java -Dguardian.test.assets="$ASSETS" -Djava.library.path="$JNI_DIR" \
+java -Dguardian.test.assets="$ASSETS" -Dguardian.test.requireFsmn="$require_fsmn" -Djava.library.path="$JNI_DIR" \
   -cp "$runtime_cp" "${WIENER_MAIN_CLASS:-expo.modules.guardiannativeprotection.WienerPrimaryIntegration}" "$1" "$ARTIFACT_DIR"

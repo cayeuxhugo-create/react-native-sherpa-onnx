@@ -1,0 +1,43 @@
+{
+  "scope": "CPU reference qualification; aggregate measurements only, no private audio or transcripts",
+  "reference": {
+    "kaldiNativeFbankVersion": "1.22.4",
+    "fsmnUpstreamCommit": "7bb4811a628e29f4645fae15fc9106b2932d089e",
+    "frontend": "Float32 normalized PCM times 32768 without int16 rounding; Hamming 400/160; 80 mel bins; dither zero; snip edges; LFR 5/1 with repeated endpoint frames; Float64 additive/multiplicative CMVN then Float32",
+    "policy": "Default upstream offline completed-segment policy; silence p0 with Float32 speech complement and probability difference 0.6, not raw speech threshold 0.6 or log odds"
+  },
+  "frontend": {
+    "syntheticCases": 14,
+    "recordedCases": 47,
+    "totalCases": 61,
+    "nonemptyProbabilityCases": 58,
+    "shapeDisagreements": 0,
+    "maximumFbankAbsoluteError": 0.0016584396362304688,
+    "maximumNormalizedFeatureAbsoluteError": 0.00025331974029541016,
+    "maximumSilenceProbabilityAbsoluteError": 0.0000152587890625,
+    "speechFrameDisagreements": 0,
+    "upstreamCompletedSegmentDisagreements": 0,
+    "qualificationBounds": {
+      "maximumFbankAbsoluteError": 0.003,
+      "maximumNormalizedFeatureAbsoluteError": 0.001,
+      "maximumSilenceProbabilityAbsoluteError": 0.0001,
+      "speechFrameDisagreements": 0
+    }
+  },
+  "policy": {
+    "upstreamReferenceComparisons": 226,
+    "syntheticReferences": 110,
+    "featureDerivedProbabilityReferences": 116,
+    "admissionDisagreements": 0,
+    "speechFrameCountDisagreements": 0,
+    "completedSegmentCountDisagreements": 0,
+    "checkedCases": [
+      "exact Float32 posterior boundary and neighboring values",
+      "14-frame rejection, final-frame onset without a closed segment, and 15-of-20 nonconsecutive onset",
+      "multiple completed segments and default 60-second splitting",
+      "zero PCM with supplied speech probabilities preserves upstream energy-floor semantics",
+      "invalid probabilities, length mismatches, nonfinite or nonnormalized PCM fail closed"
+    ],
+    "simplification": "Audio-buffer copying and fake silence endpoints are omitted; they do not create completed output segments. Default normalized-PCM energy/SNR tests are preserved; no new RMS gate is introduced."
+  }
+}
