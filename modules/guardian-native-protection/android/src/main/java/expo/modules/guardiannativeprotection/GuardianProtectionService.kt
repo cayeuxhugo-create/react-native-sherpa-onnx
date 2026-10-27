@@ -1320,7 +1320,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.4.6-wiener-study",
+      "engineRevision" to "guardian-voice-v3.4.7-channel-coherence",
+      "channelAdmission" to "ORIGINAL_AND_COHERENT_ORIGINAL_CHANNEL",
+      "channelPreprocessing" to "CONTINUOUS_PER_SOURCE_HP097",
+      "wienerCalibrationScope" to if(wienerStudy) "PER_CHANNEL_PHYSICAL_ROUTE" else "DISABLED",
       "processingMode" to processingMode,
       "continuousStudy" to continuousStudy,
       "studyModel" to if(wienerStudy) "WIENER_DD_ADAPTIVE" else if(continuousStudy) "GTCRN" else "DISABLED",

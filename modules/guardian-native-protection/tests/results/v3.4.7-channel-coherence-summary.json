@@ -1,0 +1,81 @@
+{
+  "version": "guardian-voice-v3.4.7-channel-coherence",
+  "date": "2026-10-27",
+  "base": "guardian-voice-v3.4.6-wiener-study",
+  "primaryPolicy": "original FireRed AND at least one coherent original physical channel when multichannel; unchanged primary PCM to Qwen",
+  "selection": "relative-noise weighted temporal support; in-speech switching and invalid-source failover retained; no absolute RMS speech gate",
+  "channelPayload": "independent continuous high-pass .97 per source, owned arrays, route identity distinct from selection identity",
+  "history": {
+    "seconds": 16,
+    "maxOpenedIndices": 30,
+    "missingMultichannelDataFailsClosed": true,
+    "explicitMonoRouteBoundaryRejected": true,
+    "legacyMonoCompatible": true,
+    "knownInitialZerosPreserved": true
+  },
+  "wiener": "independent per-source calibration and continuous states; diagnostics only, no product callbacks",
+  "validation": {
+    "hostSuite": "passed; selector, calibration, bank states, decoder isolation, route history and capture ownership",
+    "channelHistoryScenarios": 14,
+    "channelPreprocessorScenarios": 4,
+    "routeGenerationScenarios": 3,
+    "nativePrimaryStudyScenarios": 4,
+    "nativeMissingPayloadWorkerScenario": true,
+    "captureCompilation": "passed against real Android API 35 signatures",
+    "adapterCompilation": "passed against Sherpa reference signatures with Android stubs",
+    "collectorSimulatedScenarios": 16,
+    "latestControlledSelectorReplay": {
+      "switchesBefore": 25,
+      "switchesAfter": 1,
+      "negativeScoreSwitchesBefore": 23,
+      "negativeScoreSwitchesAfter": 0,
+      "hintScope": "historical hints held constant to isolate selector change"
+    },
+    "latestFullProductionHostReplay": {
+      "expectedPrimaryFinals": 3,
+      "primaryFinals": 3,
+      "primaryFalseFinalsObserved": 0,
+      "physicalChannels": 2,
+      "filteredChannelPairs": 10,
+      "calibrationResetsBefore": 39,
+      "calibrationResetsAfter": 4,
+      "primaryDroppedTasks": 0,
+      "diagnosticProductCallbacks": 0,
+      "perChannelAlignmentVerified": true
+    },
+    "historicalMixGateIsolation": {
+      "sameOriginalPcm": true,
+      "knownFalseWindowOriginalAccepted": true,
+      "knownFalseWindowCoherentAccepted": false,
+      "positiveFinalsBitExact": 3
+    },
+    "realQwenHost": {
+      "freshDecodes": 11,
+      "primaryExactPhrases": 3,
+      "primaryExpectedPhrases": 3,
+      "shadowExactSpeechPairs": 6,
+      "shadowExpectedSpeechPairs": 6,
+      "confirmedNegativeShadowTexts": 2,
+      "shadowTextsAreProductDecisions": false,
+      "finalReplayInputsByteExactToDecodedInputs": true
+    },
+    "monoRegressions": {
+      "recordings": 13,
+      "byteExactFinals": 23,
+      "shortWordsPreserved": 6,
+      "oldFiveMetrePhrasesPreserved": 3,
+      "capturedBlockIndexCases": 8,
+      "baselineFixedBlockControlCases": 5
+    },
+    "installer": "verified separately before publication"
+  },
+  "limitations": [
+    "French corpus only",
+    "fixed and replayed recordings do not establish device-wide or multilingual false-alarm rates",
+    "mono regression does not exhaust multichannel moving-source cases",
+    "shadow Wiener can admit noise and does not authorize alerts"
+  ],
+  "apkBuilt": false,
+  "deviceTested": false,
+  "privateAudioOrTranscriptsPublished": false
+}

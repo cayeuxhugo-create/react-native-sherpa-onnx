@@ -189,6 +189,7 @@ fun main() {
     fireRedStreamPolicyTests()
     wienerEnhancerTests()
     wienerStudyTests()
+    wienerChannelBankTests()
     adaptiveChannelsTests()
     continuousStudyTests()
     decoderTests()

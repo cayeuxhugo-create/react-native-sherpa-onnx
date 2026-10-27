@@ -27,6 +27,11 @@ sources=(
   "$source_dir/GuardianContinuousStudy.kt"
   "$source_dir/GuardianWienerEnhancer.kt"
   "$source_dir/GuardianWienerStudyStream.kt"
+  "$source_dir/GuardianWienerChannelBank.kt"
+  "$source_dir/GuardianCaptureChannelFrame.kt"
+  "$source_dir/GuardianChannelPreprocessor.kt"
+  "$source_dir/GuardianChannelWindowHistory.kt"
+  "$source_dir/GuardianAdaptiveChannels.kt"
   "$source_dir/GuardianStudyBuffer.kt"
   "$source_dir/GuardianFireRedStreaming.kt"
   "$source_dir/GuardianFireRedConfirmation.kt"
@@ -48,6 +53,12 @@ sources=(
   "$module_dir/tests/host/stubs/QwenRecognizer.kt"
   "$build_dir/GtcrnMustNotLoad.kt"
 )
+# A private replay can share these exact production classes and native checks
+# without placing its corpus paths, expected phrases, or audio in the checkout.
+if [[ -n "${WIENER_EXTRA_SOURCE:-}" ]]; then
+  [[ -f "$WIENER_EXTRA_SOURCE" ]] || { printf 'Missing extra replay source\n' >&2; exit 2; }
+  sources+=("$WIENER_EXTRA_SOURCE")
+fi
 if command -v kotlinc >/dev/null 2>&1; then
   kotlinc "${sources[@]}" -include-runtime -d "$build_dir/integration.jar"
   runtime_cp="$build_dir/integration.jar"
@@ -59,4 +70,4 @@ else
   runtime_cp="$build_dir/integration.jar:$KOTLIN_STDLIB"
 fi
 java -Dguardian.test.assets="$ASSETS" -Djava.library.path="$JNI_DIR" \
-  -cp "$runtime_cp" expo.modules.guardiannativeprotection.WienerPrimaryIntegration "$1" "$ARTIFACT_DIR"
+  -cp "$runtime_cp" "${WIENER_MAIN_CLASS:-expo.modules.guardiannativeprotection.WienerPrimaryIntegration}" "$1" "$ARTIFACT_DIR"

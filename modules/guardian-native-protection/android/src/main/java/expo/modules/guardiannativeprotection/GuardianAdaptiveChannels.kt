@@ -14,8 +14,10 @@ internal class GuardianAdaptiveChannels(private val channels: Int, private val s
     private val smoothed = FloatArray(channels) { -60f }
     private var observed = 0L
     private var selected = 0
-    private var pending = -1
-    private var pendingSamples = 0
+    // Leaky evidence is measured in equivalent full-advantage samples, not
+    // numbers of AudioRecord reads. A large gap between two near-floor dB
+    // scores is not by itself evidence of a useful replacement microphone.
+    private val advantageEvidence = DoubleArray(channels)
     private var sinceSwitch = sampleRate
     init { require(channels in 1..30 && sampleRate >= 8000) }
 
@@ -35,6 +37,7 @@ internal class GuardianAdaptiveChannels(private val channels: Int, private val s
         }
         val valid=BooleanArray(channels)
         val score=FloatArray(channels)
+        val posteriorPower=DoubleArray(channels)
         for (c in 0 until channels) {
             val rms=sqrt(energy[c]/n).toFloat()
             valid[c]=peak[c]>1f/32768 && clipped[c]<=n/50
@@ -44,6 +47,8 @@ internal class GuardianAdaptiveChannels(private val channels: Int, private val s
                 noise[c]+=alpha*(rms-noise[c])
             }
             val ratio=sqrt(max(0f,rms*rms-noise[c]*noise[c]))/noise[c].coerceAtLeast(.00002f)
+            val relativeRms=rms.toDouble()/noise[c].coerceAtLeast(.00002f)
+            posteriorPower[c]=relativeRms*relativeRms
             val value=(20*log10(ratio.coerceAtLeast(.001f))).coerceIn(-60f,80f)-min(12f,600f*clipped[c]/n)
             // Time-based smoothing, independent of short AudioRecord reads.
             val alpha=(1-exp(-n.toDouble()/(sampleRate*.15))).toFloat()
@@ -62,14 +67,29 @@ internal class GuardianAdaptiveChannels(private val channels: Int, private val s
         val winner=(0 until channels).filter { valid[it] }.maxByOrNull { score[it] } ?: selected
         val unavailable=!valid[selected] && valid[winner]
         val ready=observed>=sampleRate/2
-        val better=winner!=selected && ready && score[winner]>=score[selected]+3f && sinceSwitch>=sampleRate/2
-        if (better) {
-            if (pending!=winner) { pending=winner;pendingSamples=0 }
-            pendingSamples+=n
-        } else { pending=-1;pendingSamples=0 }
-        val change=winner!=selected && (unavailable || pendingSamples>=sampleRate/5)
+        val evidenceTime=sampleRate*.6
+        val retention=exp(-n/evidenceTime)
+        for (c in 0 until channels) {
+            if (c==selected || !valid[c] || !ready || sinceSwitch<sampleRate/2) {
+                advantageEvidence[c]=0.0
+                continue
+            }
+            val active=posteriorPower[selected]
+            val candidate=posteriorPower[c]
+            val strongest=max(active,candidate)
+            // Scale-independent comparison of current powers relative to each
+            // channel's own noise. The excess fraction continuously reduces
+            // support near the noise floor; this never gates audio or speech.
+            val confidence=if (strongest>1.0) 1.0-1.0/strongest else 0.0
+            val contrast=(candidate-active)/(candidate+active).coerceAtLeast(1e-12)
+            val rate=if (score[c]>=score[selected]+3f) contrast*confidence
+                else min(0.0,contrast)*confidence
+            advantageEvidence[c]=max(0.0,retention*advantageEvidence[c]+
+                evidenceTime*(1-retention)*rate)
+        }
+        val change=winner!=selected && (unavailable || advantageEvidence[winner]>=sampleRate*.12)
         val old=selected
-        if (change) { selected=winner;sinceSwitch=0;pending=-1;pendingSamples=0 }
+        if (change) { selected=winner;sinceSwitch=0;advantageEvidence.fill(0.0) }
         observed+=n;sinceSwitch+=n
         val out=ShortArray(n) { input[it*channels+selected] }
         var transition="NONE"

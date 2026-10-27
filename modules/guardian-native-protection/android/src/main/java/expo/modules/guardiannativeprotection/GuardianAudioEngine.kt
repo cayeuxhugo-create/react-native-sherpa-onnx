@@ -384,6 +384,7 @@ enum class FarVoicePhase {
     val enhancementExpected: Boolean = false,
     // Diagnostic capture identity; follows the original selected microphone stream.
     val captureChannelRevision: Long = 0L,
+    val captureChannels: GuardianCaptureChannelFrame? = null,
 )
 
     data class Statistics(
@@ -665,6 +666,7 @@ data class EnhancementResult(
     var capturedAtElapsedRealtimeNanos: Long = 0L,
     var sequenceNumber: Long = 0L,
     var captureChannelRevision: Long = 0L,
+    var captureChannels: GuardianCaptureChannelFrame? = null,
 
     /*
      * Analyse acoustique calculée AVANT GTCRN.
@@ -800,6 +802,8 @@ private enum class EnhancementRoute {
     private val sequenceNumber = AtomicLong(0L)
     // Kept across AudioRecord restarts; never consulted for an already queued frame.
     private val captureChannelRevision = AtomicLong(0L)
+    // Physical capture identity stays stable when only the selected channel changes.
+    private val captureRouteRevision = AtomicLong(0L)
 
     @Volatile private var state: State = State.IDLE
     @Volatile private var audioRecord: AudioRecord? = null
@@ -2137,6 +2141,7 @@ lastOutputRms =
                         adaptiveGain,
                     enhancementExpected = enhancementExpected,
                     captureChannelRevision = pooledFrame.captureChannelRevision,
+                    captureChannels = pooledFrame.captureChannels,
 
                     acousticRms =
                         currentFrameMetadata.frameRms,
@@ -3061,8 +3066,11 @@ if (
         val actualChannels = recorder.channelCount
         require(actualChannels in 1..30)
         var channelRevision = captureChannelRevision.incrementAndGet()
+        var sourceRouteRevision = captureRouteRevision.incrementAndGet()
         var adaptive = if (configuration.adaptiveChannelsEnabled && actualChannels>1)
             GuardianAdaptiveChannels(actualChannels,configuration.sampleRateHz) else null
+        val channelPreprocessor = if (adaptive != null || actualChannels == 1)
+            GuardianChannelPreprocessor(actualChannels) else null
         Log.i(TAG,"ADAPTIVE_CHANNELS_READY channels=$actualChannels enabled=${adaptive!=null} indexMask=${configuration.inputChannelIndexMask}")
         val channelDiagnostic = if (adaptive!=null) configuration.channelDiagnosticDirectory?.let {
             GuardianChannelDiagnostics(it,actualChannels)
@@ -3110,6 +3118,7 @@ if (
                     if (routeGeneration != currentRouteGeneration) {
                         routeGeneration = currentRouteGeneration
                         channelRevision = captureChannelRevision.incrementAndGet()
+                        sourceRouteRevision = captureRouteRevision.incrementAndGet()
                         if (adaptive != null) {
                             adaptive=GuardianAdaptiveChannels(actualChannels,configuration.sampleRateHz)
                             Log.i(TAG,"ADAPTIVE_CHANNELS_RESET routeChanged=true")
@@ -3126,7 +3135,20 @@ if (
                         channelDiagnostic?.offer(pcmBuffer,complete,channelFrames,captureReadEndedAtElapsedRealtimeNanos,result)
                         if (channelFrames%20L==0L || result.transitioned) Log.i(TAG,
                             "ADAPTIVE_CHANNELS frame=$channelFrames channels=$actualChannels selected=${result.selected} selectionMs=$selectionMs scores=${result.scores} valid=${result.valid} changed=${result.transitioned} transition=${result.transition} speechHint=$externalNeuralSpeechHint")
-                        if (result.pcm.isNotEmpty()) enqueuePcmFrame(result.pcm,result.pcm.size,captureReadEndedAtElapsedRealtimeNanos,channelRevision)
+                        if (result.pcm.isNotEmpty()) {
+                            // Each source is read from the original interleaved block, before mix/gain.
+                            val sourceChannels = channelPreprocessor!!.process(
+                                interleavedPcm = pcmBuffer,
+                                interleavedSampleCount = complete,
+                                routeRevision = sourceRouteRevision,
+                                selectedChannel = result.selected,
+                                usable = result.valid,
+                            )
+                            enqueuePcmFrame(
+                                result.pcm, result.pcm.size, captureReadEndedAtElapsedRealtimeNanos,
+                                channelRevision, sourceChannels,
+                            )
+                        }
                         carry=readCount-complete
                         if (carry>0) pcmBuffer.copyInto(pcmBuffer,0,complete,readCount)
                     } else if (stereoActive) {
@@ -3216,12 +3238,26 @@ if (
 
                         
                     } else {
+                        // An explicit mono identity distinguishes a real route change from a lost payload.
+                        val monoUsable =
+                            (0 until readCount).any { kotlin.math.abs(pcmBuffer[it].toInt()) > 1 } &&
+                                (0 until readCount).count {
+                                    kotlin.math.abs(pcmBuffer[it].toFloat() / PCM16_NORMALIZATION_FACTOR) >= 0.979f
+                                } <= readCount / 50
+                        val sourceChannels = if (actualChannels == 1) channelPreprocessor!!.process(
+                            interleavedPcm = pcmBuffer,
+                            interleavedSampleCount = readCount,
+                            routeRevision = sourceRouteRevision,
+                            selectedChannel = 0,
+                            usable = listOf(monoUsable),
+                        ) else null
                         enqueuePcmFrame(
                             pcmBuffer = pcmBuffer,
                             sampleCount = readCount,
                             captureReadEndedAtElapsedRealtimeNanos =
                                 captureReadEndedAtElapsedRealtimeNanos,
                             captureChannelRevision = channelRevision,
+                            captureChannels = sourceChannels,
                         )
                     }
                 }
@@ -5795,6 +5831,7 @@ if (result.applied) {
         sampleCount: Int,
         captureReadEndedAtElapsedRealtimeNanos: Long,
         captureChannelRevision: Long = 0L,
+        captureChannels: GuardianCaptureChannelFrame? = null,
     ) {
         val pooledFrame = framePool.poll()
             ?: frameQueue.poll()?.also { droppedFrameCount.incrementAndGet() }
@@ -5980,6 +6017,7 @@ lastOutputRms =
 
         pooledFrame.sequenceNumber = sequenceNumber.incrementAndGet()
         pooledFrame.captureChannelRevision = captureChannelRevision
+        pooledFrame.captureChannels = captureChannels
         capturedFrameCount.incrementAndGet()
         capturedSampleCount.addAndGet(boundedSampleCount.toLong())
 
@@ -6376,6 +6414,9 @@ lastOutputRms =
 
     frame.captureChannelRevision =
         0L
+
+    frame.captureChannels =
+        null
 
     frame.frameRms =
         0.0f

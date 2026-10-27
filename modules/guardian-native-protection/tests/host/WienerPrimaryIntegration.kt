@@ -55,7 +55,10 @@ object WienerPrimaryIntegration {
                 require(input.size in 1..(16000 * 180)) { "Replay must fit the production study limit" }
                 runReplay(replay, input, File(artifacts, "case-${index + 1}-continuous"), invalidate = false)
                 runReplay(replay, input, File(artifacts, "case-${index + 1}-discontinuity"), invalidate = true)
+                runReplay(replay, input, File(artifacts, "case-${index + 1}-channels"), invalidate = false, coherentPayload = true)
+                runReplay(replay, input, File(artifacts, "case-${index + 1}-channels-discontinuity"), invalidate = true, coherentPayload = true)
             }
+            missingChannelPayload(File(artifacts, "missing-channel-payload"))
             println("PASS Wiener production primary integration: ${cases.size} replay(s), real FireRed JNI, exact primary PCM, shadow-only decoding, aligned WAV pairs, discontinuity isolation")
         } catch (error: Throwable) {
             File(artifacts, "failure-private.txt").writeText(error.stackTraceToString())
@@ -64,7 +67,57 @@ object WienerPrimaryIntegration {
         }
     }
 
-    private fun runReplay(replay: Replay, input: FloatArray, directory: File, invalidate: Boolean) {
+    /** A lost physical-channel block cannot turn an established multi-mic
+     * session into the selected-mono fallback or fabricate a paired interval. */
+    private fun missingChannelPayload(directory: File) {
+        require(!directory.exists())
+        val records = Collections.synchronizedList(mutableListOf<Event>())
+        fun events(name: String) = synchronized(records) { records.filter { it.name == name } }
+        val diagnostics = GuardianVoiceDiagnostics(true, "HOST", { records.add(Event(it)) }, "missing-channel")
+        val callbacks = AtomicInteger()
+        val decodes = AtomicInteger()
+        val qwen = GuardianQwenRescueRecognizer { decodes.incrementAndGet(); null }
+        val decoder = GuardianQwenProgressiveDecoder(qwen, object : GuardianQwenProgressiveDecoder.Listener {
+            override fun onPartial(hypothesis: GuardianQwenProgressiveDecoder.Hypothesis) { callbacks.incrementAndGet() }
+            override fun onFinal(hypothesis: GuardianQwenProgressiveDecoder.Hypothesis) { callbacks.incrementAndGet() }
+            override fun onDecoderUnavailable(segmentId: Long, isFinal: Boolean) { callbacks.incrementAndGet() }
+            override fun onBackpressure(segmentId: Long, pendingFinalCount: Int) { callbacks.incrementAndGet() }
+        }, diagnostics = diagnostics)
+        val study = GuardianContinuousStudy(Context(), directory, diagnostics, decoder, "WIENER_DD_ADAPTIVE")
+        val pcm = FloatArray(800) { if (it % 2 == 0) .001f else -.001f }
+        fun payload() = GuardianCaptureChannelFrame(1, 2, 0,
+            listOf(GuardianCaptureChannelFrame.Channel(0, pcm.copyOf(), true)))
+        try {
+            await("Missing-payload study readiness") { events("CONTINUOUS_STUDY_READY").isNotEmpty() }
+            study.frame(pcm, 1, 50_000_000, false, 1, payload())
+            study.frame(pcm, 2, 100_000_000, false, 1, null)
+            study.frame(pcm, 3, 150_000_000, false, 1, payload())
+            study.window(1, pcm + pcm + pcm, 2400, false)
+            await("Window crossing the missing payload is skipped") { events("CONTINUOUS_STUDY_WINDOW_SKIPPED").isNotEmpty() }
+        } finally {
+            study.close()
+            await("Missing-payload study release") { events("CONTINUOUS_STUDY_END").isNotEmpty() }
+            decoder.close()
+            check(qwen.released.await(30, TimeUnit.SECONDS))
+            check(directory.isDirectory || directory.mkdirs())
+            synchronized(records) { File(directory, "events-private.jsonl").writeText(records.joinToString("\n") { it.raw } + "\n") }
+        }
+        val end = events("CONTINUOUS_STUDY_END").single()
+        check(end.flag("valid") && !end.flag("monoFallbackUsed") && end.long("missingChannelPayloads") == 1L)
+        check(end.long("channelPairs") == 0L && events("CONTINUOUS_STUDY_WINDOW").isEmpty())
+        check(events("CONTINUOUS_STUDY_CHANNEL_PAYLOAD_MISSING").size == 1)
+        check(events("CONTINUOUS_STUDY_ASR_OFFER").isEmpty() && callbacks.get() == 0 && decodes.get() == 0)
+        val session = File(directory, "continuous-study").listFiles()!!.single { it.isDirectory }
+        check(session.listFiles()!!.none { it.name.endsWith("-truth.f32") || it.name.endsWith("-asr.f32") }) {
+            "Missing multichannel data produced a mono fallback export"
+        }
+        check(readFloats(stageFile(File(session, "channel-0"), "truth", "f32")).contentEquals(pcm + pcm)) {
+            "Missing channel audio was padded or replaced with selected primary PCM"
+        }
+        println("PASS missing channel payload: no mono fallback, no invented pair, no decoder callback")
+    }
+
+    private fun runReplay(replay: Replay, input: FloatArray, directory: File, invalidate: Boolean, coherentPayload: Boolean = false) {
         require(!directory.exists()) { "Use a fresh artifact directory" }
         check(directory.mkdirs())
         val records = Collections.synchronizedList(mutableListOf<Event>())
@@ -111,6 +164,10 @@ object WienerPrimaryIntegration {
             // selects the original detector lane, including for native VAD.
             val postGain = FloatArray(pcm.size) { .125f }
             val raw = pcm.copyOf()
+            val channelPcm = pcm.copyOf()
+            val captureChannels = if (coherentPayload) GuardianCaptureChannelFrame(1, 2, 0, listOf(
+                GuardianCaptureChannelFrame.Channel(0, channelPcm, true),
+            )) else null // The silent channel 1 remains absent, never a source substitute.
             val timestamp = capturedBase + sequence * 50_000_000L
             primary.onAudioFrame(GuardianAudioEngine.AudioFrame(
                 samples = postGain, sampleCount = pcm.size, sampleRateHz = 16000,
@@ -125,11 +182,13 @@ object WienerPrimaryIntegration {
                 snrDb = 0f, speechLevel = "UNKNOWN", farVoiceEventId = 0,
                 farVoiceSource = GuardianAudioEngine.FarVoiceSource.NONE,
                 farVoicePhase = GuardianAudioEngine.FarVoicePhase.NONE,
-                adaptiveGain = 4f, enhancementExpected = true, captureChannelRevision = 0))
+                adaptiveGain = 4f, enhancementExpected = true,
+                captureChannelRevision = if (coherentPayload) sequence / 100 else 0,
+                captureChannels = captureChannels))
             check(pcm.contentEquals(original) && selected.contentEquals(original)) { "Capture PCM was modified" }
             // AudioRecord reuses buffers immediately. Production must have copied
             // every array before returning to this simulated capture callback.
-            selected.fill(Float.NaN); raw.fill(Float.NaN); postGain.fill(Float.NaN)
+            selected.fill(Float.NaN); raw.fill(Float.NaN); postGain.fill(Float.NaN); channelPcm.fill(Float.NaN)
             worker.submit {}.get(30, TimeUnit.SECONDS)
             await("Study worker backlog") { queue.size <= 8 }
         }
@@ -137,7 +196,7 @@ object WienerPrimaryIntegration {
             await("Wiener study readiness") { events("CONTINUOUS_STUDY_READY").isNotEmpty() }
             val ready = events("CONTINUOUS_STUDY_READY").single()
             check(ready.value("model") == "WIENER_DD_ADAPTIVE" && ready.long("calibrationSamples") == 48000L)
-            check(ready.value("alignment") == "WIENER_FINALIZED_SAMPLE_CLOCK")
+            check(ready.value("alignment") in setOf("WIENER_FINALIZED_SAMPLE_CLOCK", "WIENER_PER_CHANNEL_FINALIZED_SAMPLE_CLOCK"))
             check(events("FIRERED_READY").single().value("model") == GuardianFireRedConfirmation.MODEL_ID)
             if (invalidate) {
                 repeat(4) { send(FloatArray(800)) }
@@ -170,6 +229,11 @@ object WienerPrimaryIntegration {
             check(gates.keys == replay.accepted.keys + replay.rejected.keys) { "Native window set changed" }
             for (id in replay.accepted.keys) check(gates.getValue(id).flag("accepted")) { "Expected primary admission changed" }
             for (id in replay.rejected.keys) check(!gates.getValue(id).flag("accepted")) { "Rejected native window entered primary ASR" }
+            for (id in replay.accepted.keys) {
+                val gate = gates.getValue(id)
+                check(gate.flag("channelGateRequired") == coherentPayload) { "Coherent source gate obligation changed" }
+                if (coherentPayload) check(gate.long("channelAcceptedIndex") == 0L) { "Original source was not confirmed" }
+            }
             check(events("AUDIO_FRAME").any { it.long("streamVadFrames") > 0 }) { "No native streaming inference observed" }
             check(events("SEGMENT_GAIN").all { it.value("gain") == "1.0" }) { "Unit gain contract changed" }
             check(events("QWEN_START").size == replay.accepted.size && events("QWEN_START").all { it.flag("final") })
@@ -183,7 +247,8 @@ object WienerPrimaryIntegration {
                 check(warnings.get() == 0 && events("CONTINUOUS_STUDY_INVALID").isEmpty()) { "Replay was discontinuous or overloaded" }
                 val offers = events("CONTINUOUS_STUDY_ASR_OFFER").count { it.flag("accepted") }
                 check(offers > 0 && events("STUDY_QWEN_RESULT").size == offers) { "Shadow ASR was not exercised" }
-                check(events("STUDY_QWEN_RESULT").all { it.flag("eligible") && it.flag("success") && it.value("lane") == "WIENER_DD_ADAPTIVE" })
+                val lane = if (coherentPayload) "WIENER_DD_ADAPTIVE_CHANNEL_0" else "WIENER_DD_ADAPTIVE_MONO"
+                check(events("STUDY_QWEN_RESULT").all { it.flag("eligible") && it.flag("success") && it.value("lane") == lane })
                 check(decoded.size == observedFinals.size + offers) { "Shadow decoding reached product callbacks" }
             }
         } finally {
@@ -201,19 +266,24 @@ object WienerPrimaryIntegration {
         if (!invalidate) {
             check(end.long("inputSamples") == input.size.toLong() && end.long("pairedWindows") == (replay.accepted.size + replay.rejected.size).toLong())
             check(end.long("outputSamples") <= input.size && input.size - end.long("outputSamples") < 800)
-            verifyPairs(directory, input, replay.accepted + replay.rejected, events("CONTINUOUS_STUDY_WINDOW"))
+            verifyPairs(directory, input, replay.accepted + replay.rejected, events("CONTINUOUS_STUDY_WINDOW"), coherentPayload)
             check(readFloats(stageFile(directory, "truth", "f32")).contentEquals(input)) { "Primary truth export changed" }
             check(readFloats(stageFile(directory, "asr", "f32")).contentEquals(input)) { "Primary ASR export changed" }
         } else check(end.long("pairedWindows") == 0L)
-        println("PASS ${if (invalidate) "discontinuity" else "continuous"}: ${replay.accepted.size} exact primary finals, ${replay.rejected.size} native rejections, ${end.long("pairedWindows")} study pairs")
+        println("PASS ${if (coherentPayload) "channels " else ""}${if (invalidate) "discontinuity" else "continuous"}: ${replay.accepted.size} exact primary finals, ${replay.rejected.size} native rejections, ${end.long("pairedWindows")} study pairs")
     }
 
-    private fun verifyPairs(directory: File, input: FloatArray, expected: Map<Long, FloatArray>, windows: List<Event>) {
-        val session = File(directory, "continuous-study").listFiles()!!.single { it.isDirectory }
+    private fun verifyPairs(directory: File, input: FloatArray, expected: Map<Long, FloatArray>, windows: List<Event>, coherentPayload: Boolean) {
+        val root = File(directory, "continuous-study").listFiles()!!.single { it.isDirectory }
+        val session = if (coherentPayload) File(root, "channel-0") else root
         val continuous = readFloats(stageFile(session, "asr", "f32"))
         check(readFloats(stageFile(session, "truth", "f32")).contentEquals(input)) { "Study input differs from primary input" }
         var filtered = 0
         for (window in windows) {
+            if (coherentPayload) {
+                check(window.long("channelIndex") == 0L) { "An absent channel produced a pair" }
+                check(window.long("captureChannelRevision") == 1L) { "Selection revision replaced the physical route" }
+            }
             val id = window.long("segment")
             val start = window.long("startSample").toInt()
             val end = window.long("endSample").toInt()
@@ -225,6 +295,13 @@ object WienerPrimaryIntegration {
                 "Paired original is not the exact primary interval"
             }
             check(clean.size == truth.size && clean.all { it.isFinite() })
+            val expectedEvidence = when {
+                coherentPayload && window.flag("startupBypass") -> "CHANNEL_ORIGINAL_STARTUP_BYPASS"
+                coherentPayload -> "CHANNEL_ORIGINAL_AND_FILTERED_NEURAL"
+                window.flag("startupBypass") -> "PRIMARY_MONO_FALLBACK_STARTUP_BYPASS"
+                else -> "PRIMARY_MONO_FALLBACK_FILTERED_NEURAL"
+            }
+            check(window.value("sourceEvidence") == expectedEvidence)
             if (window.flag("startupBypass")) check(clean.contentEquals(truth)) { "Startup fallback is not entire original PCM" }
             else {
                 filtered++

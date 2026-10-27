@@ -62,6 +62,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private var lastDiagnosticFrameMs = Long.MIN_VALUE
     private var previousVad: Boolean? = null
     private val droppedInputTasks = AtomicInteger(0)
+    private val channelHistory = GuardianChannelWindowHistory()
     private val segmenter = GuardianSpeechSegmenter(object : GuardianSpeechSegmenter.Sink {
         override fun onSpeechStarted() {
             diagnostics?.event("SPEECH_START")
@@ -87,19 +88,26 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 warn("FireRed indisponible : aucune validation pour ce segment")
                 return
             }
+            val coherent = if (validation.decision.accepted) confirmCoherentChannel(id, pcm, endSample, validation)
+                else ChannelAdmission(false, false, "ORIGINAL_FIRERED_REJECT")
+            val finalAdmission = validation.decision.accepted && coherent.accepted
             diagnostics?.event("FIRERED_RESULT", "segment" to id, "model" to GuardianFireRedConfirmation.MODEL_ID,
-                "accepted" to validation.decision.accepted, "elapsedMs" to validation.elapsedMs,
+                "accepted" to finalAdmission, "originalAccepted" to validation.decision.accepted,
+                "elapsedMs" to validation.elapsedMs + coherent.elapsedMs,
+                "originalElapsedMs" to validation.elapsedMs,
+                "channelGateRequired" to coherent.required, "channelGateReason" to coherent.reason,
+                "channelAcceptedIndex" to coherent.channel,
                 "peakProbability" to validation.decision.peakProbability,
                 "longestPositiveFrames" to validation.decision.longestPositiveFrames,
                 "audioMs" to pcm.size.toLong() * 1000 / 16000,
                 "threshold" to GuardianFireRedPolicy.THRESHOLD,
                 "maxInputGain" to GuardianFireRedPolicy.MAX_INPUT_GAIN)
-            Log.i(TAG, "FIRERED_RESULT segment=$id accepted=${validation.decision.accepted} elapsedMs=${validation.elapsedMs}")
-            study?.window(id, pcm, endSample, validation.decision.accepted)
-            if (!validation.decision.accepted) {
+            Log.i(TAG, "FIRERED_RESULT segment=$id accepted=$finalAdmission originalAccepted=${validation.decision.accepted} channelGate=${coherent.reason}")
+            study?.window(id, pcm, endSample, finalAdmission)
+            if (!finalAdmission) {
                 diagnostics?.event("SEGMENT_WINDOW", "segment" to id, "final" to final,
                     "reason" to reason, "samples" to pcm.size, "accepted" to false,
-                    "admission" to "FIRERED_REJECT")
+                    "admission" to if (validation.decision.accepted) "COHERENT_CHANNEL_REJECT" else "FIRERED_REJECT")
                 return
             }
             val segmentGain = if (speechOnlyGain) GuardianSpeechSegmentGain.apply(pcm, confirmed=true, maximumGain=confirmedGainMaximum) else null
@@ -136,6 +144,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
             // Qwen is more robust on the original noisy consonants than on
             // aggressively denoised speech. Both FireRed passes use original PCM.
             val decoderPcm = frame.pcm
+            channelHistory.append(decoderPcm.size, frame.captureChannels)
             wav?.write("asr", decoderPcm, frame.key.sequence, frame.key.capturedAtNanos)
             wav?.write("vad", GuardianNeuralInputGain.forVad(decoderPcm, 64f), frame.key.sequence, frame.key.capturedAtNanos)
             val streamResult = streamingVad.accept(decoderPcm)
@@ -155,6 +164,12 @@ internal class GuardianQwenPrimaryAudioProcessor(
                     diagnostics.event("AUDIO_FRAME", "sequence" to frame.key.sequence,
                         "capturedAtNs" to frame.key.capturedAtNanos,
                         "captureChannelRevision" to frame.captureChannelRevision,
+                        "captureRouteRevision" to frame.captureChannels?.routeRevision,
+                        "openedCaptureChannels" to frame.captureChannels?.openedChannels,
+                        "selectedCaptureChannel" to frame.captureChannels?.selectedChannel,
+                        "captureChannelPayloadPresent" to (frame.captureChannels != null),
+                        "captureChannelIndices" to frame.captureChannels?.channels?.map { it.index },
+                        "usableCaptureChannels" to frame.captureChannels?.channels?.filter { it.usable }?.map { it.index },
                         "captureAgeMs" to (now - frame.key.capturedAtNanos / 1000000L).coerceAtLeast(0),
                         "inputWaitMs" to (now - frame.queuedAtMs).coerceAtLeast(0),
                         "route" to "TRUTH",
@@ -181,7 +196,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 }
             }
             previousVad = speech
-            study?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos,studyCalibrationSpeech,frame.captureChannelRevision)
+            study?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos,studyCalibrationSpeech,
+                frame.captureChannelRevision,frame.captureChannels)
             segmenter.accept(decoderPcm, speech)
             if (now - lastMetricsAtMs >= 5_000L) {
                 Log.i(TAG, "VOICE_INPUT profile=$profile truthFrames=$truthFrames gtcrnFrames=$enhancedFrames")
@@ -223,6 +239,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
             preGainNoiseRms = frame.acousticNoiseFloorRms,
             estimatedSnrDb = frame.snrDb,
             captureChannelRevision = frame.captureChannelRevision,
+            captureChannels = frame.captureChannels?.copyOwned(),
         )
         val preGain = if (wav != null) frame.detectorSamples.copyOf(
             frame.detectorSampleCount.coerceIn(0, frame.detectorSamples.size)) else null
@@ -286,6 +303,58 @@ internal class GuardianQwenPrimaryAudioProcessor(
         decoder.reset()
         streamingVad.reset()
         segmenter.reset()
+        channelHistory.reset()
+    }
+
+    private data class ChannelAdmission(val accepted: Boolean, val required: Boolean, val reason: String,
+        val channel: Int? = null, val elapsedMs: Long = 0L)
+
+    private fun confirmCoherentChannel(segment: Long, original: FloatArray, endSample: Long,
+        originalResult: GuardianFireRedConfirmation.Result): ChannelAdmission {
+        val window = channelHistory.window(endSample, original.size)
+        var attempted = 0
+        var elapsedMs = 0L
+        fun result(accepted: Boolean, reason: String, channel: Int? = null): ChannelAdmission {
+            diagnostics?.event("CHANNEL_COHERENCE_RESULT", "segment" to segment,
+                "accepted" to accepted, "required" to window.required, "reason" to reason,
+                "startSample" to endSample-original.size, "endSample" to endSample,
+                "routeRevision" to window.routeRevision, "openedChannels" to window.openedChannels,
+                "candidateChannels" to window.channels.map { it.index }, "attemptedChannels" to attempted,
+                "acceptedChannel" to channel, "elapsedMs" to elapsedMs,
+                "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL", "asrSource" to "UNCHANGED_PRIMARY_PCM")
+            return ChannelAdmission(accepted, window.required, reason, channel, elapsedMs)
+        }
+        if (!window.valid) return result(false, window.reason)
+        if (!window.required) return result(true, window.reason)
+        for (channel in window.channels) {
+            attempted++
+            val reused = channel.pcm.contentEquals(original)
+            val peak = channel.pcm.maxOf { kotlin.math.abs(it) }
+            val gain = GuardianNeuralInputGain.gain(channel.pcm, GuardianFireRedPolicy.MAX_INPUT_GAIN)
+            val confirmation = try {
+                if (reused) originalResult else fireRed.confirm(channel.pcm)
+            } catch (error: Throwable) {
+                diagnostics?.event("FIRERED_CHANNEL_RESULT", "segment" to segment, "channel" to channel.index,
+                    "accepted" to false, "reason" to "CONFIRMATION_ERROR", "error" to error.javaClass.simpleName,
+                    "inputPeak" to peak, "inputGain" to gain, "conditionedPeak" to peak*gain,
+                    "routeRevision" to window.routeRevision, "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL")
+                continue
+            }
+            if (!reused) elapsedMs += confirmation.elapsedMs
+            diagnostics?.event("FIRERED_CHANNEL_RESULT", "segment" to segment, "channel" to channel.index,
+                "accepted" to confirmation.decision.accepted,
+                "reason" to if (reused) "IDENTICAL_PRIMARY_PCM" else "COHERENT_ORIGINAL_CHANNEL",
+                "reusedOriginalDecision" to reused,
+                "peakProbability" to confirmation.decision.peakProbability,
+                "longestPositiveFrames" to confirmation.decision.longestPositiveFrames,
+                "elapsedMs" to if (reused) 0L else confirmation.elapsedMs,
+                "inputPeak" to peak, "inputGain" to gain, "conditionedPeak" to peak*gain,
+                "contributedSamples" to channel.contributedSamples, "usableSamples" to channel.usableSamples,
+                "startSample" to endSample-original.size, "endSample" to endSample,
+                "routeRevision" to window.routeRevision, "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL")
+            if (confirmation.decision.accepted) return result(true, "COHERENT_CHANNEL_CONFIRMED", channel.index)
+        }
+        return result(false, "NO_COHERENT_CHANNEL_CONFIRMED")
     }
 
     private fun warn(message: String) {
