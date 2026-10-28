@@ -1,0 +1,28 @@
+{
+  "collectorVersion": "reference-noise-study-3.5.0.1",
+  "engineRevision": "guardian-voice-v3.5.0-reference-noise-study",
+  "scope": "COLLECTOR_ONLY",
+  "androidChanges": false,
+  "apkRebuildRequired": false,
+  "validation": {
+    "powershellSyntaxPassed": true,
+    "referenceExportScenariosPassed": 18,
+    "legacyHashtableProjectionFailureReproduced": true,
+    "referenceCollectorEndToEndScenariosPassed": 7,
+    "validationPreservesExportFiles": true,
+    "nativeWindowsPowerShell51Executed": false,
+    "compatibilityTest": "Targeted Select-Object Hashtable-key behavior reproduced under PowerShell 7"
+  },
+  "preservedChecks": [
+    "SHA-256 transfer verification",
+    "Four distinct lanes on the same interval",
+    "Contiguous full-stream timeline",
+    "Byte-identical pair slices from full Float32 sources",
+    "No synthetic padding",
+    "Corrupted, missing, duplicate and out-of-coverage exports rejected"
+  ],
+  "limits": [
+    "Windows PowerShell 5.1 is not available on this Linux host.",
+    "Original failed archives remain marked incomplete; post-validation adaptive-channel export and final observations may be absent."
+  ]
+}

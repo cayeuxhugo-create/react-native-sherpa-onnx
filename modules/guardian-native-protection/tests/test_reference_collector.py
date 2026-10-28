@@ -194,7 +194,7 @@ def run_scenarios():
             with zipfile.ZipFile(archives[0]) as archive:
                 metadata = read_json(archive, 'session.json')
                 assert metadata['completed'] == expected_ok and metadata['controlsRestored']
-                assert metadata['collectorVersion'] == 'reference-noise-study-3.5.0'
+                assert metadata['collectorVersion'] == 'reference-noise-study-3.5.0.1'
                 assert metadata['processingModeRequested'] == 'REFERENCE_NOISE_STUDY'
                 assert archive.read('guardian.log') and archive.read('meminfo-before.txt')
                 if mode == 'wrong-ready-role':

@@ -275,7 +275,8 @@ function Assert-GuardianReferenceExport {
         $groups[$group]+=$entry
     }
     foreach ($group in $groups.Values) {
-        if ($group.Count -ne 4 -or @($group | Select-Object -ExpandProperty lane -Unique).Count -ne 4 -or @($group | ForEach-Object { [string]$_.start+':'+[string]$_.samples } | Select-Object -Unique).Count -ne 1) { throw 'Les quatre voies reference ne partagent pas la meme fenetre.' }
+        # Read Hashtable keys explicitly: Select-Object -ExpandProperty differs in Windows PowerShell 5.1.
+        if ($group.Count -ne 4 -or @($group | ForEach-Object { [string]($_['lane']) } | Select-Object -Unique).Count -ne 4 -or @($group | ForEach-Object { [string]$_.start+':'+[string]$_.samples } | Select-Object -Unique).Count -ne 1) { throw 'Les quatre voies reference ne partagent pas la meme fenetre.' }
     }
     return [ordered]@{files=$registry.Count; fullFloatStreams=$full.Count; pairedWindows=$groups.Count; pairedFloatStreams=$pairs.Count; timelineRows=$timeline.Count; byteExactPairs=$true; syntheticPaddingAllowed=$false}
 }
@@ -307,7 +308,7 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ("guardian-simple-"+[Guid]::NewGuid
 $backups = New-Object 'System.Collections.Generic.List[object]'
 $records = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion="reference-noise-study-3.5.0"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
+    collectorVersion="reference-noise-study-3.5.0.1"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
     packageName=$PackageName; startUtc=[DateTime]::UtcNow.ToString("o")
     phoneModel=Invoke-SimpleAdb @("shell","getprop","ro.product.model")
     android=Invoke-SimpleAdb @("shell","getprop","ro.build.version.release")
