@@ -40,6 +40,7 @@ sources=(
   "$source_dir/GuardianGtcrnComparison.kt"
   "$module_dir/tests/host/GtcrnComparisonTest.kt"
   "$source_dir/GuardianSpeechSegmenter.kt"
+  "$module_dir/tests/host/SpeechSegmenterContinuityTest.kt"
   "$source_dir/GuardianVoiceInputRouter.kt"
   "$source_dir/GuardianVoiceProfile.kt"
   "$source_dir/GuardianVoiceDiagnostics.kt"
@@ -73,3 +74,4 @@ java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativepr
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.FsmnPolicyTest
 
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.ReferenceNoiseEnhancerTest
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.SpeechSegmenterContinuityTest

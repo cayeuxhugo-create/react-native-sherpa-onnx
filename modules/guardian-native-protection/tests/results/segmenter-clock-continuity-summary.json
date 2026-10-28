@@ -1,0 +1,32 @@
+{
+  "scope": "SOURCE_PATCH_NOT_IN_V350_APK",
+  "baseEngineRevision": "guardian-voice-v3.5.0-reference-noise-study",
+  "fix": "Preserve real deferred quiet samples when speech resumes after the full segment buffer",
+  "validation": {
+    "hostSuitePassed": true,
+    "syntheticSourceExactScenarios": 31,
+    "independentSourceClockScenarios": 7,
+    "frozenVadReplayStreams": 8,
+    "frozenVadDecisions": 13034,
+    "emittedWindowsSourceExact": 52,
+    "primaryPhoneWindowsByteAndCoordinateUnchanged": 5,
+    "modelsRerunForFrozenReplay": false
+  },
+  "preserved": {
+    "maxSegmentSeconds": 8,
+    "endSilenceMs": 1200,
+    "tailMs": 1200,
+    "rolloverOverlapMs": 400,
+    "pauseAlignedRollover": true,
+    "neuralVadOnly": true
+  },
+  "resources": {
+    "pendingSampleCapacity": 19200,
+    "pendingPcmBytesAt16Khz": 76800
+  },
+  "limits": [
+    "No complete APK built or new phone deployment for this source patch.",
+    "The bug was not triggered by the five original phone segments analyzed; it does not explain their missed phrases.",
+    "No changes to speech models, thresholds, capture routes, Service revision or the existing v3.5.0 installer archive."
+  ]
+}
