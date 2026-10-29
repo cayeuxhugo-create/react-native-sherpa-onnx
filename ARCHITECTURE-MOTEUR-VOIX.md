@@ -1,6 +1,6 @@
 # Guardian Voice : architecture conservée et voie de recherche
 
-La voie originale reste la référence fonctionnelle. La v3.4.9 a corrigé le crash d'affinité OpenMP de FSMN ; la v3.5.0 ajoute un traitement intercanaux volontairement diagnostique. Une transcription exacte obtenue en forçant Qwen ne prouve pas que les gardes acoustiques ou le moteur complet ont validé la parole.
+La voie originale reste la référence fonctionnelle. La v3.4.9 a corrigé le crash d'affinité OpenMP de FSMN ; la v3.5.0 ajoute un traitement intercanaux volontairement diagnostique. La v3.5.1 ajoute son propre FireRed continu et son découpeur corrigé, indépendants des fenêtres principales. Une transcription exacte obtenue en forçant Qwen ne prouve pas que les gardes acoustiques ou le moteur complet ont validé la parole.
 
 ```mermaid
 flowchart LR
@@ -13,7 +13,7 @@ flowchart LR
     G --> H[Analyse d'urgence existante]
     B --> I[Deux canaux stables : étude intercanaux]
     I --> J[Profils de bruit courts et longs]
-    J --> K[WAV et validations FireRed/FSMN séparées]
+    J --> K[FireRed continu, découpage autonome, WAV et confirmations séparées]
     K --> L[Qwen diagnostique forcé, sans alerte]
 ```
 
@@ -52,3 +52,5 @@ Les fenêtres EXACT et END_PLUS_2S sont séparées. L'extension attend de vrais 
 La nouvelle voie partage l'unique Qwen via sa file diagnostique de deux tâches en attente ; les finales principales restent prioritaires. Les modèles FireRed/FSMN de comparaison appartiennent au worker d'étude et sont libérés sur ce worker. Une saturation ou une erreur invalide l'étude et conserve les fichiers récupérables ; elle ne constitue pas une admission vocale.
 
 Les compteurs `processingWallMs` et `threadCpuMs` de cette voie mesurent le travail des blocs DSP et de leur écriture ; ils ne mesurent pas les validations FireRed/FSMN ni Qwen. La consommation et la stabilité du nouveau code sur téléphone restent à mesurer. Cette livraison ne promet pas une baisse de mémoire de Qwen ni une fiabilité universelle sur toutes les langues, tous les téléphones ou tous les bruits.
+
+La v3.5.1 réserve les IDs filtrés à partir de 1e9, propose en priorité deux secondes réelles de contexte et conserve un repli exact. Les fenêtres filtrées ne dépendent plus d’un événement de parole du canal principal. Les résultats diagnostiques demeurent sans alerte ; aucune nouvelle règle de confirmation n’a été qualifiée par les essais du 29 octobre.

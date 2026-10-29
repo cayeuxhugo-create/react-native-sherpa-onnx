@@ -1,0 +1,61 @@
+{
+  "version": "guardian-voice-v3.5.1-independent-filtered-study",
+  "baseForPatch": "guardian-voice-v3.5.0-reference-noise-study",
+  "scope": "OPT_IN_SHADOW_ONLY",
+  "validation": {
+    "hostSuitePassed": true,
+    "upstreamKotlinApiCompilationPassed": true,
+    "originalStudyOnOffReplays": 2,
+    "originalCapabilityChecks": 4,
+    "originalPcmAndCallbacksUnchanged": true,
+    "independentWorkerFullReplays": 2,
+    "independentWorkerEofFallbackReplays": 1,
+    "independentWorkerProductCallbacks": 0,
+    "filteredExportScenarios": 5,
+    "independentCollectorScenarios": 7,
+    "powershellSyntaxPassed": true,
+    "automaticQwenWindows": 11,
+    "automaticNoisyOfferedWindows": 9,
+    "automaticNoisyDistinctExpectedPhrasesRecovered": 3,
+    "automaticQuietOfferedWindows": 2,
+    "automaticQuietOfferedTextsCorrect": 2,
+    "privateAudioPublished": false
+  },
+  "acousticResearch": {
+    "fsmnConditioningRecipes": 6,
+    "fixedAcousticPolicies": 5,
+    "alternativeVadFamilies": [
+      "Silero V4",
+      "TEN",
+      "WebRTC"
+    ],
+    "partialCancellationBlends": 2,
+    "qualifiedConfirmationChangeFound": false,
+    "productionConfirmationChanged": false
+  },
+  "implementation": {
+    "independentFilteredVad": true,
+    "fixedVadBlockSamples": 800,
+    "windowSources": [
+      "PRIMARY_ORIGINAL",
+      "FILTERED_STREAM_LONG"
+    ],
+    "filteredSegmentIdBase": 1000000000,
+    "maxFilteredDiagnosticOffers": 16,
+    "preferredRealContextSamples": 32000,
+    "maxAsrSamples": 128000,
+    "sourceExactFallback": true,
+    "syntheticPadding": false,
+    "gtcrnDisabledInReferenceMode": true,
+    "nativeAssetsUnchanged": true
+  },
+  "limits": [
+    "The filtered path calls only diagnostic ASR and cannot publish product results or emergency alerts.",
+    "Three expected noisy phrases were recovered automatically on a previously studied recording, with additional unrelated diagnostic text. This is not an independent zero-false validation.",
+    "No tested confirmation change both recovered the two weak voices and rejected every confirmed negative in the checked data.",
+    "Current model conditioning and production speech gates remain unchanged.",
+    "The source-clock continuity correction is included; no new model weights or native binaries are added.",
+    "Complete APK not built or deployed in this host environment; new phone timing, memory and energy still require measurement.",
+    "Only French recordings and limited phones/noises were evaluated."
+  ]
+}

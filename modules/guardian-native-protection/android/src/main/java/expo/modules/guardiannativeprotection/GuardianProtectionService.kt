@@ -1321,7 +1321,7 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.5.0-reference-noise-study",
+      "engineRevision" to "guardian-voice-v3.5.1-independent-filtered-study",
       "fsmnConfirmationRequired" to true,
       "fsmnModel" to GuardianFsmnConfirmation.MODEL_ID,
       "fsmnExecutionBackend" to GuardianFsmnConfirmation.EXECUTION_BACKEND,
@@ -1334,6 +1334,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
       "continuousStudy" to continuousStudy,
       "studyModel" to if(referenceNoiseStudy) "WIENER_CROSS_CHANNEL_REFERENCE" else if(wienerStudy) "WIENER_DD_ADAPTIVE" else if(continuousStudy) "GTCRN" else "DISABLED",
       "referenceNoiseStudy" to referenceNoiseStudy,
+      "referenceNoiseWindowSources" to "PRIMARY_ORIGINAL_AND_FILTERED_STREAM_LONG",
+      "referenceNoiseFilteredVadBlockSamples" to 800,
+      "referenceNoiseFilteredOfferPolicy" to "FIRERED_CONTEXT_PREFERRED_FSMN_LOGGED_ONLY",
+      "referenceNoiseMaxFilteredOffers" to 16,
       "referenceNoiseRole" to if(referenceNoiseStudy) "SHADOW_NO_ALERT" else "DISABLED",
       "referenceNoiseProfiles" to "SHORT_0P5_3_AND_LONG_2_15",
       "referenceNoiseContextSamples" to 32000,
