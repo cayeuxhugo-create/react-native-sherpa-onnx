@@ -91,7 +91,9 @@ internal class GuardianReferenceNoiseStudy(
             else check(filteredCount++ < 64) { "Reference filtered window limit" }
             check(windows.size + 2 <= 12) { "Reference window backlog" }
             windows.add(w)
-            windows.add(w.copy(end=w.end+CONTEXT,variant="END_PLUS_2S"))
+            // Historical variant name denotes the requested lookahead. Cap its
+            // actual extension to the remaining ASR budget; never cut EXACT.
+            windows.add(w.copy(end=GuardianAsrWindowPolicy.contextEnd(w.start,w.end) ?: (w.end+CONTEXT),variant="END_PLUS_2S"))
         }
         fun detectBlock(epoch: Epoch, count: Int) {
             val block=epoch.vadBuffer.copyOf(count)
@@ -219,7 +221,7 @@ internal class GuardianReferenceNoiseStudy(
                 val fsmn = if (ready) checkNotNull(nativeFsmn).confirm(clean) else null
                 val lane = "REFERENCE_NOISE_LONG_${w.variant}"
                 val contextPreferred = w.source == "FILTERED_STREAM_LONG" &&
-                    w.variant == "EXACT" && w.end-w.start+CONTEXT <= MAX_ASR
+                    w.variant == "EXACT" && GuardianAsrWindowPolicy.contextEnd(w.start,w.end)!=null
                 if(ready && contextPreferred && fire?.decision?.accepted==true) {
                     check(deferredExact.size<12) { "Reference deferred exact limit" }
                     deferredExact[w.id]=w
@@ -245,6 +247,7 @@ internal class GuardianReferenceNoiseStudy(
                 diagnostics?.event("REFERENCE_STUDY_WINDOW", "segment" to w.id, "variant" to w.variant, "windowSource" to w.source,
                     "epoch" to epoch.id, "available" to true, "status" to if(ready) "FILTERED" else "PREFIX_OR_DEGENERATE_REFERENCE",
                     "startSample" to w.start, "endSample" to w.end, "samples" to clean.size,
+                    "contextPolicy" to "UP_TO_2S_WITHIN_8S_KEEP_EXACT_PREFIX",
                     "primaryChannel" to epoch.first, "referenceChannel" to epoch.second,
                     "primaryOriginalAccepted" to w.originalAccepted,
                     "shortReady" to epoch.short.calibrationReady, "longReady" to epoch.long.calibrationReady,

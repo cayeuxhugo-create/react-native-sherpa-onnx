@@ -16,13 +16,14 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val listener: Listener,
     private val profile: GuardianVoiceProfile = GuardianVoiceProfile.DISTANT,
     private val diagnostics: GuardianVoiceDiagnostics? = null,
-    diagnosticWavDirectory: java.io.File? = null,
+    private val diagnosticWavDirectory: java.io.File? = null,
     private val speechOnlyGain: Boolean = false,
     private val confirmedGainMaximum: Float = 1f,
     continuousStudy: Boolean = false,
     studyModel: String = "GTCRN",
     private val requireFsmnConfirmation: Boolean = false,
     referenceNoiseStudy: Boolean = false,
+    private val adaptiveTranscription: Boolean = false,
 ) : GuardianAudioEngine.AudioProcessor {
     interface Listener {
         fun onSpeechStarted()
@@ -44,6 +45,11 @@ internal class GuardianQwenPrimaryAudioProcessor(
         try { fireRed.close() } catch (_: Throwable) { }
         try { streamingVad.close() } catch (_: Throwable) { }
         throw error
+    } else null
+    private val calibratedView = if (adaptiveTranscription) {
+        require(requireFsmnConfirmation) { "Adaptive candidate requires both native validators" }
+        GuardianCalibratedReferenceView(GuardianFireRedStreaming.load { name ->
+            context.applicationContext.assets.open(name).use { it.readBytes() } })
     } else null
     private val wav = diagnosticWavDirectory?.let { directory ->
         try {
@@ -90,6 +96,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
         override fun onWindow(id: Long, pcm: FloatArray, final: Boolean, reason: String) =
             error("Segmenter must supply sample clock")
         override fun onWindowAt(id: Long, pcm: FloatArray, final: Boolean, reason: String, endSample: Long) {
+            if (adaptiveTranscription && final) {
+                check(pendingAdaptiveWindows.size < 2) { "Adaptive window backlog" }
+                pendingAdaptiveWindows.addLast(PendingWindow(id,pcm,reason,endSample))
+            } else processCompletedWindow(id,pcm,final,reason,endSample)
+
+        }
+    })
+    private data class PendingWindow(val id: Long, val pcm: FloatArray, val reason: String, val end: Long)
+    private val pendingAdaptiveWindows = java.util.ArrayDeque<PendingWindow>()
+    private fun processCompletedWindow(id: Long, pcm: FloatArray, final: Boolean, reason: String, endSample: Long) {
             if (closed.get()) return
             // Only completed windows are validated/decoded. A partial must never
             // bypass the new acoustic admission gate.
@@ -97,6 +113,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 diagnostics?.event("FIRERED_PARTIAL_SKIPPED", "segment" to id)
                 return
             }
+            val admissionStarted = SystemClock.elapsedRealtime()
             val validation = try { fireRed.confirm(pcm) } catch (error: Throwable) {
                 diagnostics?.event("FIRERED_ERROR", "segment" to id, "error" to error.javaClass.simpleName)
                 Log.e(TAG, "FireRed indisponible : segment=$id, Qwen non appelé", error)
@@ -106,8 +123,40 @@ internal class GuardianQwenPrimaryAudioProcessor(
             val priorRejection = if (!validation.decision.accepted) "SKIPPED_ORIGINAL_REJECT" else null
             val fsmnAdmission = confirmFsmn(id, pcm, priorRejection)
             val coherent = confirmCoherentChannel(id, pcm, endSample, validation, fsmnAdmission)
-            val finalAdmission = coherent.accepted
+            val filtered = calibratedView?.window(endSample-pcm.size,endSample)
+            var filteredFire: GuardianFireRedConfirmation.Result? = null
+            var filteredFsmn: GuardianFsmnConfirmation.Result? = null
+            val filteredConfirmationStarted = SystemClock.elapsedRealtime()
+            try {
+                filteredFire = filtered?.let { fireRed.confirm(it.pcm) }
+                filteredFsmn = if (filteredFire?.decision?.accepted==true) fsmn?.confirm(checkNotNull(filtered).pcm) else null
+            } catch(error: Throwable) {
+                filteredFire=null; filteredFsmn=null
+                diagnostics?.event("ADAPTIVE_VALIDATION_ERROR", "segment" to id, "error" to error.javaClass.simpleName)
+            }
+            val coherentWindow = if(filtered!=null) channelHistory.window(endSample,pcm.size) else null
+            val filteredConfirmationMs = SystemClock.elapsedRealtime()-filteredConfirmationStarted
+            // A suspect calibration cannot rescue an original refusal or
+            // replace an admitted original. Both native checks still apply;
+            // neither attenuation nor ASR words can admit this view.
+            val useFiltered = filtered!=null && GuardianAdaptiveAdmissionPolicy.useFiltered(
+                filtered.calibrationClean,coherentWindow?.valid==true,
+                filteredFire?.decision?.accepted==true,filteredFsmn?.decision?.accepted==true,
+                coherent.accepted,coherent.channel,filtered.primary)
+            val finalAdmission = coherent.accepted || useFiltered
+            val asrChannel = if(useFiltered) filtered?.primary else coherent.channel
+            if (adaptiveTranscription) diagnostics?.event("ADAPTIVE_ADMISSION", "segment" to id,
+                "originalAccepted" to coherent.accepted, "filteredAvailable" to (filtered!=null),
+                "calibrationClean" to filtered?.calibrationClean,
+                "acceptedProfileFrames" to filtered?.acceptedProfileFrames,
+                "rejectedProfileFrames" to filtered?.rejectedProfileFrames,
+                "filteredFireRedAccepted" to filteredFire?.decision?.accepted,
+                "filteredFsmnAccepted" to filteredFsmn?.decision?.accepted,
+                "filteredFsmnSpeechFrames" to filteredFsmn?.decision?.speechFrames,
+                "usedFiltered" to useFiltered, "accepted" to finalAdmission,
+                "policy" to "CLEAN_CALIBRATION_DUAL_NEURAL_CANDIDATE")
             val admissionReason = when {
+                useFiltered -> "CALIBRATED_FILTERED_DUAL_NEURAL"
                 finalAdmission -> "NEURAL_CONFIRMED"
                 !coherent.required && !validation.decision.accepted -> "FIRERED_REJECT"
                 !coherent.required && !fsmnAdmission.accepted -> if (fsmnAdmission.error) "FSMN_ERROR" else "FSMN_REJECT"
@@ -118,15 +167,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "confirmationMs" to validation.elapsedMs,
                 "coherentGateMs" to coherent.elapsedMs,
                 "fsmnConfirmationMs" to fsmnAdmission.confirmationMs,
-                "admissionConfirmationMs" to validation.elapsedMs + coherent.elapsedMs + fsmnAdmission.confirmationMs,
+                "filteredConfirmationMs" to filteredConfirmationMs,
+                "admissionConfirmationMs" to (SystemClock.elapsedRealtime()-admissionStarted),
                 "channelGateRequired" to coherent.required, "channelGateReason" to coherent.reason,
-                "channelAcceptedIndex" to coherent.channel,
+                "channelAcceptedIndex" to asrChannel,
                 "coherentEvaluated" to coherent.evaluated,
                 "coherentAccepted" to if (coherent.evaluated) coherent.accepted else null,
                 "fsmnConfirmationRequired" to requireFsmnConfirmation,
-                "fsmnAccepted" to if (requireFsmnConfirmation) coherent.fsmnAccepted else null,
+                "fsmnAccepted" to if(useFiltered) filteredFsmn?.decision?.accepted else if (requireFsmnConfirmation) coherent.fsmnAccepted else null,
                 "originalFsmnAccepted" to if (requireFsmnConfirmation && priorRejection == null) fsmnAdmission.accepted else null,
-                "asrChannel" to coherent.channel,
+                "asrChannel" to asrChannel,
                 "admissionReason" to admissionReason,
                 "peakProbability" to validation.decision.peakProbability,
                 "longestPositiveFrames" to validation.decision.longestPositiveFrames,
@@ -144,13 +194,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
                     "admission" to admissionReason)
                 return
             }
-            val selectedPcm = coherent.pcm ?: pcm
+            val selectedPcm = if(useFiltered) checkNotNull(filtered).pcm else coherent.pcm ?: pcm
             val segmentGain = if (speechOnlyGain) GuardianSpeechSegmentGain.apply(selectedPcm, confirmed=true, maximumGain=confirmedGainMaximum) else null
             val asrPcm = segmentGain?.pcm ?: selectedPcm
-            diagnostics?.event("ASR_INPUT", "segment" to id, "channel" to coherent.channel,
+            val exportedPrefix = if(adaptiveTranscription) exportAdaptiveWindow(id,pcm,asrPcm) else null
+            diagnostics?.event("ASR_INPUT", "segment" to id, "channel" to asrChannel,
                 "samples" to asrPcm.size, "sampleRateHz" to 16000,
+                "startSample" to endSample-pcm.size, "endSample" to endSample,
+                "windowExportPrefix" to exportedPrefix,
                 "pcmSha256" to GuardianPcmIdentity.sha256(asrPcm),
-                "source" to if (coherent.channel == null) "PRIMARY_ORIGINAL_PCM" else "SELECTED_COHERENT_ORIGINAL_CHANNEL")
+                "source" to if(useFiltered) "CALIBRATED_REFERENCE_LONG" else if (coherent.channel == null) "PRIMARY_ORIGINAL_PCM" else "SELECTED_COHERENT_ORIGINAL_CHANNEL")
             if (segmentGain != null) diagnostics?.event("SEGMENT_GAIN", "segment" to id,
                 "gain" to segmentGain.gain, "samples" to pcm.size, "evidence" to "NEURAL_CONFIRMED",
                 "inputRmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(selectedPcm)))
@@ -164,12 +217,27 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "reason" to reason, "samples" to pcm.size,
                 "audioMs" to pcm.size.toLong() * 1000 / 16000,
                 "rmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(pcm)),
-                "asrChannel" to coherent.channel,
+                "asrChannel" to asrChannel,
                 "asrRmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(asrPcm)),
                 "accepted" to accepted)
             if (!accepted && final) warn("Fenêtre Qwen finale refusée : segment=$id")
+    }
+    private fun exportAdaptiveWindow(id: Long, original: FloatArray, asr: FloatArray): String? {
+        val directory=diagnosticWavDirectory ?: return null
+        val relative="adaptive-asr/${diagnostics?.sessionId ?: "unknown"}/segment-$id"
+        return try {
+            val writer=GuardianDiagnosticWavWriter(java.io.File(directory,relative),profile.name,"window",diagnostics,
+                emitLifecycleEvents=false)
+            try {
+                writer.write("truth",original,id,0);writer.write("asr",asr,id,0)
+                check(!writer.isClosed) { "Adaptive ASR window export failed" }
+            } finally { writer.close() }
+            "$relative/${writer.filePrefix}"
+        } catch(error: Exception) {
+            diagnostics?.event("ASR_EXPORT_ERROR", "segment" to id, "error" to error.javaClass.simpleName)
+            null
         }
-    })
+    }
     private val router = GuardianVoiceInputRouter(
         noisy = false, // FireRed reads original PCM immediately; never wait for GTCRN.
         emit = { frame, pcm, enhanced ->
@@ -194,6 +262,10 @@ internal class GuardianQwenPrimaryAudioProcessor(
             // hysteresis before noticing voice at the calibration boundary.
             // This conservative guard affects only shadow calibration.
             val studyCalibrationSpeech = speech || (earlyStudyCalibrationGuard && streamResult.peak >= .5f)
+            val filteredViewStarted = SystemClock.elapsedRealtime()
+            val filteredSpeech = calibratedView?.accept(decoderPcm,frame.captureChannels,
+                speech || streamResult.peak>=.5f) ?: false
+            val filteredViewMs = SystemClock.elapsedRealtime()-filteredViewStarted
             val now = SystemClock.elapsedRealtime()
             if (diagnostics?.enabled == true) {
                 if (previousVad != speech) {
@@ -218,6 +290,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
                         "streamVadPeakProbability" to streamResult.peak,
                         "streamVadFrames" to streamResult.frames,
                         "streamVadElapsedMs" to streamResult.elapsedMs,
+                        "filteredViewElapsedMs" to filteredViewMs,
+                        "filteredVadSpeech" to filteredSpeech,
                         "studyCalibrationSpeech" to studyCalibrationSpeech,
                         "rawVadMaxInputGain" to 64,
                         "enhancementExpected" to frame.enhancementExpected,
@@ -241,7 +315,13 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 frame.captureChannelRevision,frame.captureChannels)
             referenceStudy?.frame(decoderPcm, frame.key.sequence, frame.key.capturedAtNanos,
                 studyCalibrationSpeech, frame.captureChannelRevision, frame.captureChannels)
-            segmenter.accept(decoderPcm, speech)
+            // One real capture block covers the FFT retained tail. Never trim
+            // a completed phrase or synthesize samples to make it available.
+            while(pendingAdaptiveWindows.isNotEmpty() && channelHistory.end >= pendingAdaptiveWindows.first.end+800L) {
+                val pending=pendingAdaptiveWindows.removeFirst()
+                processCompletedWindow(pending.id,pending.pcm,true,pending.reason,pending.end)
+            }
+            segmenter.accept(decoderPcm, speech || filteredSpeech)
             if (now - lastMetricsAtMs >= 5_000L) {
                 Log.i(TAG, "VOICE_INPUT profile=$profile truthFrames=$truthFrames gtcrnFrames=$enhancedFrames")
                 lastMetricsAtMs = now
@@ -356,6 +436,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
         decoder.reset()
         streamingVad.reset()
         segmenter.reset()
+        calibratedView?.reset()
+        pendingAdaptiveWindows.clear()
         channelHistory.reset()
         previousAsrChannel = null
         previousAsrRoute = null
@@ -520,7 +602,9 @@ internal class GuardianQwenPrimaryAudioProcessor(
             try {
                 router.reset()
                 try { fsmn?.close() } finally {
-                    try { streamingVad.close() } finally { try { fireRed.close() } finally { wav?.close() } }
+                    try { calibratedView?.close() } finally {
+                        try { streamingVad.close() } finally { try { fireRed.close() } finally { wav?.close() } }
+                    }
                 }
             } finally { worker.shutdownNow() }
         }

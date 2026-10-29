@@ -5,8 +5,11 @@ source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotect
 build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 sources=(
+  "$source_dir/GuardianAsrWindowPolicy.kt"
+  "$source_dir/GuardianCalibratedReferenceView.kt"
   "$source_dir/GuardianReferenceNoiseEnhancer.kt"
   "$module_dir/tests/host/ReferenceNoiseEnhancerTest.kt"
+  "$module_dir/tests/host/AdaptivePolicyTest.kt"
   "$source_dir/GuardianFsmnConfirmation.kt"
   "$source_dir/GuardianFsmnPolicy.kt"
   "$module_dir/tests/host/FsmnConditioningTest.kt"
@@ -77,3 +80,4 @@ java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativepr
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.ReferenceNoiseEnhancerTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.SpeechSegmenterContinuityTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.MicrophoneSelectionTest
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.AdaptivePolicyTest

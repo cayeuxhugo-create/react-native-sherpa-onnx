@@ -10,7 +10,9 @@ import kotlin.math.sqrt
  * Diagnostic, cross-channel Wiener predictor residual: X0 - H * X1.
  *
  * H is estimated only from complete Hann windows inside the declared prefix.
- * Prefix speech is observed, never silently removed from this experimental fit.
+ * Legacy fitting observes prefix speech. The explicit robust candidate excludes
+ * marked speech with a 250 ms guard and frames above four times median band
+ * energy on either source; fewer than 63 usable frames bypasses the filter.
  * Separate from the mono Wiener gain mask: no gain, normalization, limiter or cascade.
  *
  * One instance belongs to one uninterrupted, synchronous pair of source streams.
@@ -18,7 +20,7 @@ import kotlin.math.sqrt
  * returned, retaining 256..511 input samples; empty input never pads or flushes.
  * Route changes and gaps require a new instance, owned by the calling worker.
  */
-internal class GuardianReferenceNoiseEnhancer(val profile: Profile) {
+internal class GuardianReferenceNoiseEnhancer(val profile: Profile, private val robustCalibration: Boolean = false) {
     enum class Profile(val startSample: Long, val endSample: Long) {
         SHORT(8_000L, 48_000L),
         LONG(32_000L, 240_000L);
@@ -42,6 +44,14 @@ internal class GuardianReferenceNoiseEnhancer(val profile: Profile) {
         private set
     var degenerateReference = false
         private set
+    var acceptedProfileFrames = 0
+        private set
+    var rejectedProfileFrames = 0
+        private set
+    private data class CalibrationFrame(val start: Long, val energy: Double, val referenceEnergy: Double,
+        val power: DoubleArray, val crossReal: DoubleArray, val crossImaginary: DoubleArray)
+    private val calibrationFrames = ArrayList<CalibrationFrame>()
+    private val speechRanges = ArrayList<LongRange>()
 
     private val primaryRing = FloatArray(RING_SIZE)
     private val referenceRing = FloatArray(RING_SIZE)
@@ -65,6 +75,7 @@ internal class GuardianReferenceNoiseEnhancer(val profile: Profile) {
         require(inputEndSample >= inputSamples)
         if (inputSamples < profile.endSample && inputEndSample > profile.startSample) {
             observedSpeechDuringProfile = true
+            if (robustCalibration) speechRanges.add((inputSamples - 4_000L)..(inputEndSample + 4_000L))
         }
     }
 
@@ -134,6 +145,11 @@ internal class GuardianReferenceNoiseEnhancer(val profile: Profile) {
         referenceImaginary[BINS - 1] = 0.0
         if (start >= profile.startSample && center + HOP_SIZE <= profile.endSample) {
             profileFrames++
+            val framePower = if (robustCalibration) DoubleArray(BINS) else null
+            val frameCrossReal = if (robustCalibration) DoubleArray(BINS) else null
+            val frameCrossImaginary = if (robustCalibration) DoubleArray(BINS) else null
+            var energy = 0.0
+            var referenceEnergy = 0.0
             for (bin in 0 until BINS) {
                 val ar = primaryReal[bin]
                 val ai = primaryImaginary[bin]
@@ -144,7 +160,18 @@ internal class GuardianReferenceNoiseEnhancer(val profile: Profile) {
                 referencePowerSum[bin] += magnitude * magnitude
                 crossRealSum[bin] += ar * br + ai * bi
                 crossImaginarySum[bin] += ai * br - ar * bi
+                if (robustCalibration) {
+                    framePower!![bin] = magnitude * magnitude
+                    frameCrossReal!![bin] = ar * br + ai * bi
+                    frameCrossImaginary!![bin] = ai * br - ar * bi
+                    if (bin in 8..243) {
+                        energy += ar * ar + ai * ai
+                        referenceEnergy += magnitude * magnitude
+                    }
+                }
             }
+            if (robustCalibration) calibrationFrames.add(CalibrationFrame(start, energy, referenceEnergy,
+                checkNotNull(framePower), checkNotNull(frameCrossReal), checkNotNull(frameCrossImaginary)))
         }
         // All earlier frame supports end before the literal bypass boundary.
         if (!calibrationReady || degenerateReference || !profileFinite) return
@@ -170,11 +197,42 @@ internal class GuardianReferenceNoiseEnhancer(val profile: Profile) {
 
     private fun finishCalibration() {
         calibrationReady = true
+        acceptedProfileFrames = profileFrames
+        if (robustCalibration && calibrationFrames.isNotEmpty()) {
+            fun median(values: List<Double>): Double = values.sorted().let {
+                (it[(it.size - 1) / 2] + it[it.size / 2]) / 2.0
+            }
+            val medianPrimary = median(calibrationFrames.map { it.energy })
+            val medianReference = median(calibrationFrames.map { it.referenceEnergy })
+            referencePowerSum.fill(0.0); crossRealSum.fill(0.0); crossImaginarySum.fill(0.0)
+            acceptedProfileFrames = 0
+            calibrationFrames.forEach { frame ->
+                val start = frame.start
+                val speech = speechRanges.any { it.first < start + WINDOW_SIZE && it.last >= start }
+                // Reject transient-dominated windows on either source. This is
+                // calibration hygiene, not a speech decision or an ASR score.
+                if (!speech && frame.energy <= 4.0 * medianPrimary &&
+                    frame.referenceEnergy <= 4.0 * medianReference) {
+                    acceptedProfileFrames++
+                    for (bin in 0 until BINS) {
+                        referencePowerSum[bin] += frame.power[bin]
+                        crossRealSum[bin] += frame.crossReal[bin]
+                        crossImaginarySum[bin] += frame.crossImaginary[bin]
+                    }
+                }
+            }
+            rejectedProfileFrames = profileFrames - acceptedProfileFrames
+            calibrationFrames.clear(); speechRanges.clear()
+            if (acceptedProfileFrames < 63) {
+                degenerateReference = true
+                return
+            }
+        }
         if (profileFrames == 0) {
             degenerateReference = true
             return
         }
-        val power = DoubleArray(BINS) { referencePowerSum[it] / profileFrames }
+        val power = DoubleArray(BINS) { referencePowerSum[it] / acceptedProfileFrames }
         profileFinite = power.all { it.isFinite() } && crossRealSum.all { it.isFinite() } && crossImaginarySum.all { it.isFinite() }
         if (!profileFinite) return
         // FFT bins 8..243 are 125..3796.875 Hz: exactly 120 <= f < 3800.
@@ -187,8 +245,8 @@ internal class GuardianReferenceNoiseEnhancer(val profile: Profile) {
         }
         for (bin in 0 until BINS) {
             val denominator = power[bin] + regularizer
-            transferReal[bin] = (crossRealSum[bin] / profileFrames) / denominator
-            transferImaginary[bin] = (crossImaginarySum[bin] / profileFrames) / denominator
+            transferReal[bin] = (crossRealSum[bin] / acceptedProfileFrames) / denominator
+            transferImaginary[bin] = (crossImaginarySum[bin] / acceptedProfileFrames) / denominator
         }
         profileFinite = transferReal.all { it.isFinite() } && transferImaginary.all { it.isFinite() }
     }

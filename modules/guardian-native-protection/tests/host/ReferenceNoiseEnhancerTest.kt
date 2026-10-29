@@ -120,6 +120,48 @@ fun referenceNoiseEnhancerTests() {
         val following = invalid.process(floatArrayOf(.1f), floatArrayOf(.2f))
         check(following.isEmpty() && invalid.inputSamples == 1L)
     }
+    test("robust fit excludes prefix transients and observed speech without changing sample origin") {
+        val rng=Random(798L)
+        val r=FloatArray(260_000) { (rng.nextGaussian()*.002).toFloat() }
+        val p=FloatArray(r.size) { r[it]*.7f }
+        for(i in 160_000 until 168_000) { r[i]*=100f;p[i]*=100f }
+        val e=GuardianReferenceNoiseEnhancer(GuardianReferenceNoiseEnhancer.Profile.LONG,true)
+        val result=ArrayList<Float>()
+        for(start in p.indices step 800) {
+            val end=minOf(start+800,p.size)
+            if(start in 80_000 until 88_000)e.markCalibrationSpeech(end.toLong())
+            result.addAll(e.process(p.copyOfRange(start,end),r.copyOfRange(start,end)).toList())
+        }
+        check(e.calibrationReady && e.profileFinite && !e.degenerateReference)
+        check(e.rejectedProfileFrames>0 && e.acceptedProfileFrames>=63)
+        check(e.profileFrames==e.acceptedProfileFrames+e.rejectedProfileFrames)
+        check(e.observedSpeechDuringProfile && result.all { it.isFinite() })
+        check(result.take(240_000).toFloatArray().contentEquals(p.copyOf(240_000)))
+    }
+    test("robust fit fails closed if no sufficient speech-free prefix remains") {
+        val e=GuardianReferenceNoiseEnhancer(GuardianReferenceNoiseEnhancer.Profile.LONG,true)
+        val result=ArrayList<Float>()
+        for(start in 0 until 260_000 step 800) {
+            val end=minOf(start+800,260_000)
+            e.markCalibrationSpeech(end.toLong())
+            result.addAll(e.process(FloatArray(end-start){.01f},FloatArray(end-start){.02f}).toList())
+        }
+        check(e.calibrationReady && e.degenerateReference && e.acceptedProfileFrames==0)
+        check(result.all { it==.01f })
+    }
+    test("robust calibration and retained tail do not depend on caller chunk sizes") {
+        fun run(chunks: IntArray): FloatArray {
+            val e=GuardianReferenceNoiseEnhancer(GuardianReferenceNoiseEnhancer.Profile.LONG,true)
+            val result=ArrayList<Float>();var start=0;var index=0
+            while(start<primary.size) {
+                val end=minOf(primary.size,start+chunks[index++%chunks.size])
+                result.addAll(e.process(primary.copyOfRange(start,end),reference.copyOfRange(start,end)).toList());start=end
+            }
+            check(e.acceptedProfileFrames>=63)
+            return result.toFloatArray()
+        }
+        check(run(intArrayOf(800)).contentEquals(run(intArrayOf(1,513,4000,257))))
+    }
     println("$tests reference noise enhancer synthetic groups passed")
 }
 

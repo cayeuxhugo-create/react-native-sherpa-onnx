@@ -83,7 +83,7 @@ object ReferenceNoiseStudyIntegration {
             if(enabled) {
                 val ref=reference as GuardianReferenceNoiseStudy
                 // These diagnostics must never become primary callbacks. The
-                // first cannot fit +2s under 8s; the second lacks future samples.
+                // first gets a capped +1s under 8s; the second lacks future samples.
                 ref.window(1001,FloatArray(112000),first.size-40000L,false)
                 ref.window(1002,FloatArray(8000),first.size-800L,false)
             }
@@ -97,7 +97,8 @@ object ReferenceNoiseStudyIntegration {
         if(enabled) {
             val end=snapshot.single{value(it,"event")=="REFERENCE_STUDY_END"}
             check(value(end,"valid")=="true" && value(end,"pairEverAvailable")=="true")
-            check(snapshot.any{value(it,"event")=="REFERENCE_STUDY_WINDOW" && value(it,"status")=="CONTEXT_TOO_LONG_OR_INVALID"})
+            check(snapshot.any{value(it,"event")=="REFERENCE_STUDY_WINDOW" && value(it,"segment")=="1001" &&
+                value(it,"variant")=="END_PLUS_2S" && value(it,"available")=="true" && value(it,"samples")=="128000"})
             check(snapshot.any{value(it,"event")=="REFERENCE_STUDY_WINDOW" && value(it,"segment")=="1002" && value(it,"variant")=="END_PLUS_2S" && value(it,"available")=="false"})
             check(snapshot.filter{value(it,"event")=="REFERENCE_STUDY_WINDOW"}.all{value(it,"productionEligible")=="false"})
             check(snapshot.none{value(it,"event")=="CONTINUOUS_STUDY_READY" || value(it,"event")=="GTCRN_COMPARISON_READY"})

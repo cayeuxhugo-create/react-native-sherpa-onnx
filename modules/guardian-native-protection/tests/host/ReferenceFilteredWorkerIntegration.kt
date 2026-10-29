@@ -107,8 +107,12 @@ object ReferenceFilteredWorkerIntegration {
             val exact = variants.single { value(it, "variant") == "EXACT" }
             val context = variants.single { value(it, "variant") == "END_PLUS_2S" }
             check(value(exact, "startSample") == value(context, "startSample"))
-            check(checkNotNull(value(context, "endSample")).toLong() - checkNotNull(value(exact, "endSample")).toLong() == 32000L)
-            if (value(context, "available") == "true" && value(exact, "status") == "FILTERED") {
+            val exactStart=checkNotNull(value(exact,"startSample")).toLong()
+            val exactEnd=checkNotNull(value(exact,"endSample")).toLong()
+            check(checkNotNull(value(context,"endSample")).toLong()==
+                (GuardianAsrWindowPolicy.contextEnd(exactStart,exactEnd) ?: (exactEnd+32000L)))
+            if (value(context, "available") == "true" && value(exact, "status") == "FILTERED" &&
+                value(exact,"filteredFireRedAccepted")=="true") {
                 check(value(exact, "diagnosticOfferStatus") == "CONTEXT_PREFERRED") {
                     "The exact window was decoded despite its real context being available"
                 }

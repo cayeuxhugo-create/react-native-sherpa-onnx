@@ -1,0 +1,122 @@
+{
+  "version": "guardian-voice-v3.5.3-adaptive-candidate",
+  "baseCommit": "18fd88c3d1116d2eb0a627b8e4dd5af7c29b7dd8",
+  "previousDeliveryCommit": "ee9ce0af4e3abb005fa0ebcdaa48ae0535c1f208",
+  "validation": {
+    "hostSuitePassed": true,
+    "adaptivePolicyCases": 25,
+    "referenceCalibrationGroups": 9,
+    "adapterApiCompilationPassed": true,
+    "nativeCandidatePipelinePassed": true,
+    "nativeSafetyScenarios": 10,
+    "nativeExpectedFinalCounts": [
+      3,
+      3,
+      3,
+      3,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "nativeSyntheticNoiseSeconds": 248,
+    "nativeContinuedCapturesUseSyntheticSilence": true,
+    "exportedAsrWindowIdentityChecks": 14,
+    "finalCandidateNativeReplaysPassed": true,
+    "referenceCallbacksAndOriginalPcmUnchanged": true,
+    "referenceCappedContextAndCloseFallbackPassed": true,
+    "collectorScenariosPassed": 6,
+    "collectorFourChannelRoutePassed": true,
+    "realQwenCpuComparisonOffers": 144,
+    "realQwenCpuAdditionalOffers": 54,
+    "realQwenCpuCandidateOffers": 6,
+    "realQwenCpuActualDecodes": 130,
+    "identicalPcmOffersCanReuseDecode": true,
+    "realQwenCandidatePcmMatchesNativeInputs": true
+  },
+  "recognition": {
+    "references": "USER_PROVIDED_PROTOCOL; 5m same-phrase assumption without independent annotation",
+    "baselinePrimaryCounts": [
+      1,
+      3
+    ],
+    "candidatePrimaryCounts": [
+      3,
+      3
+    ],
+    "baselineExactPhrases": [
+      0,
+      2
+    ],
+    "candidateExactPhrases": [
+      3,
+      2
+    ],
+    "candidateWordErrors": [
+      0,
+      1
+    ],
+    "candidateReferenceWordCounts": [
+      22,
+      22
+    ],
+    "candidateExtraDecodedWindows": 0,
+    "realQwenCpuValidated": true,
+    "previouslyRejectedSpeechRecoveredOn3mCapture": true,
+    "lexicalSubstitutionOn5mCaptureFixed": false
+  },
+  "configuration": {
+    "normalMode": "ORIGINAL",
+    "testMode": "ADAPTIVE_CANDIDATE",
+    "asrMaximumGain": 1,
+    "intermediateMixPromoted": false,
+    "filteredRescueRequiresCleanCalibrationAndBothNativeGates": true,
+    "legacyReferenceStudyRole": "SHADOW_NO_ALERT",
+    "maxAsrSamples": 128000,
+    "realLookaheadSamples": 800,
+    "medianTransientEnergyRatio": 4,
+    "minimumCalibrationFrames": 63,
+    "speechCalibrationGuardSamples": 4000
+  },
+  "model": {
+    "variant": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25",
+    "runtime": "sherpa-onnx 1.13.8 CPU",
+    "officialArchiveSha256": "393f8a14e2f5fb96746aaab342997a40641001fbd5bf9592a080a8329178ee96",
+    "files": {
+      "conv_frontend.onnx": "d22dc4423e0940e49884e903d2ea2f7e5567c14fc1aed97e4e26d6b8f208ef9e",
+      "decoder.int8.onnx": "4f6885be5959ae26af3089d38ee7972c5fafbeeb1cf8d5e76eab6d8b61ca5771",
+      "encoder.int8.onnx": "60748d3e6744a57c9c91e1b17424a6c2990567e8adceb0783940c03ed98fa9d9",
+      "tokenizer/merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "tokenizer/tokenizer_config.json": "4942d005604266809309cabc9f4e9cb89ce855d59b14681fdc0e1cc62ea26c4c",
+      "tokenizer/vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    },
+    "configuration": {
+      "num_threads": 1,
+      "sample_rate": 16000,
+      "feature_dim": 128,
+      "max_total_len": 512,
+      "max_new_tokens": 256,
+      "temperature": 1e-06,
+      "top_p": 0.8,
+      "seed": 42,
+      "provider": "cpu"
+    },
+    "forcedLanguage": "French"
+  },
+  "limitations": {
+    "fullAndroidApkBuilt": false,
+    "phoneRuntimeValidated": false,
+    "phoneLatencyMeasured": false,
+    "customAndroidAarByteParityVerified": false,
+    "generalNoiseRejectionProven": false,
+    "promotedToDefault": false,
+    "globalBestMicrophoneVerified": false
+  },
+  "privacy": {
+    "privateAudioOrRecognitionTextsIncluded": false,
+    "remotePublicationPerformed": false,
+    "mainModified": false
+  }
+}

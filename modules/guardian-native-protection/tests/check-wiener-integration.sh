@@ -41,6 +41,8 @@ sources=(
   "$source_dir/GuardianFireRedStreaming.kt"
   "$source_dir/GuardianFireRedConfirmation.kt"
   "$source_dir/GuardianFireRedPolicy.kt"
+  "$source_dir/GuardianAsrWindowPolicy.kt"
+  "$source_dir/GuardianCalibratedReferenceView.kt"
   "$source_dir/GuardianReferenceNoiseEnhancer.kt"
   "$source_dir/GuardianReferenceNoiseStudy.kt"
   "$source_dir/GuardianFsmnConfirmation.kt"

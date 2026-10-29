@@ -1306,10 +1306,11 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val diagnosticWavDirectory = diagnosticOptions.wavDirectory
     val processingMode = if (diagnosticWavDirectory != null) runCatching {
       File(applicationContext.filesDir, "guardian-voice-processing.txt").readText().trim()
-        .takeIf { it in setOf("CANDIDATE", "CANDIDATE_GAIN2", "CANDIDATE_GAIN4", "CONTINUOUS_STUDY", "CONTINUOUS_QUALITY_STUDY", "WIENER_STUDY", "REFERENCE_NOISE_STUDY") }
+        .takeIf { it in setOf("CANDIDATE", "CANDIDATE_GAIN2", "CANDIDATE_GAIN4", "ADAPTIVE_CANDIDATE", "CONTINUOUS_STUDY", "CONTINUOUS_QUALITY_STUDY", "WIENER_STUDY", "REFERENCE_NOISE_STUDY") }
     }.getOrNull() ?: "ORIGINAL" else "ORIGINAL"
     val wienerStudy = processingMode == "WIENER_STUDY"
     val referenceNoiseStudy = processingMode == "REFERENCE_NOISE_STUDY"
+    val adaptiveTranscription = processingMode == "ADAPTIVE_CANDIDATE"
     val continuousStudy = processingMode.startsWith("CONTINUOUS_") || wienerStudy
     val qualityStudy = processingMode == "CONTINUOUS_QUALITY_STUDY"
     val speechGainCandidate = processingMode != "ORIGINAL"
@@ -1321,7 +1322,10 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.5.2-microphone-selection",
+      "engineRevision" to "guardian-voice-v3.5.3-adaptive-candidate",
+      "adaptiveTranscription" to adaptiveTranscription,
+      "adaptiveCalibration" to if(adaptiveTranscription) "ROBUST_PREFIX_TRANSIENT_AND_VAD_EXCLUSION" else "DISABLED",
+      "adaptiveAsrPolicy" to if(adaptiveTranscription) "CLEAN_CALIBRATION_DUAL_NEURAL_CANDIDATE" else "DISABLED",
       "fsmnConfirmationRequired" to true,
       "fsmnModel" to GuardianFsmnConfirmation.MODEL_ID,
       "fsmnExecutionBackend" to GuardianFsmnConfirmation.EXECUTION_BACKEND,
@@ -2271,6 +2275,7 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
         studyModel = if(wienerStudy) "WIENER_DD_ADAPTIVE" else "GTCRN",
         requireFsmnConfirmation = true,
         referenceNoiseStudy = referenceNoiseStudy,
+        adaptiveTranscription = adaptiveTranscription,
         listener = object : GuardianQwenPrimaryAudioProcessor.Listener {
             override fun onSpeechStarted() {
                 if (isCurrentVoiceSession()) asrListener.onSpeechStarted()
