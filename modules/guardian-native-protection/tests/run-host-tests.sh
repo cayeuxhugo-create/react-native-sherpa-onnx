@@ -28,6 +28,7 @@ sources=(
   "$source_dir/GuardianStudyBuffer.kt"
   "$module_dir/tests/host/ContinuousStudyTest.kt"
   "$source_dir/GuardianChannelQualityScores.kt"
+  "$module_dir/tests/host/MicrophoneSelectionTest.kt"
   "$source_dir/GuardianSpeechSegmentGain.kt"
   "$source_dir/GuardianSpatialAudio.kt"
   "$source_dir/GuardianFireRedPolicy.kt"
@@ -75,3 +76,4 @@ java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativepr
 
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.ReferenceNoiseEnhancerTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.SpeechSegmenterContinuityTest
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.MicrophoneSelectionTest

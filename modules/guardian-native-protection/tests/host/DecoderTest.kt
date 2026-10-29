@@ -155,8 +155,8 @@ private fun diagnosticSchedulerTests(): Int {
         val result = Results(); val decoder = GuardianQwenProgressiveDecoder(qwen, result, diagnostics = diag)
         try {
             check(decoder.offerDiagnostic(1, FloatArray(16000), "OLD_INFLIGHT")); await(entered)
-            check(decoder.offerDiagnostic(2, FloatArray(16000), "OLD_QUEUED_0"))
-            check(decoder.offerDiagnostic(2, FloatArray(16000), "OLD_QUEUED_1"))
+            check(decoder.offerDiagnostic(2, FloatArray(16000) { .1f }, "OLD_QUEUED_0"))
+            check(decoder.offerDiagnostic(2, FloatArray(16000) { .2f }, "OLD_QUEUED_1"))
             decoder.reset()
             check(decoder.pendingDiagnosticCount() == 0)
             check(decoder.offerDiagnostic(3, FloatArray(16000), "NEW"))
@@ -179,8 +179,8 @@ private fun diagnosticSchedulerTests(): Int {
         val result = Results(); val decoder = GuardianQwenProgressiveDecoder(qwen, result, diagnostics = diag)
         try {
             check(decoder.offerDiagnostic(1, FloatArray(16000), "INFLIGHT")); await(entered)
-            check(decoder.offerDiagnostic(2, FloatArray(16000), "QUEUED_0"))
-            check(decoder.offerDiagnostic(2, FloatArray(16000), "QUEUED_1"))
+            check(decoder.offerDiagnostic(2, FloatArray(16000) { .1f }, "QUEUED_0"))
+            check(decoder.offerDiagnostic(2, FloatArray(16000) { .2f }, "QUEUED_1"))
             decoder.close()
             check(decoder.offerDiagnosticStatus(3, FloatArray(16000), "CLOSED") ==
                 GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.CLOSED)
@@ -210,14 +210,45 @@ private fun diagnosticSchedulerTests(): Int {
             check(decoder.offerDiagnosticStatus(0, FloatArray(16000), "SEGMENT") == GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.INVALID_SEGMENT)
             check(decoder.offerDiagnosticStatus(1, FloatArray(16000), " ") == GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.INVALID_LANE)
             check(decoder.offerDiagnostic(1, FloatArray(16000), "EMPTY_TEXT")); await(entered)
-            check(decoder.offerDiagnostic(2, FloatArray(16000), "FAILED"))
-            check(decoder.offerDiagnostic(3, FloatArray(16000), "DECODED"))
+            check(decoder.offerDiagnostic(2, FloatArray(16000) { .1f }, "FAILED"))
+            check(decoder.offerDiagnostic(3, FloatArray(16000) { .2f }, "DECODED"))
             allow.countDown(); await(done)
             val lines = resultLines(events)
             check(lines.any { it.contains("\"status\":\"EMPTY\"") && it.contains("EMPTY_TEXT") })
             check(lines.any { it.contains("\"status\":\"FAILED\"") && it.contains("DECODE_FAILED") })
             check(lines.any { it.contains("\"status\":\"DECODED\"") && it.contains("DIAGNOSTIC_ONLY") })
             check(calls.get() == 3 && result.finals.isEmpty() && result.partials.isEmpty())
+        } finally { allow.countDown(); decoder.close(); await(qwen.released) }
+    }
+
+    scenario("identical diagnostic PCM is deduplicated across candidate IDs and reset permits a fresh decode") {
+        val entered = CountDownLatch(1); val allow = CountDownLatch(1); val done = CountDownLatch(2)
+        val firstCompleted = CountDownLatch(1)
+        val events = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val diag = GuardianVoiceDiagnostics(true, output={ line ->
+            events.add(line)
+            if (line.contains("\"event\":\"STUDY_QWEN_RESULT\"")) { firstCompleted.countDown(); done.countDown() }
+        })
+        val calls = java.util.concurrent.atomic.AtomicInteger()
+        val qwen = GuardianQwenRescueRecognizer {
+            calls.incrementAndGet(); entered.countDown(); await(allow)
+            GuardianQwenRescueRecognizer.Result("DIAGNOSTIC_ONLY")
+        }
+        val result = Results(); val decoder = GuardianQwenProgressiveDecoder(qwen, result, diagnostics=diag)
+        val pcm = FloatArray(16000) { .01f }
+        try {
+            check(decoder.offerDiagnostic(2, pcm, "PRIMARY_EXACT")); await(entered)
+            check(decoder.offerDiagnosticStatus(1000000001, pcm.copyOf(), "FILTERED_EXACT") ==
+                GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.DUPLICATE_PCM)
+            check(decoder.pendingDiagnosticCount() == 0)
+            allow.countDown(); await(firstCompleted)
+            check(decoder.offerDiagnosticStatus(9, pcm, "COMPLETED_COPY") == GuardianQwenProgressiveDecoder.DiagnosticOfferStatus.DUPLICATE_PCM)
+            check(events.any { it.contains("DUPLICATE_PCM") && it.contains("\"duplicateOfSegment\":2") })
+            decoder.reset()
+            check(decoder.offerDiagnostic(10, pcm, "NEW_GENERATION"))
+            await(done)
+            check(calls.get() == 2)
+            check(result.finals.isEmpty() && result.partials.isEmpty())
         } finally { allow.countDown(); decoder.close(); await(qwen.released) }
     }
 

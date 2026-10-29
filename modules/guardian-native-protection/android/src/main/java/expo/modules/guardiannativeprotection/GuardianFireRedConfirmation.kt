@@ -6,7 +6,8 @@ import java.security.MessageDigest
  * Original Qwen PCM is never modified. Native NCNN is statically linked into a
  * distinct library and does not replace Sherpa/Qwen's ONNX Runtime. */
 internal class GuardianFireRedConfirmation private constructor(private var handle: Long) : AutoCloseable {
-    data class Result(val decision: GuardianFireRedPolicy.Decision, val elapsedMs: Long)
+    data class Result(val decision: GuardianFireRedPolicy.Decision, val elapsedMs: Long,
+        val speechSupport: BooleanArray = booleanArrayOf())
 
     fun confirm(original: FloatArray): Result {
         check(handle != 0L) { "FireRed closed" }
@@ -15,7 +16,8 @@ internal class GuardianFireRedConfirmation private constructor(private var handl
         val copy = GuardianNeuralInputGain.forVad(original, GuardianFireRedPolicy.MAX_INPUT_GAIN)
         val probabilities = GuardianFireRedNative.infer(handle, copy)
         check(probabilities.size == 1 + (copy.size - 400) / 160) { "FireRed output length invalid" }
-        return Result(GuardianFireRedPolicy.evaluate(probabilities), (System.nanoTime() - started) / 1_000_000)
+        return Result(GuardianFireRedPolicy.evaluate(probabilities), (System.nanoTime() - started) / 1_000_000,
+            GuardianFireRedPolicy.speechSupport(probabilities))
     }
 
     override fun close() {

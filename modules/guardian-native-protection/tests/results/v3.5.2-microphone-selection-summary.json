@@ -1,0 +1,40 @@
+{
+  "version": "guardian-voice-v3.5.2-microphone-selection",
+  "baseCommit": "18fd88c3d1116d2eb0a627b8e4dd5af7c29b7dd8",
+  "validation": {
+    "hostSuitePassed": true,
+    "coreGroups": 20,
+    "fireRedPolicyChecks": 9,
+    "decoderConcurrencyScenarios": 12,
+    "microphoneSelectionCases": 10,
+    "segmenterContinuityCases": 30,
+    "captureApiCompilationPassed": true,
+    "adapterApiCompilationPassed": true,
+    "collectorScenariosPassed": 7,
+    "nativeSourceRoutingPassed": true,
+    "fullPrivateCaptureReplays": 2,
+    "expectedPrimaryFinalCounts": [
+      1,
+      3
+    ],
+    "extraPrimaryFinals": 0,
+    "selectedMicrophonePcmExact": true,
+    "controlledAlternateMicrophoneSwitchPassed": true,
+    "nativeMicrophoneWindowComparisons": 38
+  },
+  "limitations": {
+    "fullAndroidApkBuilt": false,
+    "newQwenTranscriptionsValidated": false,
+    "deviceTestPerformed": false,
+    "filteredRecoveryPromoted": false,
+    "recognitionOfPreviouslyRejectedSpeechFixed": false,
+    "lexicalSubstitutionsFixed": false
+  },
+  "implementation": {
+    "nativeAssetsUnchanged": true,
+    "originalAdmissionVetoPreserved": true,
+    "exactDiagnosticPcmDeduplicated": true,
+    "mainUnchanged": true,
+    "privateAudioOrTranscriptsIncluded": false
+  }
+}

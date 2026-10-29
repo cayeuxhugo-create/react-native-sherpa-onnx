@@ -35,6 +35,7 @@ sources=(
   "$source_dir/GuardianCaptureChannelFrame.kt"
   "$source_dir/GuardianChannelPreprocessor.kt"
   "$source_dir/GuardianChannelWindowHistory.kt"
+  "$source_dir/GuardianChannelQualityScores.kt"
   "$source_dir/GuardianAdaptiveChannels.kt"
   "$source_dir/GuardianStudyBuffer.kt"
   "$source_dir/GuardianFireRedStreaming.kt"

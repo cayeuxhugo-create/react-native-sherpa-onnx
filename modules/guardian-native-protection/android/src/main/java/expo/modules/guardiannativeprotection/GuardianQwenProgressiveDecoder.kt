@@ -51,7 +51,7 @@ class GuardianQwenProgressiveDecoder(
     }
 
     internal enum class DiagnosticOfferStatus {
-        QUEUED, QUEUE_FULL, CLOSED, EMPTY_PCM, INVALID_LENGTH, INVALID_PCM, INVALID_SEGMENT, INVALID_LANE
+        QUEUED, DUPLICATE_PCM, QUEUE_FULL, CLOSED, EMPTY_PCM, INVALID_LENGTH, INVALID_PCM, INVALID_SEGMENT, INVALID_LANE
     }
 
     /** Physical-channel fairness, independent of candidate IDs or unsuccessful offers. */
@@ -102,9 +102,12 @@ class GuardianQwenProgressiveDecoder(
         val generation: Long,
         val queuedAtMs: Long = SystemClock.elapsedRealtime(),
         val diagnosticLane: String? = null,
+        val diagnosticFingerprint: String? = null,
     )
 
     private val lock = Any()
+    // Bounded, generation-local identities. Text equality is never audio equality.
+    private val diagnosticInputs = LinkedHashMap<String, Pair<Long, String>>()
     private val closed = AtomicBoolean(false)
     private val worker = Executors.newSingleThreadExecutor { job ->
         Thread(job, "Guardian-Qwen-Primary").apply {
@@ -206,6 +209,10 @@ class GuardianQwenProgressiveDecoder(
 
     internal fun offerDiagnosticStatus(segmentId: Long, pcm: FloatArray, lane: String): DiagnosticOfferStatus =
         synchronized(lock) {
+            val fingerprint = if (pcm.isNotEmpty() && validLength(pcm, true) && pcm.all { it.isFinite() }) {
+                GuardianPcmIdentity.sha256(pcm)
+            } else null
+            val duplicate = fingerprint?.let { diagnosticInputs[it] }
             val status = when {
                 closed.get() -> DiagnosticOfferStatus.CLOSED
                 segmentId <= 0L -> DiagnosticOfferStatus.INVALID_SEGMENT
@@ -213,16 +220,21 @@ class GuardianQwenProgressiveDecoder(
                 pcm.isEmpty() -> DiagnosticOfferStatus.EMPTY_PCM
                 !validLength(pcm, true) -> DiagnosticOfferStatus.INVALID_LENGTH
                 pcm.any { !it.isFinite() } -> DiagnosticOfferStatus.INVALID_PCM
+                duplicate != null -> DiagnosticOfferStatus.DUPLICATE_PCM
                 pendingDiagnostics.size >= MAX_PENDING_DIAGNOSTICS -> DiagnosticOfferStatus.QUEUE_FULL
                 else -> DiagnosticOfferStatus.QUEUED
             }
             if (status == DiagnosticOfferStatus.QUEUED) {
+                diagnosticInputs[checkNotNull(fingerprint)] = segmentId to lane
+                while (diagnosticInputs.size > 32) diagnosticInputs.remove(diagnosticInputs.keys.first())
                 pendingDiagnostics.addLast(Job(segmentId, 0, pcm.copyOf(), true, null,
-                    AcousticEvidence.NEURAL_CONFIRMED, generation, diagnosticLane = lane))
+                    AcousticEvidence.NEURAL_CONFIRMED, generation, diagnosticLane = lane, diagnosticFingerprint = fingerprint))
                 scheduleLocked()
             }
             diagnostics?.event("STUDY_QWEN_OFFER", "segment" to segmentId, "lane" to lane,
                 "accepted" to (status == DiagnosticOfferStatus.QUEUED), "status" to status.name,
+                "duplicateOfSegment" to if (status == DiagnosticOfferStatus.DUPLICATE_PCM) duplicate?.first else null,
+                "duplicateOfLane" to if (status == DiagnosticOfferStatus.DUPLICATE_PCM) duplicate?.second else null,
                 "pendingDiagnostics" to pendingDiagnostics.size,
                 "maxPendingDiagnostics" to MAX_PENDING_DIAGNOSTICS, "role" to "SHADOW_NO_ALERT")
             status
@@ -297,6 +309,7 @@ class GuardianQwenProgressiveDecoder(
                         result.text.isBlank() -> "EMPTY_TEXT"
                         else -> null
                     }
+                    if (result == null && job.generation == generation) job.diagnosticFingerprint?.let { diagnosticInputs.remove(it) }
                     diagnostics?.event("STUDY_QWEN_RESULT",
                         "eligible" to eligible, "status" to status, "reason" to reason, "started" to true,
                         "segment" to job.segmentId, "lane" to job.diagnosticLane,
@@ -419,6 +432,7 @@ class GuardianQwenProgressiveDecoder(
     fun reset() {
         synchronized(lock) {
             generation++
+            diagnosticInputs.clear()
             diagnostics?.event("QWEN_RESET", "generation" to generation)
             pendingFinals.clear()
             pendingPartial = null
@@ -437,6 +451,7 @@ class GuardianQwenProgressiveDecoder(
     fun close() {
         if (!closed.compareAndSet(false, true)) return
         synchronized(lock) {
+            diagnosticInputs.clear()
             pendingFinals.clear()
             pendingPartial = null
             dropPendingDiagnosticsLocked("DECODER_CLOSED")

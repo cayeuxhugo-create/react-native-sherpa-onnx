@@ -237,8 +237,8 @@ internal class GuardianReferenceNoiseStudy(
                 }
                 val offerReason = offer?.name ?: when {
                     !ready -> "NOT_READY"
-                    contextPreferred -> "CONTEXT_PREFERRED"
                     fire?.decision?.accepted != true -> "FIRERED_REJECT"
+                    contextPreferred -> "CONTEXT_PREFERRED"
                     filteredOffers >= 16 -> "FILTERED_OFFER_LIMIT"
                     else -> "NOT_OFFERED"
                 }
@@ -250,12 +250,15 @@ internal class GuardianReferenceNoiseStudy(
                     "shortReady" to epoch.short.calibrationReady, "longReady" to epoch.long.calibrationReady,
                     "shortSpeechObservedDuringProfile" to epoch.short.observedSpeechDuringProfile,
                     "longSpeechObservedDuringProfile" to epoch.long.observedSpeechDuringProfile,
+                    "calibrationQualified" to (ready && !epoch.long.observedSpeechDuringProfile),
                     "calibrationAssumption" to "PROTOCOL_NO_SPEECH_PREFIX_UNVERIFIED",
                     "filteredFireRedAccepted" to fire?.decision?.accepted,
                     "filteredFireRedPeak" to fire?.decision?.peakProbability,
+                    "filteredFireRedLongestPositiveFrames" to fire?.decision?.longestPositiveFrames,
                     "filteredFsmnAccepted" to fsmn?.decision?.accepted,
                     "filteredFsmnSpeechFrames" to fsmn?.decision?.speechFrames,
                     "filteredCombinedAccepted" to if(ready) fire!!.decision.accepted && fsmn!!.decision.accepted else null,
+                    "confirmationMeaning" to "SPEECH_PRESENCE_ONLY_NOT_TEXT_ACCURACY_OR_PRODUCTION_ADMISSION",
                     "diagnosticLane" to lane, "diagnosticOfferStatus" to offerReason,
                     "diagnosticForced" to true, "productionEligible" to false, "role" to "SHADOW_NO_ALERT")
             }

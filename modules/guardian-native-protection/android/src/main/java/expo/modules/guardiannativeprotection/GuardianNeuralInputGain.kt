@@ -1,5 +1,15 @@
 package expo.modules.guardiannativeprotection
 
+/** Identity of the exact float32 waveform, not of its transcription. */
+internal object GuardianPcmIdentity {
+    fun sha256(pcm: FloatArray): String {
+        val bytes = java.nio.ByteBuffer.allocate(pcm.size * 4).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+        pcm.forEach { bytes.putFloat(it) }
+        return java.security.MessageDigest.getInstance("SHA-256").digest(bytes.array())
+            .joinToString("") { "%02x".format(it.toInt() and 255) }
+    }
+}
+
 /** Peak-bounded model conditioning. A gain is never evidence of speech. */
 internal object GuardianNeuralInputGain {
     fun gain(pcm: FloatArray, maximum: Float): Float {

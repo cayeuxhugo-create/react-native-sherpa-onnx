@@ -76,6 +76,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private var previousVad: Boolean? = null
     private val droppedInputTasks = AtomicInteger(0)
     private val channelHistory = GuardianChannelWindowHistory()
+    private var previousAsrChannel: Int? = null
+    private var previousAsrRoute: Long? = null
     private val segmenter = GuardianSpeechSegmenter(object : GuardianSpeechSegmenter.Sink {
         override fun onSpeechStarted() {
             diagnostics?.event("SPEECH_START")
@@ -101,20 +103,15 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 warn("FireRed indisponible : aucune validation pour ce segment")
                 return
             }
-            val coherent = if (validation.decision.accepted) confirmCoherentChannel(id, pcm, endSample, validation)
-                else ChannelAdmission(false, false, "ORIGINAL_FIRERED_REJECT")
-            val priorRejection = when {
-                !validation.decision.accepted -> "SKIPPED_ORIGINAL_REJECT"
-                !coherent.accepted -> "SKIPPED_COHERENT_REJECT"
-                else -> null
-            }
+            val priorRejection = if (!validation.decision.accepted) "SKIPPED_ORIGINAL_REJECT" else null
             val fsmnAdmission = confirmFsmn(id, pcm, priorRejection)
-            val finalAdmission = validation.decision.accepted && coherent.accepted && fsmnAdmission.accepted
+            val coherent = confirmCoherentChannel(id, pcm, endSample, validation, fsmnAdmission)
+            val finalAdmission = coherent.accepted
             val admissionReason = when {
-                !validation.decision.accepted -> "FIRERED_REJECT"
-                !coherent.accepted -> "COHERENT_CHANNEL_REJECT"
-                !fsmnAdmission.accepted -> if (fsmnAdmission.error) "FSMN_ERROR" else "FSMN_REJECT"
-                else -> "NEURAL_CONFIRMED"
+                finalAdmission -> "NEURAL_CONFIRMED"
+                !coherent.required && !validation.decision.accepted -> "FIRERED_REJECT"
+                !coherent.required && !fsmnAdmission.accepted -> if (fsmnAdmission.error) "FSMN_ERROR" else "FSMN_REJECT"
+                else -> coherent.reason
             }
             diagnostics?.event("FIRERED_RESULT", "segment" to id, "model" to GuardianFireRedConfirmation.MODEL_ID,
                 "accepted" to finalAdmission, "originalAccepted" to validation.decision.accepted,
@@ -124,10 +121,12 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "admissionConfirmationMs" to validation.elapsedMs + coherent.elapsedMs + fsmnAdmission.confirmationMs,
                 "channelGateRequired" to coherent.required, "channelGateReason" to coherent.reason,
                 "channelAcceptedIndex" to coherent.channel,
-                "coherentEvaluated" to validation.decision.accepted,
-                "coherentAccepted" to if (validation.decision.accepted) coherent.accepted else null,
+                "coherentEvaluated" to coherent.evaluated,
+                "coherentAccepted" to if (coherent.evaluated) coherent.accepted else null,
                 "fsmnConfirmationRequired" to requireFsmnConfirmation,
-                "fsmnAccepted" to if (requireFsmnConfirmation && priorRejection == null) fsmnAdmission.accepted else null,
+                "fsmnAccepted" to if (requireFsmnConfirmation) coherent.fsmnAccepted else null,
+                "originalFsmnAccepted" to if (requireFsmnConfirmation && priorRejection == null) fsmnAdmission.accepted else null,
+                "asrChannel" to coherent.channel,
                 "admissionReason" to admissionReason,
                 "peakProbability" to validation.decision.peakProbability,
                 "longestPositiveFrames" to validation.decision.longestPositiveFrames,
@@ -145,11 +144,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
                     "admission" to admissionReason)
                 return
             }
-            val segmentGain = if (speechOnlyGain) GuardianSpeechSegmentGain.apply(pcm, confirmed=true, maximumGain=confirmedGainMaximum) else null
-            val asrPcm = segmentGain?.pcm ?: pcm
+            val selectedPcm = coherent.pcm ?: pcm
+            val segmentGain = if (speechOnlyGain) GuardianSpeechSegmentGain.apply(selectedPcm, confirmed=true, maximumGain=confirmedGainMaximum) else null
+            val asrPcm = segmentGain?.pcm ?: selectedPcm
+            diagnostics?.event("ASR_INPUT", "segment" to id, "channel" to coherent.channel,
+                "samples" to asrPcm.size, "sampleRateHz" to 16000,
+                "pcmSha256" to GuardianPcmIdentity.sha256(asrPcm),
+                "source" to if (coherent.channel == null) "PRIMARY_ORIGINAL_PCM" else "SELECTED_COHERENT_ORIGINAL_CHANNEL")
             if (segmentGain != null) diagnostics?.event("SEGMENT_GAIN", "segment" to id,
                 "gain" to segmentGain.gain, "samples" to pcm.size, "evidence" to "NEURAL_CONFIRMED",
-                "inputRmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(pcm)))
+                "inputRmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(selectedPcm)))
             val evidence = GuardianQwenProgressiveDecoder.AcousticEvidence.NEURAL_CONFIRMED
             val accepted = if (final) {
                 decoder.offerFinal(id, asrPcm, reason, evidence)
@@ -160,6 +164,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "reason" to reason, "samples" to pcm.size,
                 "audioMs" to pcm.size.toLong() * 1000 / 16000,
                 "rmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(pcm)),
+                "asrChannel" to coherent.channel,
+                "asrRmsDbfs" to GuardianVoiceDiagnostics.dbfs(GuardianVoiceDiagnostics.rms(asrPcm)),
                 "accepted" to accepted)
             if (!accepted && final) warn("Fenêtre Qwen finale refusée : segment=$id")
         }
@@ -351,57 +357,105 @@ internal class GuardianQwenPrimaryAudioProcessor(
         streamingVad.reset()
         segmenter.reset()
         channelHistory.reset()
+        previousAsrChannel = null
+        previousAsrRoute = null
     }
 
     private data class ChannelAdmission(val accepted: Boolean, val required: Boolean, val reason: String,
-        val channel: Int? = null, val elapsedMs: Long = 0L)
+        val channel: Int? = null, val elapsedMs: Long = 0L, val pcm: FloatArray? = null,
+        val fsmnAccepted: Boolean? = null, val evaluated: Boolean = false)
 
     private fun confirmCoherentChannel(segment: Long, original: FloatArray, endSample: Long,
-        originalResult: GuardianFireRedConfirmation.Result): ChannelAdmission {
+        originalResult: GuardianFireRedConfirmation.Result, originalFsmn: FsmnAdmission): ChannelAdmission {
+        val selectionStarted = SystemClock.elapsedRealtime()
         val window = channelHistory.window(endSample, original.size)
+        if (window.routeRevision != previousAsrRoute) {
+            previousAsrChannel = null
+            previousAsrRoute = window.routeRevision
+        }
         var attempted = 0
         var elapsedMs = 0L
-        fun result(accepted: Boolean, reason: String, channel: Int? = null): ChannelAdmission {
+        fun result(accepted: Boolean, reason: String, channel: Int? = null,
+            pcm: FloatArray? = null, fsmnAccepted: Boolean? = null): ChannelAdmission {
+            val gateMs = SystemClock.elapsedRealtime() - selectionStarted
             diagnostics?.event("CHANNEL_COHERENCE_RESULT", "segment" to segment,
                 "accepted" to accepted, "required" to window.required, "reason" to reason,
                 "startSample" to endSample-original.size, "endSample" to endSample,
                 "routeRevision" to window.routeRevision, "openedChannels" to window.openedChannels,
                 "candidateChannels" to window.channels.map { it.index }, "attemptedChannels" to attempted,
-                "acceptedChannel" to channel, "coherentGateMs" to elapsedMs,
-                "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL", "asrSource" to "UNCHANGED_PRIMARY_PCM")
-            return ChannelAdmission(accepted, window.required, reason, channel, elapsedMs)
+                "acceptedChannel" to channel, "asrChannel" to channel, "coherentGateMs" to gateMs,
+                "nativeChannelConfirmationMs" to elapsedMs,
+                "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL",
+                "asrSource" to if (channel == null) "PRIMARY_ORIGINAL_PCM" else "SELECTED_COHERENT_ORIGINAL_CHANNEL")
+            return ChannelAdmission(accepted, window.required, reason, channel, gateMs, pcm, fsmnAccepted, attempted > 0)
         }
         if (!window.valid) return result(false, window.reason)
-        if (!window.required) return result(true, window.reason)
-        for (channel in window.channels) {
+        if (!window.required) return result(originalResult.decision.accepted && originalFsmn.accepted,
+            window.reason, pcm=original, fsmnAccepted=originalFsmn.accepted)
+        // A different microphone must not override an explicit original rejection.
+        // The 5 m recording contains exactly this counterexample: the alternate
+        // mic passes both models on a disturbance rejected by original FSMN.
+        if (!originalResult.decision.accepted) return result(false, "FIRERED_REJECT")
+        if (!originalFsmn.accepted) return result(false,
+            if (originalFsmn.error) "FSMN_ERROR" else "FSMN_REJECT", fsmnAccepted=false)
+        val candidates = window.channels.map { channel ->
             attempted++
             val reused = channel.pcm.contentEquals(original)
-            val peak = channel.pcm.maxOf { kotlin.math.abs(it) }
-            val gain = GuardianNeuralInputGain.gain(channel.pcm, GuardianFireRedPolicy.MAX_INPUT_GAIN)
             val confirmation = try {
-                if (reused) originalResult else fireRed.confirm(channel.pcm)
+                if (reused) originalResult else fireRed.confirm(channel.pcm).also { elapsedMs += it.elapsedMs }
             } catch (error: Throwable) {
                 diagnostics?.event("FIRERED_CHANNEL_RESULT", "segment" to segment, "channel" to channel.index,
-                    "accepted" to false, "reason" to "CONFIRMATION_ERROR", "error" to error.javaClass.simpleName,
-                    "inputPeak" to peak, "inputGain" to gain, "conditionedPeak" to peak*gain,
-                    "routeRevision" to window.routeRevision, "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL")
-                continue
+                    "accepted" to false, "reason" to "CONFIRMATION_ERROR", "error" to error.javaClass.simpleName)
+                return@map GuardianMicrophoneSelection.Candidate(channel.index, channel.pcm, false,
+                    BooleanArray(1 + (original.size - 400) / 160), channel.contributedSamples)
             }
-            if (!reused) elapsedMs += confirmation.elapsedMs
+            val fsmnAccepted = when {
+                !confirmation.decision.accepted -> false
+                !requireFsmnConfirmation -> true
+                reused -> originalFsmn.accepted
+                else -> try {
+                    val checked = checkNotNull(fsmn).confirm(channel.pcm)
+                    elapsedMs += checked.confirmationMs
+                    diagnostics?.event("FSMN_CHANNEL_RESULT", "segment" to segment, "channel" to channel.index,
+                        "evaluated" to true, "accepted" to checked.decision.accepted,
+                        "speechFrames" to checked.decision.speechFrames, "detectedSegments" to checked.decision.detectedSegments,
+                        "inputGain" to checked.inputGain, "confirmationMs" to checked.confirmationMs)
+                    checked.decision.accepted
+                } catch (error: Throwable) {
+                    diagnostics?.event("FSMN_CHANNEL_RESULT", "segment" to segment, "channel" to channel.index,
+                        "evaluated" to true, "accepted" to false, "error" to error.javaClass.simpleName)
+                    false
+                }
+            }
             diagnostics?.event("FIRERED_CHANNEL_RESULT", "segment" to segment, "channel" to channel.index,
-                "accepted" to confirmation.decision.accepted,
-                "reason" to if (reused) "IDENTICAL_PRIMARY_PCM" else "COHERENT_ORIGINAL_CHANNEL",
-                "reusedOriginalDecision" to reused,
-                "peakProbability" to confirmation.decision.peakProbability,
+                "accepted" to confirmation.decision.accepted, "fsmnAccepted" to fsmnAccepted,
+                "reusedOriginalDecision" to reused, "peakProbability" to confirmation.decision.peakProbability,
                 "longestPositiveFrames" to confirmation.decision.longestPositiveFrames,
-                "confirmationMs" to if (reused) 0L else confirmation.elapsedMs,
-                "inputPeak" to peak, "inputGain" to gain, "conditionedPeak" to peak*gain,
                 "contributedSamples" to channel.contributedSamples, "usableSamples" to channel.usableSamples,
                 "startSample" to endSample-original.size, "endSample" to endSample,
                 "routeRevision" to window.routeRevision, "source" to "CONTINUOUS_HP_ORIGINAL_CHANNEL")
-            if (confirmation.decision.accepted) return result(true, "COHERENT_CHANNEL_CONFIRMED", channel.index)
+            GuardianMicrophoneSelection.Candidate(channel.index, channel.pcm,
+                confirmation.decision.accepted && fsmnAccepted, confirmation.speechSupport, channel.contributedSamples)
         }
-        return result(false, "NO_COHERENT_CHANNEL_CONFIRMED")
+        val selected = GuardianMicrophoneSelection.select(candidates, previousAsrChannel)
+            ?: return result(false, "NO_NEURALLY_CONFIRMED_MICROPHONE", fsmnAccepted=false)
+        for (candidate in candidates) {
+            val quality = selected.qualities.getValue(candidate.index)
+            diagnostics?.event("ASR_MICROPHONE_QUALITY", "segment" to segment, "channel" to candidate.index,
+                "confirmed" to candidate.confirmed, "contrastDb" to quality.contrastDb,
+                "clippedFraction" to quality.clippedFraction, "selected" to (candidate.index == selected.candidate.index),
+                "routeRevision" to window.routeRevision)
+        }
+        previousAsrChannel = selected.candidate.index
+        diagnostics?.event("ASR_MICROPHONE_SELECTION", "segment" to segment,
+            "routeRevision" to window.routeRevision, "selectedChannel" to selected.candidate.index,
+            "reason" to selected.reason, "comparedChannels" to candidates.map { it.index },
+            "confirmedChannels" to candidates.filter { it.confirmed }.map { it.index },
+            "contrastDb" to candidates.map { selected.qualities.getValue(it.index).contrastDb },
+            "clippedFraction" to candidates.map { selected.qualities.getValue(it.index).clippedFraction },
+            "startSample" to endSample-original.size, "endSample" to endSample,
+            "scope" to "WHOLE_UTTERANCE_SPEECH_BAND_CONTRAST_NOT_ASR_ACCURACY")
+        return result(true, "COHERENT_CHANNEL_CONFIRMED", selected.candidate.index, selected.candidate.pcm, true)
     }
 
     private data class FsmnAdmission(val accepted: Boolean, val confirmationMs: Long = 0L, val error: Boolean = false)

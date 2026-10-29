@@ -10,6 +10,17 @@ internal object GuardianFireRedPolicy {
     const val MAX_INPUT_GAIN = 64f
     const val MIN_SPEECH_FRAMES = 20
     const val SMOOTH_FRAMES = 5
+
+    /** Same smoothing as admission; support is used only to compare microphones. */
+    fun speechSupport(probabilities: FloatArray): BooleanArray {
+        require(probabilities.all { it.isFinite() && it in 0f..1f })
+        var sum = 0.0
+        return BooleanArray(probabilities.size) { i ->
+            sum += probabilities[i]
+            if (i >= SMOOTH_FRAMES) sum -= probabilities[i - SMOOTH_FRAMES]
+            sum / minOf(i + 1, SMOOTH_FRAMES) >= THRESHOLD
+        }
+    }
     data class Decision(val accepted: Boolean, val peakProbability: Float,
                         val longestPositiveFrames: Int)
 
