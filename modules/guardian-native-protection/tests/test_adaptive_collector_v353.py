@@ -17,6 +17,8 @@ source = source.replace("if event=='SESSION_START':\n  kw.update(",
 source = source.replace("!='REFERENCE_NOISE_STUDY':", " not in ['REFERENCE_NOISE_STUDY','ADAPTIVE_CANDIDATE']:")
 source = source.replace("channels=1 if mode=='mono' else 2", "channels=1 if mode=='mono' else 4 if mode=='four-channels' else 2")
 source = source.replace("for channel in range(2):", "for channel in range(4 if mode=='four-channels' else 2):")
+source = source.replace('w.writeframes(bytes(range(256))*500)',
+                        "w.writeframes(b'' if mode=='legacy-empty' else bytes(range(256))*500)")
 needle = "  if mode=='missing-file':"
 assert needle in source
 source = source.replace(needle, """  relative='adaptive-asr/abc12345/segment-1/'+prefix
@@ -36,13 +38,19 @@ source = source.replace(needle, """  relative='adaptive-asr/abc12345/segment-1/'
   if mode=='missing-file':""")
 
 
+source += """
+if a[:2]==['shell','log'] and a[-1]=='SIMPLE_RECORD_END' and mode=='missing-channel':
+ f('files/guardian-diagnostics/adaptive-channels/abc12345/channel-1/'+prefix+'-raw.f32').unlink()
+"""
+
+
 def main():
     collector = (repo/'enregistrer-guardian-adaptatif.ps1').read_text(encoding='utf-8-sig')
     collector = collector.replace('.AddSeconds(60)', '.AddSeconds(2)').replace('.AddSeconds(15)', '.AddSeconds(2)')
     with tempfile.TemporaryDirectory(prefix='guardian-adaptive-collector-') as tmp:
         tmp = Path(tmp)
         script=tmp/'collector.ps1'; script.write_text(collector,encoding='utf-8-sig')
-        modes=['ok','four-channels','wrong-identity','bad-proof','wrong-engine','mode-off']
+        modes=['ok','four-channels','legacy-empty','missing-channel','wrong-identity','bad-proof','wrong-engine','mode-off']
         for mode in modes:
             case=tmp/mode; (case/'remote/files').mkdir(parents=True);(case/'bin').mkdir()
             project=case/'app with spaces';project.mkdir();(project/'package.json').write_text('{}')
@@ -55,10 +63,10 @@ def main():
             command=[os.environ.get('PWSH','pwsh'),'-NoProfile','-File',str(script),
                 '-ProjectDirectory',str(project),'-PackageName','com.example.test',
                 '-DurationSeconds','1','-TestCase','FREE','-ProcessingMode','ADAPTIVE_CANDIDATE']
-            if mode=='four-channels': command+=['-CaptureRoute','MIC_STEREO_FOCUS']
+            if mode in ['four-channels','legacy-empty']: command+=['-CaptureRoute','MIC_STEREO_FOCUS']
             run=subprocess.run(command,
                 input='synthetic fixture\n\n\n',text=True,capture_output=True,env=env,timeout=60)
-            expected=mode in ['ok','four-channels']
+            expected=mode in ['ok','four-channels','legacy-empty']
             assert (run.returncode==0)==expected, mode+'\n'+run.stdout+run.stderr
             archives=list((project/'diagnostics-voix').glob('*.zip'));assert len(archives)==1
             with zipfile.ZipFile(archives[0]) as z:
@@ -66,6 +74,7 @@ def main():
                 assert metadata['controlsRestored'] and metadata['completed']==expected
                 if expected:
                     assert metadata['adaptiveAsrWindowCount']==1
+                    assert metadata['multimicCaptureFormat']=='PER_CHANNEL_FLOAT32_AND_PCM16'
                     assert metadata['fsmnAdmissionChecks'][0]['consistent']
                     assert len(metadata['adaptiveAdmissions'])==1
                     inputs=metadata['asrInputIdentities'];assert len(inputs)==1
@@ -77,7 +86,7 @@ def main():
             assert previous.read_bytes()==b'ORIGINAL\n'
             assert sorted(p.name for p in (case/'remote/files').glob('guardian-*.txt'))==[previous.name]
             print('PASS adaptive collector',mode,flush=True)
-        print('PASS 6 adaptive collector scenarios',flush=True)
+        print('PASS 8 adaptive collector scenarios',flush=True)
 
 
 if __name__=='__main__':main()

@@ -324,7 +324,7 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ("guardian-simple-"+[Guid]::NewGuid
 $backups = New-Object 'System.Collections.Generic.List[object]'
 $records = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion="adaptive-candidate-3.5.3"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
+    collectorVersion="adaptive-candidate-3.5.3.1"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
     packageName=$PackageName; startUtc=[DateTime]::UtcNow.ToString("o")
     phoneModel=Invoke-SimpleAdb @("shell","getprop","ro.product.model")
     android=Invoke-SimpleAdb @("shell","getprop","ro.build.version.release")
@@ -918,9 +918,14 @@ try {
             $trace = Join-Path $output "adaptive-channels/selection.tsv"
             $metadata["channelTraceFrames"] = @(Import-Csv -LiteralPath $trace -Delimiter "`t").Count
             if ($metadata["channelTraceFrames"] -lt 1) { throw "Trace de selection vide." }
+            $metadata["multimicCollected"] = $true
+            $metadata["multimicCaptureFormat"] = "PER_CHANNEL_FLOAT32_AND_PCM16"
         }
     }
-    if ($CaptureRoute -eq "MIC_STEREO_FOCUS") {
+    # Adaptive capture exports every source separately. Its input loop bypasses
+    # the legacy stereo writer, whose header-only file is not a source recording.
+    # Require legacy stereo only when the verified adaptive exports are absent.
+    if ($CaptureRoute -eq "MIC_STEREO_FOCUS" -and -not $metadata["adaptiveChannelSelection"]) {
         $pattern = 'MULTIMIC DIAGNOSTIC SAVED : path=(/storage/emulated/0/Android/data/' + [regex]::Escape($PackageName) + '/files/guardian-diagnostics/guardian-multimic-[0-9]{13}-VOICE_FOCUS[.]wav),'
         $stereoPaths = @(Get-Content -LiteralPath $logPath -Encoding UTF8 | ForEach-Object { if ($_ -match $pattern) { $Matches[1] } })
         if ($stereoPaths.Count -ne 1) { throw "WAV multicanal finalise absent ou ambigu ; les autres fichiers sont conserves." }
@@ -933,6 +938,7 @@ try {
         if (-not $stereoHeader.valid -or $stereoHeader.channels -ne 2 -or $stereoHeader.sampleRateHz -ne 16000 -or $stereoHeader.durationSeconds -lt ($DurationSeconds-0.1)) { throw "WAV multicanal invalide ou incomplet." }
         $records.Add([pscustomobject]@{file=("multimic/"+$stereoName); header=$stereoHeader; sha256=(Get-FileHash -LiteralPath $stereoLocal -Algorithm SHA256).Hash.ToLowerInvariant()})
         $metadata["multimicCollected"] = $true
+        $metadata["multimicCaptureFormat"] = "LEGACY_STEREO_PCM16"
     }
     $exportErrors = @(Read-DiagnosticEvents | Where-Object { $_.session -eq $session.session -and $_.event -in @("WAV_ERROR","WAV_FINALIZE_ERROR","WAV_INVALID_PCM","GTCRN_COMPARISON_ERROR") })
     if ($exportErrors.Count -gt 0) { throw "Erreur d'export audio pendant la session ; les fichiers disponibles sont conserves." }
