@@ -2,9 +2,20 @@
 [CmdletBinding()]
 param(
     [string]$ProjectDirectory = "",
-    [string]$ArchivePath = (Join-Path $PSScriptRoot "modules-voix-v3.5.3-adaptive-candidate.zip")
+    [string]$ArchivePath = ""
 )
 $ErrorActionPreference = "Stop"
+# Resolve script-relative defaults after parameter binding (Windows PowerShell 5.1).
+if ([string]::IsNullOrWhiteSpace($ArchivePath)) {
+    $installerDirectory = $PSScriptRoot
+    if ([string]::IsNullOrWhiteSpace($installerDirectory) -and $MyInvocation.MyCommand.Path) {
+        $installerDirectory = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+    }
+    if ([string]::IsNullOrWhiteSpace($installerDirectory)) {
+        throw "Indiquer -ArchivePath avec le chemin complet du ZIP v3.5.3."
+    }
+    $ArchivePath = Join-Path $installerDirectory "modules-voix-v3.5.3-adaptive-candidate.zip"
+}
 $expectedZipHash = "c042320d8dd77edaf4f9f684f885705abb6fc1dc0a1bc3f4236b5e1f8b76e756"
 
 function Assert-GuardianModule {
@@ -56,7 +67,7 @@ try {
         $ArchivePath = (Resolve-Path -LiteralPath $ArchivePath).Path
         Copy-Item -LiteralPath $ArchivePath -Destination $zipPath
     } else {
-        throw "Indiquer -ArchivePath vers l archive locale v3.5.2. Aucun telechargement implicite."
+        throw "Indiquer -ArchivePath vers l archive locale v3.5.3. Aucun telechargement implicite."
     }
     if ((Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedZipHash) {
         throw "Le ZIP ne correspond pas à la version v3.5.3-adaptive-candidate attendue. Aucun fichier du projet n'a été modifié."
