@@ -34,6 +34,9 @@ else
     '0a426f3f12edb5c2dff486ddc7accb6675a666bf6c852f48d28ce37f49afc69f  DenoisedAudio.kt' | sha256sum --check --status)
 fi
 sources=(
+  "$source_dir/GuardianTemporalSpeechCore.kt"
+  "$source_dir/GuardianTemporalConfirmationView.kt"
+  "$source_dir/GuardianTemporalGtcrn.kt"
   "$source_dir/GuardianAsrWindowPolicy.kt"
   "$source_dir/GuardianCalibratedReferenceView.kt"
   "$source_dir/GuardianReferenceNoiseEnhancer.kt"

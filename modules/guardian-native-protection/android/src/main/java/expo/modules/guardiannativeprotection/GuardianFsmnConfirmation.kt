@@ -19,9 +19,10 @@ internal class GuardianFsmnConfirmation private constructor(private var handle: 
         val inputGain: Float, val inputPeak: Float, val conditionedPeak: Float,
         val posteriorFrames: Int, val silencePosteriorMin: Float,
         val silencePosteriorMax: Float, val silencePosteriorMean: Double,
-        val confirmationMs: Long, val inferenceMs: Long, val confirmationCpuMs: Long)
+        val confirmationMs: Long, val inferenceMs: Long, val confirmationCpuMs: Long,
+        val temporalCore: GuardianTemporalSpeechCore.Result? = null)
 
-    fun confirm(original: FloatArray): Result {
+    fun confirm(original: FloatArray, includeTemporalCore: Boolean = false): Result {
         check(handle != 0L) { "FSMN closed" }
         val started = System.nanoTime()
         val cpuStarted = SystemClock.currentThreadTimeMillis()
@@ -32,10 +33,11 @@ internal class GuardianFsmnConfirmation private constructor(private var handle: 
         check(p0.size == 1 + (input.pcm.size - FRAME_LENGTH) / FRAME_SHIFT) { "FSMN output length invalid" }
         check(p0.all { it.isFinite() && it in 0f..1f }) { "FSMN posterior invalid" }
         val decision = GuardianFsmnPolicy.evaluate(p0, input.pcm)
+        val core = if (includeTemporalCore) GuardianTemporalSpeechCore.evaluate(p0) else null
         return Result(decision, input.inputGain, input.inputPeak, input.conditionedPeak, p0.size,
             p0.minOrNull()!!, p0.maxOrNull()!!, p0.sumOf { it.toDouble() } / p0.size,
             (System.nanoTime() - started) / 1_000_000L, inferenceMs,
-            SystemClock.currentThreadTimeMillis() - cpuStarted)
+            SystemClock.currentThreadTimeMillis() - cpuStarted, core)
     }
 
     override fun close() {

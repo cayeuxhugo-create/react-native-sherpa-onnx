@@ -24,8 +24,14 @@ internal class GuardianGtcrnEnhancer(context: android.content.Context) {
     fun process(pcm: FloatArray, count: Int, rate: Int): GuardianAudioEngine.EnhancementResult = error("GTCRN unavailable")
     fun release() {}
 }
+internal object GuardianTemporalGtcrn {
+    fun loadView(context: android.content.Context): GuardianTemporalConfirmationView =
+        error("Temporal GTCRN requires an explicit real backend in this host test")
+}
 KOTLIN
 sources=(
+  "$source_dir/GuardianTemporalSpeechCore.kt"
+  "$source_dir/GuardianTemporalConfirmationView.kt"
   "$source_dir/GuardianQwenPrimaryAudioProcessor.kt"
   "$source_dir/GuardianQwenProgressiveDecoder.kt"
   "$source_dir/GuardianContinuousStudy.kt"

@@ -1322,10 +1322,11 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
     val voiceDiagnostics = if (diagnosticOptions.enabled)
       GuardianVoiceDiagnostics(enabled = true, profile = voiceProfile.name) else null
     voiceDiagnostics?.event("SESSION_START",
-      "engineRevision" to "guardian-voice-v3.5.3-adaptive-candidate",
+      "engineRevision" to "guardian-voice-v3.5.4-temporal-rescue",
       "adaptiveTranscription" to adaptiveTranscription,
+      "temporalRescueEnabled" to adaptiveTranscription,
       "adaptiveCalibration" to if(adaptiveTranscription) "ROBUST_PREFIX_TRANSIENT_AND_VAD_EXCLUSION" else "DISABLED",
-      "adaptiveAsrPolicy" to if(adaptiveTranscription) "CLEAN_CALIBRATION_DUAL_NEURAL_CANDIDATE" else "DISABLED",
+      "adaptiveAsrPolicy" to if(adaptiveTranscription) "CLEAN_CALIBRATION_DUAL_NEURAL_WITH_TEMPORAL_RESCUE" else "DISABLED",
       "fsmnConfirmationRequired" to true,
       "fsmnModel" to GuardianFsmnConfirmation.MODEL_ID,
       "fsmnExecutionBackend" to GuardianFsmnConfirmation.EXECUTION_BACKEND,
@@ -2276,6 +2277,7 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
         requireFsmnConfirmation = true,
         referenceNoiseStudy = referenceNoiseStudy,
         adaptiveTranscription = adaptiveTranscription,
+        temporalRescueEnabled = adaptiveTranscription,
         listener = object : GuardianQwenPrimaryAudioProcessor.Listener {
             override fun onSpeechStarted() {
                 if (isCurrentVoiceSession()) asrListener.onSpeechStarted()

@@ -30,7 +30,8 @@ with tempfile.TemporaryDirectory(prefix='guardian-script-default-') as temporary
         text = source.replace('$ErrorActionPreference = "Stop"',
                               '$ErrorActionPreference = "Stop"\n$PSScriptRoot = ""', 1) if empty_root else source
         installer.write_text(text, encoding='utf-8-sig')
-        shutil.copyfile(a.archive, scripts/'modules-voix-v3.5.3-adaptive-candidate.zip')
+        archive_name = 'modules-voix-' + manifest['version'].removeprefix('guardian-voice-') + '.zip'
+        shutil.copyfile(a.archive, scripts/archive_name)
         project = root/'application'; module = project/'modules/guardian-native-protection'
         module.mkdir(parents=True); (module/'old.txt').write_text('old module')
         (project/'package.json').write_text('{}')

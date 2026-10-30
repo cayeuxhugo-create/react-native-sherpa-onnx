@@ -11,6 +11,9 @@ param(
     [ValidateRange(-1,20)][int]$ExpectedAudioSource = -1,
     [ValidateRange(0,30)][int]$ExpectedCaptureChannels = 0,
     [ValidateRange(0,1073741823)][int]$ExpectedChannelIndexMask = 0,
+    [ValidatePattern('^guardian-voice-v[0-9]+[.][0-9]+[.][0-9]+-[A-Za-z0-9-]+$')]
+    [string]$ExpectedEngineRevision = "guardian-voice-v3.5.3-adaptive-candidate",
+    [switch]$RequireTemporalRescue,
     [ValidateSet("FREE","SILENCE","WORDS","PHRASES")][string]$TestCase = "PHRASES",
     [ValidateSet("ORIGINAL","CANDIDATE","CANDIDATE_GAIN2","CANDIDATE_GAIN4","CONTINUOUS_STUDY","CONTINUOUS_QUALITY_STUDY","WIENER_STUDY","REFERENCE_NOISE_STUDY","ADAPTIVE_CANDIDATE")][string]$ProcessingMode = "ADAPTIVE_CANDIDATE",
     [ValidateRange(0,20)][double]$DistanceMeters = 0,
@@ -21,6 +24,9 @@ param(
 $ErrorActionPreference = "Stop"
 $Profile = $Profile.ToUpperInvariant()
 $ProcessingMode = $ProcessingMode.ToUpperInvariant()
+if ($RequireTemporalRescue -and $ProcessingMode -ne "ADAPTIVE_CANDIDATE") {
+    throw "Le secours temporel exige le mode ADAPTIVE_CANDIDATE."
+}
 $isStudyMode = $ProcessingMode -like "CONTINUOUS_*" -or $ProcessingMode -eq "WIENER_STUDY"
 $isReferenceMode = $ProcessingMode -eq "REFERENCE_NOISE_STUDY"
 $adbExecutable = (Get-Command adb -ErrorAction Stop).Source
@@ -167,6 +173,32 @@ function Save-FsmnMetadata {
                 $filteredProof[0].filteredFireRedAccepted -eq $true -and $filteredProof[0].filteredFsmnAccepted -eq $true -and
                 $filteredProof[0].usedFiltered -eq $true -and $admission.fsmnConfirmationRequired -eq $true)
         }
+        if ($admission.admissionReason -eq "CALIBRATED_FILTERED_TEMPORAL_RESCUE") {
+            $adaptiveProof = @($same | Where-Object { $_.event -eq "ADAPTIVE_ADMISSION" -and $_.segment -eq $admission.segment })
+            $rescueProof = @($same | Where-Object { $_.event -eq "TEMPORAL_RESCUE_RESULT" -and $_.segment -eq $admission.segment })
+            $asrProof = @($same | Where-Object { $_.event -eq "ASR_INPUT" -and $_.segment -eq $admission.segment })
+            $consistent = ($admission.accepted -eq $true -and $admission.fsmnConfirmationRequired -eq $true -and
+                $adaptiveProof.Count -eq 1 -and $adaptiveProof[0].calibrationClean -eq $true -and
+                $adaptiveProof[0].originalAccepted -eq $false -and $adaptiveProof[0].filteredAvailable -eq $true -and
+                $adaptiveProof[0].filteredFireRedAccepted -eq $true -and $adaptiveProof[0].filteredFsmnAccepted -eq $false -and
+                $adaptiveProof[0].usedFiltered -eq $true -and $adaptiveProof[0].temporalRescueAttempted -eq $true -and
+                $adaptiveProof[0].temporalRescueAccepted -eq $true -and
+                $rescueProof.Count -eq 1 -and $rescueProof[0].success -eq $true -and $rescueProof[0].accepted -eq $true -and
+                $rescueProof[0].coherent -eq $true -and $rescueProof[0].calibrationClean -eq $true -and
+                $rescueProof[0].fireRedAccepted -eq $true -and $rescueProof[0].fsmnAccepted -eq $true -and
+                $rescueProof[0].corePositiveFrames -ge 100 -and $rescueProof[0].coreSpanFrames -ge $rescueProof[0].corePositiveFrames -and
+                $rescueProof[0].coreStartFrame -ge 0 -and
+                ($rescueProof[0].coreEndFrameExclusive - $rescueProof[0].coreStartFrame) -eq $rescueProof[0].coreSpanFrames -and
+                $rescueProof[0].coreEndFrameExclusive -le (1+[Math]::Floor(([double]$rescueProof[0].sourceEndSample-[double]$rescueProof[0].sourceStartSample-400)/160)) -and
+                $rescueProof[0].coreDensity -ge 0.25 -and $rescueProof[0].coreDensity -le 1 -and
+                [Math]::Abs([double]$rescueProof[0].coreDensity - ([double]$rescueProof[0].corePositiveFrames / [Math]::Max(1,[double]$rescueProof[0].coreSpanFrames))) -lt 0.000001 -and
+                $rescueProof[0].routeRevision -ge 0 -and $rescueProof[0].sourceChannel -ge 0 -and
+                $rescueProof[0].asrAudio -ceq "CALIBRATED_REFERENCE_LONG" -and
+                $asrProof.Count -eq 1 -and $asrProof[0].source -ceq "CALIBRATED_REFERENCE_LONG" -and
+                $asrProof[0].channel -eq $rescueProof[0].sourceChannel -and
+                $asrProof[0].startSample -eq $rescueProof[0].sourceStartSample -and
+                $asrProof[0].endSample -eq $rescueProof[0].sourceEndSample)
+        }
         if (-not $consistent) {
             $problem = "Preuve FSMN absente ou incoherente pour le segment " + [string]$admission.segment + "."
             if (-not $studyProblems.Contains($problem)) { $studyProblems.Add($problem) }
@@ -179,6 +211,15 @@ function Save-FsmnMetadata {
     $metadata["adaptiveFilteredWindows"] = @($same | Where-Object { $_.event -eq "ADAPTIVE_ADMISSION" -and $_.usedFiltered -eq $true }).Count
     $metadata["adaptiveFilterAvailableWindows"] = @($same | Where-Object { $_.event -eq "ADAPTIVE_ADMISSION" -and $_.filteredAvailable -eq $true }).Count
     $metadata["adaptiveErrors"] = @($same | Where-Object { $_.event -eq "ADAPTIVE_VALIDATION_ERROR" })
+    $metadata["temporalRescueReady"] = @($same | Where-Object { $_.event -eq "TEMPORAL_RESCUE_READY" })
+    $metadata["temporalRescueResults"] = @($same | Where-Object { $_.event -eq "TEMPORAL_RESCUE_RESULT" })
+    $rescueErrors = @($same | Where-Object { $_.event -eq "TEMPORAL_RESCUE_ERROR" })
+    $metadata["temporalRescueErrors"] = $rescueErrors
+    if ($RequireTemporalRescue -and $rescueErrors.Count -gt 0) {
+        $problem = "Secours temporel en erreur ; fichiers recuperables conserves, bloc non valide."
+        if (-not $studyProblems.Contains($problem)) { $studyProblems.Add($problem) }
+    }
+    $metadata["temporalRescuedWindows"] = @($same | Where-Object { $_.event -eq "ADAPTIVE_ADMISSION" -and $_.temporalRescueAccepted -eq $true -and $_.usedFiltered -eq $true }).Count
     $metadata["asrMicrophoneSelections"] = @($same | Where-Object { $_.event -eq "ASR_MICROPHONE_SELECTION" })
     $metadata["asrMicrophoneQualities"] = @($same | Where-Object { $_.event -eq "ASR_MICROPHONE_QUALITY" })
     $metadata["asrInputIdentities"] = @($same | Where-Object { $_.event -eq "ASR_INPUT" })
@@ -327,7 +368,9 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ("guardian-simple-"+[Guid]::NewGuid
 $backups = New-Object 'System.Collections.Generic.List[object]'
 $records = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion="adaptive-candidate-3.5.3.2"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
+    # Compatible with the route runner for adaptive-candidate-3.5.3.2.
+    collectorVersion="adaptive-candidate-3.5.4.0"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
+    expectedEngineRevision=$ExpectedEngineRevision; temporalRescueRequired=[bool]$RequireTemporalRescue
     packageName=$PackageName; startUtc=[DateTime]::UtcNow.ToString("o")
     phoneModel=Invoke-SimpleAdb @("shell","getprop","ro.product.model")
     android=Invoke-SimpleAdb @("shell","getprop","ro.build.version.release")
@@ -401,7 +444,7 @@ try {
     do {
         $events = @(Read-DiagnosticEvents)
         $knownOld = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.diagnosticControlRevision -lt 3 })
-        if ($knownOld.Count -gt 0) { throw "Le moteur a démarré avec une ancienne révision diagnostique. Installer le module FireRed + etude reference/bruit v3.5.3 et son APK pour ce collecteur." }
+        if ($knownOld.Count -gt 0) { throw "Le moteur a demarre avec une ancienne revision diagnostique. Installer le module et reconstruire l'APK attendu : $ExpectedEngineRevision." }
         $starts = @($events | Where-Object { $_.event -eq "SESSION_START" -and $_.diagnosticControlRevision -ge 3 -and $_.profile -eq $Profile -and $_.diagnosticsEnabledBy -eq "PRIVATE_FILE" })
         foreach ($candidate in @($starts | Sort-Object elapsedMs -Descending)) {
             if ($candidate.processingMode -ne $ProcessingMode) { throw "Le mode de traitement demande n'a pas ete applique. Nouveau redemarrage complet necessaire." }
@@ -409,11 +452,22 @@ try {
             # A previously ready session may already have ended while the user
             # was responding to the prompt. Never time a test against its WAV.
             if (@($same | Where-Object { $_.event -eq "SESSION_END" }).Count -gt 0) { continue }
-            if ($candidate.engineRevision -ne "guardian-voice-v3.5.3-adaptive-candidate") {
-                throw "Ce test exige le nouvel APK FireRed + etude reference/bruit v3.5.3. La revision observee est : $($candidate.engineRevision)"
+            if ($candidate.engineRevision -cne $ExpectedEngineRevision) {
+                throw "Ce test exige l'APK $ExpectedEngineRevision. La revision observee est : $($candidate.engineRevision). Installer le module puis reconstruire l'application."
             }
             if ($ProcessingMode -eq "ADAPTIVE_CANDIDATE" -and $candidate.adaptiveTranscription -ne $true) {
                 throw "Le candidat adaptatif n'est pas actif : test interrompu pour eviter une comparaison incorrecte."
+            }
+            $metadata["session"] = $candidate.session
+            if ($RequireTemporalRescue) {
+                if ($candidate.temporalRescueEnabled -ne $true) { throw "Le nouvel APK ne confirme pas le secours temporel actif." }
+                $rescueReady = @($same | Where-Object { $_.event -eq "TEMPORAL_RESCUE_READY" -and
+                    $_.model -ceq "GTCRN_UNITY_CONFIRMATION" -and $_.inputGain -eq 1 -and
+                    $_.asrAudio -ceq "CALIBRATED_REFERENCE_LONG" -and
+                    $_.minimumIslandFrames -eq 15 -and $_.maximumGapFrames -eq 120 -and
+                    $_.minimumCorePositiveFrames -eq 100 -and $_.minimumCoreDensity -eq 0.25 })
+                if ($rescueReady.Count -eq 0) { continue }
+                if ($rescueReady.Count -ne 1) { throw "Initialisation du secours temporel dupliquee ; conserver les logs." }
             }
             $metadata["session"] = $candidate.session
             $metadata["fsmnConfirmationRequired"] = ($candidate.fsmnConfirmationRequired -eq $true)
@@ -471,7 +525,7 @@ try {
     if (-not $session) {
         $observed = @(Read-DiagnosticEvents | Where-Object { $_.event -eq "SESSION_START" })
         if ($observed.Count -gt 0 -and $observed[-1].diagnosticControlRevision -lt 3) {
-            throw "Le moteur a démarré, mais ce collecteur exige le module FireRed + etude reference/bruit v3.5.3 et son nouvel APK. Les logs permettent de vérifier la version installée."
+            throw "Le moteur a demarre, mais ce collecteur exige le module et l'APK $ExpectedEngineRevision. Les logs permettent de verifier la version installee."
         }
         throw "Aucun démarrage complet avec WAV confirmé. Vérifier l'arrêt complet puis la réactivation de la protection ; voir guardian.log et adb-errors.log. Ce message ne prouve pas que le build est incorrect."
     }
@@ -854,6 +908,37 @@ try {
             }
         }
         $metadata["adaptiveAsrWindowCount"] = $asrInputs.Count
+        $rescueResults = @(Read-DiagnosticEvents | Where-Object { $_.session -eq $session.session -and $_.event -eq "TEMPORAL_RESCUE_RESULT" })
+        $confirmationWindows = 0
+        foreach ($rescueResult in @($rescueResults | Where-Object { $_.success -eq $true })) {
+            $prefix = [string]$rescueResult.confirmationExportPrefix
+            $expectedPrefix = '^adaptive-rescue/' + [regex]::Escape([string]$session.session) + '/segment-' + [regex]::Escape([string]$rescueResult.segment) + '/guardian-voice-[A-Za-z0-9._-]+$'
+            $sampleCount = [long]$rescueResult.sourceEndSample - [long]$rescueResult.sourceStartSample
+            if ($prefix -notmatch $expectedPrefix -or [long]$rescueResult.sourceStartSample -lt 0 -or $sampleCount -le 0 -or $sampleCount -gt 128000) {
+                throw "Identite ou bornes de la confirmation GTCRN invalides."
+            }
+            foreach ($suffix in @("-truth.wav","-truth.f32","-asr.wav","-asr.f32","-index.tsv")) {
+                $relative = $prefix + $suffix
+                $local = Join-Path $output $relative.Replace('/',[IO.Path]::DirectorySeparatorChar)
+                [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($local))
+                Copy-PrivateFile ("files/guardian-diagnostics/"+$relative) $local
+                $header = if ($suffix.EndsWith(".wav")) { Get-GuardianWavHeader $local } else { @{valid=$true;kind="temporal-confirmation-sidecar"} }
+                if (-not $header.valid -or ($suffix.EndsWith(".wav") -and ($header.sampleRateHz -ne 16000 -or $header.channels -ne 1 -or $header.bytes -ne (44+$sampleCount*2)))) {
+                    throw "WAV de confirmation GTCRN invalide ou incomplet."
+                }
+                if ($suffix.EndsWith(".f32") -and (Get-Item -LiteralPath $local).Length -ne ($sampleCount*4)) {
+                    throw "Float de confirmation GTCRN incomplet."
+                }
+                $records.Add([pscustomobject]@{file=$relative;header=$header;sha256=(Get-FileHash -LiteralPath $local -Algorithm SHA256).Hash.ToLowerInvariant()})
+            }
+            $pcmPath = Join-Path $output (($prefix+"-asr.f32").Replace('/',[IO.Path]::DirectorySeparatorChar))
+            if ((Get-FileHash -LiteralPath $pcmPath -Algorithm SHA256).Hash.ToLowerInvariant() -cne [string]$rescueResult.confirmationPcmSha256) {
+                throw "Les octets exportes ne correspondent pas a la confirmation GTCRN."
+            }
+            $confirmationWindows++
+        }
+        $metadata["temporalConfirmationWindowCount"] = $confirmationWindows
+        $metadata["temporalConfirmationAudioMeaning"] = "adaptive-rescue asr files contain unity GTCRN confirmation audio only; Qwen receives the separate adaptive-asr window."
     }
     if ($isReferenceMode) {
         $referenceDeadline=[DateTime]::UtcNow.AddSeconds(20)

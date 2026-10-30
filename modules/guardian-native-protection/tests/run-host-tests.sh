@@ -6,10 +6,14 @@ build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 sources=(
   "$source_dir/GuardianAsrWindowPolicy.kt"
+  "$source_dir/GuardianTemporalSpeechCore.kt"
+  "$source_dir/GuardianTemporalConfirmationView.kt"
   "$source_dir/GuardianCalibratedReferenceView.kt"
   "$source_dir/GuardianReferenceNoiseEnhancer.kt"
   "$module_dir/tests/host/ReferenceNoiseEnhancerTest.kt"
   "$module_dir/tests/host/AdaptivePolicyTest.kt"
+  "$module_dir/tests/host/TemporalSpeechCoreTest.kt"
+  "$module_dir/tests/host/TemporalConfirmationViewTest.kt"
   "$source_dir/GuardianFsmnConfirmation.kt"
   "$source_dir/GuardianFsmnPolicy.kt"
   "$module_dir/tests/host/FsmnConditioningTest.kt"
@@ -81,3 +85,5 @@ java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativepr
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.SpeechSegmenterContinuityTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.MicrophoneSelectionTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.AdaptivePolicyTest
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.TemporalSpeechCoreTest
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.TemporalConfirmationViewTest

@@ -1,0 +1,92 @@
+{
+  "version": "guardian-voice-v3.5.4-temporal-rescue",
+  "previousDeliveryCommit": "dbaf5178dfbaf46687ae6c8dd866632588edf052",
+  "validation": {
+    "hostSuitePassed": true,
+    "temporalCoreAssertions": 169,
+    "temporalViewTestGroups": 8,
+    "adapterApiCompilationPassed": true,
+    "collectorScenariosPassed": true,
+    "newCollectorScenarios": 12,
+    "legacyCollectorScenarios": 12,
+    "newTestLauncherScenarios": 6,
+    "legacyTestLauncherScenarios": 3,
+    "bootstrapInstallerScenarios": 5,
+    "nativeCandidatePipelinePassed": true,
+    "nativePipelineScenarios": 12,
+    "nativeExpectedFinalCounts": [
+      3,
+      2,
+      3,
+      3,
+      3,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      2
+    ],
+    "nativeSyntheticNoiseSeconds": 248.0,
+    "temporalRescueCounterexamplesPassed": true,
+    "acousticCoreCorrelatedWindows": 52,
+    "acousticCoreCaptures": 5,
+    "acousticSpeechWindowsAccepted": 28,
+    "acousticExtraWindowsRejected": 24,
+    "realQwenCandidatePcmMatchesNativeInputs": true,
+    "realQwenActualRoutedInputsDecoded": 3,
+    "exactPhrasesOnLatestCaptureCpuReplay": 3,
+    "wordErrorsOnLatestCaptureCpuReplay": 0,
+    "extraAsrWindowsOnLatestCapture": 0,
+    "previousQuietCaptureAsrPcmBitIdentical": true,
+    "gtcrnRuntimeFailurePreservesOrdinaryAdmissions": true,
+    "exportChecks": {
+      "wavFloatPairs": 10,
+      "exportIdentities": 5,
+      "confirmationPcmBitMatchesStudy": 2,
+      "asrCount": 3,
+      "extraAsrCount": 0
+    }
+  },
+  "implementation": {
+    "normalMode": "ORIGINAL",
+    "testMode": "ADAPTIVE_CANDIDATE",
+    "asrAudioOnRescue": "CALIBRATED_REFERENCE_LONG",
+    "confirmationOnlyAudio": "GTCRN_UNITY_CONTINUOUS",
+    "gtcrnInputGain": 1,
+    "gtcrnThreads": 1,
+    "minimumIslandFrames": 15,
+    "maximumGapFrames": 120,
+    "minimumCorePositiveFrames": 100,
+    "minimumCoreDensity": 0.25,
+    "requiresCleanCalibration": true,
+    "requiresStableSourceAndRoute": true,
+    "requiresCompletedFilteredFsmnRefusal": true,
+    "requiresFilteredFireRed": true,
+    "requiresGtcrnFireRedAndFsmn": true,
+    "maxWindowSamples": 128000,
+    "originalOrOrdinaryFilteredShortSpeechUsesExistingPolicy": true
+  },
+  "validationRuntime": {
+    "fireRedAndFsmn": "Production Kotlin and real Linux JNI",
+    "gtcrn": "Sherpa-ONNX 1.13.8 real CPU model through test-only binary IPC backend",
+    "androidGtcrnAdapter": "Compiled against public pinned Sherpa Kotlin API 1.13.8; native Android execution pending",
+    "qwen": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25 public CPU; French; 1 thread; temperature 1e-6"
+  },
+  "limitations": {
+    "fullAndroidApkBuilt": false,
+    "phoneRuntimeValidated": false,
+    "phoneLatencyMeasured": false,
+    "generalNoiseRejectionProven": false,
+    "independentHeldOutCorpusValidated": false,
+    "promotedToDefault": false,
+    "previousStereo3mSecondPhraseRecovered": false,
+    "globalBestPhysicalMicrophoneProven": false,
+    "customAndroidAarByteParityVerified": false
+  },
+  "privacy": {
+    "privateAudioOrRecognitionTextsIncluded": false,
+    "mainModified": false
+  }
+}

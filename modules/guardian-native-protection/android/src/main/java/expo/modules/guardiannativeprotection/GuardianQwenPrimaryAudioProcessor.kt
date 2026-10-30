@@ -24,6 +24,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val requireFsmnConfirmation: Boolean = false,
     referenceNoiseStudy: Boolean = false,
     private val adaptiveTranscription: Boolean = false,
+    private val temporalRescueEnabled: Boolean = false,
+    temporalConfirmationFactory: (() -> GuardianTemporalConfirmationView)? = null,
 ) : GuardianAudioEngine.AudioProcessor {
     interface Listener {
         fun onSpeechStarted()
@@ -50,6 +52,19 @@ internal class GuardianQwenPrimaryAudioProcessor(
         require(requireFsmnConfirmation) { "Adaptive candidate requires both native validators" }
         GuardianCalibratedReferenceView(GuardianFireRedStreaming.load { name ->
             context.applicationContext.assets.open(name).use { it.readBytes() } })
+    } else null
+    private var temporalView = if (temporalRescueEnabled) {
+        require(adaptiveTranscription && requireFsmnConfirmation) { "Temporal rescue requires adaptive dual validation" }
+        try {
+            temporalConfirmationFactory?.invoke() ?: GuardianTemporalGtcrn.loadView(context.applicationContext)
+        } catch (error: Throwable) {
+            try { calibratedView?.close() } finally {
+                try { fsmn?.close() } finally {
+                    try { streamingVad.close() } finally { fireRed.close() }
+                }
+            }
+            throw error
+        }
     } else null
     private val wav = diagnosticWavDirectory?.let { directory ->
         try {
@@ -139,10 +154,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
             // A suspect calibration cannot rescue an original refusal or
             // replace an admitted original. Both native checks still apply;
             // neither attenuation nor ASR words can admit this view.
-            val useFiltered = filtered!=null && GuardianAdaptiveAdmissionPolicy.useFiltered(
+            val normallyUseFiltered = filtered!=null && GuardianAdaptiveAdmissionPolicy.useFiltered(
                 filtered.calibrationClean,coherentWindow?.valid==true,
                 filteredFire?.decision?.accepted==true,filteredFsmn?.decision?.accepted==true,
                 coherent.accepted,coherent.channel,filtered.primary)
+            val rescueEligible = temporalRescueEnabled && filtered != null && GuardianTemporalRescuePolicy.eligible(
+                coherent.accepted, normallyUseFiltered, filtered.calibrationClean, coherentWindow?.valid==true,
+                filteredFire?.decision?.accepted==true, filteredFsmn!=null, filteredFsmn?.decision?.accepted==true)
+            val rescue = if (rescueEligible) confirmTemporalRescue(id, pcm, endSample,
+                checkNotNull(filtered), checkNotNull(coherentWindow)) else TemporalAdmission(false)
+            val useFiltered = normallyUseFiltered || rescue.accepted
             val finalAdmission = coherent.accepted || useFiltered
             val asrChannel = if(useFiltered) filtered?.primary else coherent.channel
             if (adaptiveTranscription) diagnostics?.event("ADAPTIVE_ADMISSION", "segment" to id,
@@ -153,9 +174,11 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "filteredFireRedAccepted" to filteredFire?.decision?.accepted,
                 "filteredFsmnAccepted" to filteredFsmn?.decision?.accepted,
                 "filteredFsmnSpeechFrames" to filteredFsmn?.decision?.speechFrames,
+                "temporalRescueAttempted" to rescueEligible, "temporalRescueAccepted" to rescue.accepted,
                 "usedFiltered" to useFiltered, "accepted" to finalAdmission,
-                "policy" to "CLEAN_CALIBRATION_DUAL_NEURAL_CANDIDATE")
+                "policy" to if (temporalRescueEnabled) "CLEAN_CALIBRATION_DUAL_NEURAL_WITH_TEMPORAL_RESCUE" else "CLEAN_CALIBRATION_DUAL_NEURAL_CANDIDATE")
             val admissionReason = when {
+                rescue.accepted -> "CALIBRATED_FILTERED_TEMPORAL_RESCUE"
                 useFiltered -> "CALIBRATED_FILTERED_DUAL_NEURAL"
                 finalAdmission -> "NEURAL_CONFIRMED"
                 !coherent.required && !validation.decision.accepted -> "FIRERED_REJECT"
@@ -168,13 +191,15 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "coherentGateMs" to coherent.elapsedMs,
                 "fsmnConfirmationMs" to fsmnAdmission.confirmationMs,
                 "filteredConfirmationMs" to filteredConfirmationMs,
+                "temporalRescueConfirmationMs" to rescue.elapsedMs,
                 "admissionConfirmationMs" to (SystemClock.elapsedRealtime()-admissionStarted),
                 "channelGateRequired" to coherent.required, "channelGateReason" to coherent.reason,
                 "channelAcceptedIndex" to asrChannel,
                 "coherentEvaluated" to coherent.evaluated,
                 "coherentAccepted" to if (coherent.evaluated) coherent.accepted else null,
                 "fsmnConfirmationRequired" to requireFsmnConfirmation,
-                "fsmnAccepted" to if(useFiltered) filteredFsmn?.decision?.accepted else if (requireFsmnConfirmation) coherent.fsmnAccepted else null,
+                "fsmnAccepted" to if(rescue.accepted) true else if(useFiltered) filteredFsmn?.decision?.accepted else if (requireFsmnConfirmation) coherent.fsmnAccepted else null,
+                "fsmnConfirmationSource" to if(rescue.accepted) "GTCRN_UNITY_CONFIRMATION" else if(useFiltered) "CALIBRATED_REFERENCE_LONG" else "ORIGINAL_PCM",
                 "originalFsmnAccepted" to if (requireFsmnConfirmation && priorRejection == null) fsmnAdmission.accepted else null,
                 "asrChannel" to asrChannel,
                 "admissionReason" to admissionReason,
@@ -222,9 +247,56 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 "accepted" to accepted)
             if (!accepted && final) warn("Fenêtre Qwen finale refusée : segment=$id")
     }
-    private fun exportAdaptiveWindow(id: Long, original: FloatArray, asr: FloatArray): String? {
+    private data class TemporalAdmission(val accepted: Boolean, val elapsedMs: Long = 0L)
+
+    private fun confirmTemporalRescue(id: Long, original: FloatArray, endSample: Long,
+        filtered: GuardianCalibratedReferenceView.Window, history: GuardianChannelWindowHistory.Window): TemporalAdmission {
+        val started = SystemClock.elapsedRealtime()
+        val startSample = endSample-original.size
+        fun reject(reason: String): TemporalAdmission {
+            diagnostics?.event("TEMPORAL_RESCUE_RESULT", "segment" to id,
+                "sourceStartSample" to startSample, "sourceEndSample" to endSample,
+                "sourceChannel" to filtered.primary, "routeRevision" to history.routeRevision,
+                "success" to false, "accepted" to false, "reason" to reason)
+            return TemporalAdmission(false, SystemClock.elapsedRealtime()-started)
+        }
+        // A confirmation must come from exactly the same physical-route epoch
+        // and stable selected source. Never confirm a crossfade or a splice.
+        val stable = history.valid && history.channels.any { it.index==filtered.primary &&
+            it.contributedSamples==original.size && it.pcm.contentEquals(original) }
+        if (!stable) return reject("UNSTABLE_ORIGINAL_SOURCE")
+        val confirmation = temporalView?.window(startSample, endSample, filtered.primary, history.routeRevision)
+            ?: return reject("CONFIRMATION_WINDOW_UNAVAILABLE")
+        return try {
+            val fire = fireRed.confirm(confirmation.pcm)
+            val neural = if (fire.decision.accepted) checkNotNull(fsmn).confirm(confirmation.pcm, includeTemporalCore=true) else null
+            val core = neural?.temporalCore
+            val accepted = GuardianTemporalRescuePolicy.admit(true, fire.decision.accepted,
+                neural?.decision?.accepted==true, core?.accepted==true)
+            val prefix = exportAdaptiveWindow(id, original, confirmation.pcm, "adaptive-rescue")
+            diagnostics?.event("TEMPORAL_RESCUE_RESULT", "segment" to id,
+                "sourceStartSample" to startSample, "sourceEndSample" to endSample,
+                "sourceChannel" to confirmation.primary, "routeRevision" to confirmation.routeRevision,
+                "success" to true, "accepted" to accepted,
+                "coherent" to stable, "calibrationClean" to filtered.calibrationClean,
+                "fireRedAccepted" to fire.decision.accepted, "fsmnAccepted" to neural?.decision?.accepted,
+                "positiveFrames" to core?.positiveFrames, "corePositiveFrames" to core?.corePositiveFrames,
+                "coreSpanFrames" to core?.coreSpanFrames, "coreDensity" to core?.coreDensity,
+                "coreStartFrame" to core?.coreStartFrame, "coreEndFrameExclusive" to core?.coreEndFrameExclusive,
+                "fsmnInputGain" to neural?.inputGain, "confirmationMs" to (SystemClock.elapsedRealtime()-started),
+                "confirmationPcmSha256" to GuardianPcmIdentity.sha256(confirmation.pcm),
+                "confirmationExportPrefix" to prefix, "asrAudio" to "CALIBRATED_REFERENCE_LONG",
+                "reason" to if(accepted) "COHERENT_TEMPORAL_CORE" else "DUAL_NEURAL_OR_CORE_REJECT")
+            TemporalAdmission(accepted, SystemClock.elapsedRealtime()-started)
+        } catch (error: Throwable) {
+            diagnostics?.event("TEMPORAL_RESCUE_ERROR", "segment" to id, "error" to error.javaClass.simpleName)
+            reject("CONFIRMATION_ERROR")
+        }
+    }
+
+    private fun exportAdaptiveWindow(id: Long, original: FloatArray, asr: FloatArray, root: String = "adaptive-asr"): String? {
         val directory=diagnosticWavDirectory ?: return null
-        val relative="adaptive-asr/${diagnostics?.sessionId ?: "unknown"}/segment-$id"
+        val relative="$root/${diagnostics?.sessionId ?: "unknown"}/segment-$id"
         return try {
             val writer=GuardianDiagnosticWavWriter(java.io.File(directory,relative),profile.name,"window",diagnostics,
                 emitLifecycleEvents=false)
@@ -254,6 +326,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
             // aggressively denoised speech. Both FireRed passes use original PCM.
             val decoderPcm = frame.pcm
             channelHistory.append(decoderPcm.size, frame.captureChannels)
+            val temporalViewStarted = SystemClock.elapsedRealtime()
+            try {
+                temporalView?.accept(decoderPcm, frame.captureChannels)
+            } catch (error: Throwable) {
+                // This extra confirmation is optional for already admitted
+                // speech. Its failure disables only the rescue, never admits it.
+                diagnostics?.event("TEMPORAL_RESCUE_ERROR", "error" to error.javaClass.simpleName)
+                disableTemporalView()
+            }
+            val temporalViewMs = SystemClock.elapsedRealtime()-temporalViewStarted
             wav?.write("asr", decoderPcm, frame.key.sequence, frame.key.capturedAtNanos)
             wav?.write("vad", GuardianNeuralInputGain.forVad(decoderPcm, 64f), frame.key.sequence, frame.key.capturedAtNanos)
             val streamResult = streamingVad.accept(decoderPcm)
@@ -291,6 +373,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
                         "streamVadFrames" to streamResult.frames,
                         "streamVadElapsedMs" to streamResult.elapsedMs,
                         "filteredViewElapsedMs" to filteredViewMs,
+                        "temporalViewElapsedMs" to temporalViewMs,
                         "filteredVadSpeech" to filteredSpeech,
                         "studyCalibrationSpeech" to studyCalibrationSpeech,
                         "rawVadMaxInputGain" to 64,
@@ -344,6 +427,13 @@ internal class GuardianQwenPrimaryAudioProcessor(
             "maxInputGain" to GuardianFsmnConfirmation.MAX_INPUT_GAIN, "minInputGain" to 1f,
             "frameLength" to GuardianFsmnConfirmation.FRAME_LENGTH,
             "frameShift" to GuardianFsmnConfirmation.FRAME_SHIFT)
+        if (temporalRescueEnabled) diagnostics?.event("TEMPORAL_RESCUE_READY",
+            "model" to "GTCRN_UNITY_CONFIRMATION", "inputGain" to 1,
+            "asrAudio" to "CALIBRATED_REFERENCE_LONG",
+            "minimumIslandFrames" to GuardianTemporalSpeechCore.MIN_ISLAND_FRAMES,
+            "maximumGapFrames" to GuardianTemporalSpeechCore.MAX_GAP_FRAMES,
+            "minimumCorePositiveFrames" to GuardianTemporalSpeechCore.MIN_CORE_POSITIVE_FRAMES,
+            "minimumCoreDensity" to GuardianTemporalSpeechCore.MIN_CORE_DENSITY)
     }
 
     override fun onAudioFrame(frame: GuardianAudioEngine.AudioFrame) {
@@ -437,10 +527,22 @@ internal class GuardianQwenPrimaryAudioProcessor(
         streamingVad.reset()
         segmenter.reset()
         calibratedView?.reset()
+        try { temporalView?.reset() } catch (error: Throwable) {
+            diagnostics?.event("TEMPORAL_RESCUE_ERROR", "operation" to "RESET", "error" to error.javaClass.simpleName)
+            disableTemporalView()
+        }
         pendingAdaptiveWindows.clear()
         channelHistory.reset()
         previousAsrChannel = null
         previousAsrRoute = null
+    }
+
+    private fun disableTemporalView() {
+        val owned=temporalView
+        temporalView=null
+        try { owned?.close() } catch (error: Throwable) {
+            diagnostics?.event("TEMPORAL_RESCUE_ERROR", "operation" to "CLOSE", "error" to error.javaClass.simpleName)
+        }
     }
 
     private data class ChannelAdmission(val accepted: Boolean, val required: Boolean, val reason: String,
@@ -602,8 +704,10 @@ internal class GuardianQwenPrimaryAudioProcessor(
             try {
                 router.reset()
                 try { fsmn?.close() } finally {
-                    try { calibratedView?.close() } finally {
+                    try { temporalView?.close() } finally {
+                      try { calibratedView?.close() } finally {
                         try { streamingVad.close() } finally { try { fireRed.close() } finally { wav?.close() } }
+                      }
                     }
                 }
             } finally { worker.shutdownNow() }
