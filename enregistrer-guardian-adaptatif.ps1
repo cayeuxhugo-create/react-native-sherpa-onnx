@@ -8,6 +8,9 @@ param(
     [ValidateRange(1,120)][int]$DurationSeconds = 75,
     [ValidateSet("AUTO","VOICE_RECOGNITION_MONO","MIC_MONO","MIC_STEREO_FOCUS")]
     [string]$CaptureRoute = "AUTO",
+    [ValidateRange(-1,20)][int]$ExpectedAudioSource = -1,
+    [ValidateRange(0,30)][int]$ExpectedCaptureChannels = 0,
+    [ValidateRange(0,1073741823)][int]$ExpectedChannelIndexMask = 0,
     [ValidateSet("FREE","SILENCE","WORDS","PHRASES")][string]$TestCase = "PHRASES",
     [ValidateSet("ORIGINAL","CANDIDATE","CANDIDATE_GAIN2","CANDIDATE_GAIN4","CONTINUOUS_STUDY","CONTINUOUS_QUALITY_STUDY","WIENER_STUDY","REFERENCE_NOISE_STUDY","ADAPTIVE_CANDIDATE")][string]$ProcessingMode = "ADAPTIVE_CANDIDATE",
     [ValidateRange(0,20)][double]$DistanceMeters = 0,
@@ -324,7 +327,7 @@ $work = Join-Path ([IO.Path]::GetTempPath()) ("guardian-simple-"+[Guid]::NewGuid
 $backups = New-Object 'System.Collections.Generic.List[object]'
 $records = New-Object 'System.Collections.Generic.List[object]'
 $metadata = [ordered]@{
-    collectorVersion="adaptive-candidate-3.5.3.1"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
+    collectorVersion="adaptive-candidate-3.5.3.2"; profile=$Profile; captureRouteRequested=$CaptureRoute; durationRequestedSeconds=$DurationSeconds
     packageName=$PackageName; startUtc=[DateTime]::UtcNow.ToString("o")
     phoneModel=Invoke-SimpleAdb @("shell","getprop","ro.product.model")
     android=Invoke-SimpleAdb @("shell","getprop","ro.build.version.release")
@@ -483,6 +486,21 @@ try {
         }
     }
     if ($capture.Count -gt 0) { $metadata["captureConfig"] = $capture[-1] }
+    $metadata["expectedAudioSource"] = $ExpectedAudioSource
+    if ($ExpectedAudioSource -ge 0 -and ($capture.Count -eq 0 -or $capture[-1].audioSource -ne $ExpectedAudioSource)) {
+        throw ("Route non conforme : source Android " + $ExpectedAudioSource + " attendue. Arreter la protection. Configuration observee : " + ($capture | ConvertTo-Json -Compress))
+    }
+    $metadata["expectedCaptureChannels"] = $ExpectedCaptureChannels
+    $metadata["expectedChannelIndexMask"] = $ExpectedChannelIndexMask
+    if ($ExpectedCaptureChannels -gt 0 -and ($capture.Count -eq 0 -or $capture[-1].channels -ne $ExpectedCaptureChannels)) {
+        throw ("Route non conforme : " + $ExpectedCaptureChannels + " canaux Android attendus. Configuration observee : " + ($capture | ConvertTo-Json -Compress))
+    }
+    if ($ExpectedChannelIndexMask -gt 0 -and ($capture.Count -eq 0 -or $capture[-1].requestedChannelIndexMask -ne $ExpectedChannelIndexMask)) {
+        throw ("Route non conforme : masque de canaux " + $ExpectedChannelIndexMask + " attendu. Configuration observee : " + ($capture | ConvertTo-Json -Compress))
+    }
+    if ($ExpectedAudioSource -ge 0 -or $ExpectedCaptureChannels -gt 0 -or $ExpectedChannelIndexMask -gt 0) {
+        Write-Host ("Route verifiee : source=" + $capture[-1].audioSource + ", canaux=" + $capture[-1].channels + ", masque=" + $capture[-1].requestedChannelIndexMask)
+    }
     $prefix = [string]$ready.prefix
     if ($prefix -notmatch '^guardian-voice-\d{13}-(DISTANT|NOISY)-[A-Za-z0-9]{1,8}$') { throw "Nom d'enregistrement invalide dans les logs." }
     $metadata["session"] = $session.session

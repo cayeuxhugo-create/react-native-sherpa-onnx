@@ -19,6 +19,8 @@ source = source.replace("channels=1 if mode=='mono' else 2", "channels=1 if mode
 source = source.replace("for channel in range(2):", "for channel in range(4 if mode=='four-channels' else 2):")
 source = source.replace('w.writeframes(bytes(range(256))*500)',
                         "w.writeframes(b'' if mode=='legacy-empty' else bytes(range(256))*500)")
+source = source.replace("mode=='four-channels'", "mode in ['four-channels','auto-four-channels','wrong-mask','wrong-source']")
+source = source.replace("def emit(event,**kw):\n", "def emit(event,**kw):\n if event=='CAPTURE_CONFIG' and mode in ['auto-four-channels','wrong-count','wrong-mask','wrong-source']:kw['audioSource']=6 if mode=='wrong-source' else 1\n if event=='CAPTURE_CONFIG':kw['requestedChannelIndexMask']=3 if mode=='wrong-mask' else 15 if mode in ['four-channels','auto-four-channels','wrong-source'] else None\n", 1)
 needle = "  if mode=='missing-file':"
 assert needle in source
 source = source.replace(needle, """  relative='adaptive-asr/abc12345/segment-1/'+prefix
@@ -50,7 +52,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='guardian-adaptive-collector-') as tmp:
         tmp = Path(tmp)
         script=tmp/'collector.ps1'; script.write_text(collector,encoding='utf-8-sig')
-        modes=['ok','four-channels','legacy-empty','missing-channel','wrong-identity','bad-proof','wrong-engine','mode-off']
+        modes=['ok','four-channels','legacy-empty','auto-four-channels','wrong-count','wrong-mask','wrong-source','missing-channel','wrong-identity','bad-proof','wrong-engine','mode-off']
         for mode in modes:
             case=tmp/mode; (case/'remote/files').mkdir(parents=True);(case/'bin').mkdir()
             project=case/'app with spaces';project.mkdir();(project/'package.json').write_text('{}')
@@ -64,14 +66,17 @@ def main():
                 '-ProjectDirectory',str(project),'-PackageName','com.example.test',
                 '-DurationSeconds','1','-TestCase','FREE','-ProcessingMode','ADAPTIVE_CANDIDATE']
             if mode in ['four-channels','legacy-empty']: command+=['-CaptureRoute','MIC_STEREO_FOCUS']
+            if mode in ['auto-four-channels','wrong-count','wrong-mask','wrong-source']: command+=['-ExpectedAudioSource','1','-ExpectedCaptureChannels','4','-ExpectedChannelIndexMask','15']
             run=subprocess.run(command,
                 input='synthetic fixture\n\n\n',text=True,capture_output=True,env=env,timeout=60)
-            expected=mode in ['ok','four-channels','legacy-empty']
+            expected=mode in ['ok','four-channels','legacy-empty','auto-four-channels']
             assert (run.returncode==0)==expected, mode+'\n'+run.stdout+run.stderr
             archives=list((project/'diagnostics-voix').glob('*.zip'));assert len(archives)==1
             with zipfile.ZipFile(archives[0]) as z:
                 metadata=json.loads(z.read('session.json').decode('utf-8-sig'))
                 assert metadata['controlsRestored'] and metadata['completed']==expected
+                expected_error={'wrong-count':'4 canaux Android attendus','wrong-mask':'masque de canaux 15 attendu','wrong-source':'source Android 1 attendue'}.get(mode)
+                if expected_error: assert expected_error in metadata['error']
                 if expected:
                     assert metadata['adaptiveAsrWindowCount']==1
                     assert metadata['multimicCaptureFormat']=='PER_CHANNEL_FLOAT32_AND_PCM16'
@@ -86,7 +91,7 @@ def main():
             assert previous.read_bytes()==b'ORIGINAL\n'
             assert sorted(p.name for p in (case/'remote/files').glob('guardian-*.txt'))==[previous.name]
             print('PASS adaptive collector',mode,flush=True)
-        print('PASS 8 adaptive collector scenarios',flush=True)
+        print('PASS 12 adaptive collector scenarios',flush=True)
 
 
 if __name__=='__main__':main()
