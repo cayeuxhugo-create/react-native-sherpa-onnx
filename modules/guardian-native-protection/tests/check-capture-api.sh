@@ -6,9 +6,10 @@ module_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 : "${KOTLIN_STDLIB:?Set Kotlin stdlib path}"
 build="$(mktemp -d)"
 trap 'rm -rf "$build"' EXIT
+source "$module_dir/tests/kotlin-sources.sh"
 sources=()
 for name in GuardianAudioEngine GuardianCaptureChannelFrame GuardianChannelPreprocessor GuardianAudioCapabilities GuardianSpatialAudio GuardianAdaptiveChannels GuardianChannelDiagnostics GuardianDiagnosticWavWriter GuardianVoiceDiagnostics GuardianChannelQualityScores GuardianSpeechSegmentGain; do
-  sources+=("$module_dir/android/src/main/java/expo/modules/guardiannativeprotection/$name.kt")
+  sources+=("$(guardian_source "$name.kt")")
 done
 sources+=("$module_dir/tests/host/CaptureRouteGenerationTest.kt")
 sources+=("$module_dir/tests/host/ChannelPreprocessorTest.kt")

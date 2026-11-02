@@ -1,0 +1,395 @@
+{
+  "schema": 1,
+  "base": "user-uploaded modules.zip; identical to installed resilience module",
+  "package": "expo.modules.guardiannativeprotection",
+  "moves": [
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianApplicationProvider.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/GuardianApplicationProvider.kt",
+      "sha256": "e7c9b6edebc1bd92da9328db042de2072c26e08c6e809b0a5a791e1f0f7cd21f"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianIdentityManager.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/GuardianIdentityManager.kt",
+      "sha256": "31d199e4f9407e11d367554dfa27c7a1317b2c332ba567accd93d6d17d414847"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianProtectionService.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/GuardianProtectionService.kt",
+      "sha256": "a3ba95f5278052d91a1534ea6157af5bcd2c57be4b056b1bbc5c1e44fa7a2915"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianNativeConfig.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/config/GuardianNativeConfig.kt",
+      "sha256": "b75c493217ad8ac5505b7e2665d4f237311313fc7a53ef862214ec7840c374d4"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianNativeConfigRecord.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/config/GuardianNativeConfigRecord.kt",
+      "sha256": "a7390ef752d9243f858431154f10fc45c774494625ce9727819b954f0b3b2e7e"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianNativeEvent.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/events/GuardianNativeEvent.kt",
+      "sha256": "e3577ae73c0fe8c1dd63911d47e9ce3772512df647870844a703e818f4f7a2f1"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianServiceEvent.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/events/GuardianServiceEvent.kt",
+      "sha256": "e3001ea63a7ab8cf3a259157058bf61e6d69d738fb770a20bbf6a024417e0481"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianServiceHealthEvent.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/events/GuardianServiceHealthEvent.kt",
+      "sha256": "ec98abe471e1e78828fcaf767b570e50748380490914cb6f960da7d1bfef5af6"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianSosEvent.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/core/events/GuardianSosEvent.kt",
+      "sha256": "56cf4300b9a399883a9c8db8b61e3bb65be2eb85eeb2621ca28ceb47cf057d32"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianApiClient.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/network/GuardianApiClient.kt",
+      "sha256": "42a86e80c5bf151da94411d3592defe35704ee3f0afb1f5d7a0ad1f90d7c8853"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAppCheckInitializer.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/network/GuardianAppCheckInitializer.kt",
+      "sha256": "4ad41d173caca5ad47e545fa7d563ba4091e64795f6d8a777ce4887ed5747436"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianNativeAuthProvider.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/network/GuardianNativeAuthProvider.kt",
+      "sha256": "c02e77ac3f864ee00adbbe7b562b6a79cf096c87b4f70fc0181c661fbe37f282"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianUploadScheduler.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/network/GuardianUploadScheduler.kt",
+      "sha256": "636bec8822dac1bc193cfe0ad79eda16785e4ccbe96e5f3389e186f4a068ac87"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianUploadWorker.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/network/GuardianUploadWorker.kt",
+      "sha256": "d514ff33d4ba125b1cea68671fbeafa61dcdf2adcb3bb1cbf91ca82a7e875ef9"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianEventBatchEncoder.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/network/GuardianEventBatchEncoder.kt",
+      "sha256": "2e8076865fd0f75b0c42225af7e01d6ce43a792e04138a202b4990fa697ae5f0"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianLocationStore.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/persistence/GuardianLocationStore.kt",
+      "sha256": "43161adba3b23dbe68bc1d81d05169a2edbc9e90133e3be79b698ffede65b37b"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianNativeConfigStore.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/persistence/GuardianNativeConfigStore.kt",
+      "sha256": "fc0f807061a9030df600cbf748e1c35ccda8421bb5a253868e096e0516b7e13a"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianLocationEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/location/GuardianLocationEngine.kt",
+      "sha256": "4f5ea83d3efad1f06d135691475c8cb4fb198c868d2aa5c4187b7a6a6ab850c0"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianLocationEvent.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/location/GuardianLocationEvent.kt",
+      "sha256": "b9c87645814129684685573922fca3c3490660eda55b3888f5ab4d06ee292fe5"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianLocationRecord.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/location/GuardianLocationRecord.kt",
+      "sha256": "9409d924f7217d1aa6fa188089ad3ad2011b137ecac07051819dc2b5a09f9251"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianPtiEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/pti/GuardianPtiEngine.kt",
+      "sha256": "66ffed41f7cef505259bb74458369cdb795999b12507662e3a34d066c76859d6"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianPtiEvent.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/pti/GuardianPtiEvent.kt",
+      "sha256": "9c2c38da25c78ea0670bc55da825c15763299fb66fa6766c7a98b698a2b0fcc0"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAdaptiveChannels.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianAdaptiveChannels.kt",
+      "sha256": "de10804ce7894b0eb49eb269dbb731fd56e50b5800189bba55c988dda4e208fe"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAudioCapabilities.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianAudioCapabilities.kt",
+      "sha256": "c04570140632c9159076dd0462033bab504e16c8fe144e42c904842147345e8f"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAudioEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianAudioEngine.kt",
+      "sha256": "e69d88b72b8e1b7e1613c3b87564511bf50eb62c63f16c12487dc476507a1623"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAudioRouteEvidenceStore.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianAudioRouteEvidenceStore.kt",
+      "sha256": "e89e29ebdd7acaaac253752047952df2181983d9ea40bb0a7fe0bcc398370290"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianCaptureChannelFrame.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianCaptureChannelFrame.kt",
+      "sha256": "0300957ed411b7ff8aae9d79b08492b0010abb6c2cf19e4c72e871d2512bee2a"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianChannelPreprocessor.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianChannelPreprocessor.kt",
+      "sha256": "7ff12b217d7a2959fd42a4ca40911e5cf608319079305939939b17473e12f778"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianChannelQualityScores.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianChannelQualityScores.kt",
+      "sha256": "9ff3403e70c2f69e922937110f0172681138b46e7f9e41e16cacdb3c330316ff"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianChannelWindowHistory.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianChannelWindowHistory.kt",
+      "sha256": "cb9a8da1a18513f73a0c3d7b01ff2e20c68879e41c7ccabf365d5ca9f8f95dc9"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpatialAudio.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/capture/GuardianSpatialAudio.kt",
+      "sha256": "c0e3d0eb3e6452423abc5cfc3d0762f2dbe0947c783bdd6444e31858dd132648"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianFireRedConfirmation.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianFireRedConfirmation.kt",
+      "sha256": "6162a2a58048914675c4c2ebd78c8f128de8265be99d3b34512186965e3e8e85"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianFireRedPolicy.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianFireRedPolicy.kt",
+      "sha256": "8975401255636808d778f17861b80fdbdc5ff54d07107cd06105a09900257b00"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianFireRedStreaming.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianFireRedStreaming.kt",
+      "sha256": "d66a726d15aff6ce6437483833f8c8d745b8e589872b882e64193d63a52f3b29"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianFsmnConfirmation.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianFsmnConfirmation.kt",
+      "sha256": "47b93aec86b2588245b835b8b9939e1b1113b682de219c71ab44dbe549ba4d7f"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianFsmnPolicy.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianFsmnPolicy.kt",
+      "sha256": "80dd0ab31bd04d9e1e0d699e22f7e7f6f095a6187885c34b221cab364ca188e5"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianNeuralInputGain.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianNeuralInputGain.kt",
+      "sha256": "8527208e002ec6be46aae61cc70307bb864a0eefe9398b6b63f7a4e1cc3d7cfb"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianNeuralVad.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianNeuralVad.kt",
+      "sha256": "2b53f17ea448032ae9a9f4c608ed5a55fa82bfe09f97b3f7e18c5f62366808c3"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianTemporalSpeechCore.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/vad/GuardianTemporalSpeechCore.kt",
+      "sha256": "dc90061ef496cfaa514f4579ec44c241128d846dce1a47db9dc02bf1a7e7a0de"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianCalibratedReferenceView.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianCalibratedReferenceView.kt",
+      "sha256": "26f3a88cfaba7902060536bdac0217412f3296f5ae29dd2867737a2d6af2376c"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianGtcrnEnhancer.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianGtcrnEnhancer.kt",
+      "sha256": "01fdf2c316058706b0d809c0475109a964ac918560d9799908151a14a84b7bc9"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianReferenceNoiseEnhancer.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianReferenceNoiseEnhancer.kt",
+      "sha256": "503347b5dd8b2548e0f10f485d9cf66d3e5b8a3963c6afa34c774fc04acdcafe"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianWienerChannelBank.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianWienerChannelBank.kt",
+      "sha256": "77425ace1c33672e21b4baff65dea892f4dca10bfb4dbead77897f1c704761fd"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianWienerEnhancer.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianWienerEnhancer.kt",
+      "sha256": "7a32bea59344f67338e5e3d167a6afe26202f2a85d3345611b4dc5f02f9e7b57"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianTemporalGtcrn.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianTemporalGtcrn.kt",
+      "sha256": "7366df2f9e857b652de3a9fa53913fb3ce1b30df17b229bcce9a51d2954b7c0a"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianTemporalConfirmationView.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianTemporalConfirmationView.kt",
+      "sha256": "6163c3ba48ef44b5fc5e30f2d96f9fea8f679e8ec14362d618ede6823a00f9b8"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpeechSegmentGain.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/enhancement/GuardianSpeechSegmentGain.kt",
+      "sha256": "2b40d150c84d9d9885e912a6b61409b1d08e53d7a6a0cd5b90aef53662d9b647"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAsrContract.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/asr/GuardianAsrContract.kt",
+      "sha256": "5ca7323b00cc6a1e6b5ec8df10681d0343f6e6b4c0e6406fe66a6362eb9537f5"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAsrInputNormalizer.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/asr/GuardianAsrInputNormalizer.kt",
+      "sha256": "84e3346aaa515760001cb88cd5b012e4bb3d2ac711231b6ceb23b8a812ea959e"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianAsrWindowPolicy.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/asr/GuardianAsrWindowPolicy.kt",
+      "sha256": "ea094edd30fc60a2a034f9973c317d362a9d9a3133a8da25105e75d8d727b123"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianQwenPrimaryAudioProcessor.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/asr/GuardianQwenPrimaryAudioProcessor.kt",
+      "sha256": "84bf44cd350b339641f8154e9c6d4d745acfb45acb530a1eba04163201bd0787"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianQwenProgressiveDecoder.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/asr/GuardianQwenProgressiveDecoder.kt",
+      "sha256": "3fc4e03567e45e6601b94d5bda69bb55661c57752a8906753c853618daacf7ae"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianQwenRescueRecognizer.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/asr/GuardianQwenRescueRecognizer.kt",
+      "sha256": "e859273a96f807d11a50d60e9b0a377955a6ae38cc93924a3998cff03e9f570d"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceInputRouter.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/asr/GuardianVoiceInputRouter.kt",
+      "sha256": "4fc9e8e953037e7dd784e9a28580fb35d7d16b160c3a7fe8f00c99f54f0cacc4"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianBoundaryEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/segmentation/GuardianBoundaryEngine.kt",
+      "sha256": "6253213e4e5d0b02f6a3dfe9e583721bfa4e7ac11de9d81c34d916c33c5efa83"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianConversationEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/segmentation/GuardianConversationEngine.kt",
+      "sha256": "ac8909a0f4c660529c1e57e68cd52243a7ad3907ade39f0ed8ba6b16a05cfeca"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpeechSegmenter.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/segmentation/GuardianSpeechSegmenter.kt",
+      "sha256": "ad93779cb0c7dc9307a6b148fbb9ab14f05497de76e31520db0fa6d1ef677ec2"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceProfile.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/segmentation/GuardianVoiceProfile.kt",
+      "sha256": "2d484bcf8efb35b2d47ac00b9b90b0e314969a40ab69c36b891dbdf311112a4b"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianWordTimelineEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/segmentation/GuardianWordTimelineEngine.kt",
+      "sha256": "a30268555fe178ac1f73595625b127dc5d0f6afa29cdc1ae9aa0db9cd89d6a48"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/decision/GuardianVoiceEngine.kt",
+      "sha256": "48cee02b746936deb249187ec80830f56faf242a4c73800fce67bd34c7d32538"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceEvent.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/decision/GuardianVoiceEvent.kt",
+      "sha256": "efbf082423d200c2078f96e7463370258839a7b36a2eb8313645354a1aed9501"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceFusionEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/decision/GuardianVoiceFusionEngine.kt",
+      "sha256": "758a7faeb8d8f87af6cbcad9d373750f69239206c204d8d30fd3440ca85b1be3"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceUnderstandingEngine.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/decision/GuardianVoiceUnderstandingEngine.kt",
+      "sha256": "09e0b9392105a97cf4ba8ea7c7365ab26dcf3a37796007e93f5beb58c4d97716"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianEventDelivery.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/delivery/GuardianEventDelivery.kt",
+      "sha256": "68425ea02e55751fda846ddb7897795475a15f9a3f40d43324f8f507f29b6307"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceEventJournal.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/delivery/GuardianVoiceEventJournal.kt",
+      "sha256": "d5770d1298f690fed23b1011bebefe3f8e8d40fc8734218567068220f4015dd3"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianChannelDiagnostics.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianChannelDiagnostics.kt",
+      "sha256": "edeebd6338f90d2dfd7aa596f13e79ea5bd1433747f738a95b45c846a8c7e8db"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianContinuousStudy.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianContinuousStudy.kt",
+      "sha256": "30b1bed58e8953c900cc1fe4302acddf068eec27d3e3b59c1e8e6832c374f4cb"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianDiagnosticOptions.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianDiagnosticOptions.kt",
+      "sha256": "60c50d7b59e834af1094be485780b72936535a03339197ef96c858b0d8a7d37c"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianDiagnosticWavWriter.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianDiagnosticWavWriter.kt",
+      "sha256": "a1e766f293248356212cc3151c8a84afb4f052fb4a5057998360bdba5cac01a1"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianGtcrnComparison.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianGtcrnComparison.kt",
+      "sha256": "e98502d5abae1f980a4e279ef7c3db48b6312c25794468959f904cca3f6c5846"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianReferenceNoiseStudy.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianReferenceNoiseStudy.kt",
+      "sha256": "288348d9c27c2c473e62ccb686a44d5380a56c316b8a7e4e38c925569584c469"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianStudyBuffer.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianStudyBuffer.kt",
+      "sha256": "9d5ec7bdb5593f020f573f8400d173b96df2aa4a84dfbf5c32102303921e1789"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianVoiceDiagnostics.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianVoiceDiagnostics.kt",
+      "sha256": "80a1d536ce73d9c46a4857e84ae632f81401934d2619ce98038ed3a8ccde431d"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianWienerStudyStream.kt",
+      "to": "android/src/main/java/expo/modules/guardiannativeprotection/voice/diagnostics/GuardianWienerStudyStream.kt",
+      "sha256": "98bfdee09245ff5ada03f1b8faa0708963d651c9b3c53a226f58d0325b38e6be"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianLexicalV31Simulation.kt",
+      "to": "tests/host/legacy/GuardianLexicalV31Simulation.kt",
+      "sha256": "50087cc6955d18dd16ff36cf80b5f04256b6d5b2ef60d04670e3c3ac7eef584e"
+    },
+    {
+      "from": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpeechRescueRingSimulation.kt",
+      "to": "tests/host/legacy/GuardianSpeechRescueRingSimulation.kt",
+      "sha256": "b4e18b20117f7adda837515c279f032b6573457b10689a3cd2242d7d21057a2f"
+    }
+  ],
+  "removed": [
+    {
+      "path": "android/src/main/java/expo/modules/guardiannativeprotection/GuardianManualSosEvent.kt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "empty Kotlin file; no declaration or code"
+    }
+  ],
+  "productionKotlinFiles": 76
+}

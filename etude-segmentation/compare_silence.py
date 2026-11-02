@@ -18,7 +18,7 @@ def main():
  if a.output.exists():p.error('Choose a new output directory')
  a.output.mkdir(parents=True)
  frontend=a.module/'tests/replay_v32.py';spec=importlib.util.spec_from_file_location('frontend',frontend);f=importlib.util.module_from_spec(spec);spec.loader.exec_module(f)
- source=(a.module/'android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpeechSegmenter.kt').read_text()
+ source=(a.module/'android/src/main/java/expo/modules/guardiannativeprotection/voice/segmentation/GuardianSpeechSegmenter.kt').read_text()
  jars={}
  for ms in [800,1000,1200]:
   d=a.output/str(ms);d.mkdir();copy,n=re.subn(r'const val END_SILENCE_MS = \d+',f'const val END_SILENCE_MS = {ms}',source)

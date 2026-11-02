@@ -12,7 +12,7 @@ python - "$repo_dir" "$output_directory" "$tail_ms" <<'PY'
 import sys
 from pathlib import Path
 repo,out=map(Path,sys.argv[1:3]);tail=int(sys.argv[3]);assert tail in [800,1200]
-source=repo/'modules/guardian-native-protection/android/src/main/java/expo/modules/guardiannativeprotection/GuardianSpeechSegmenter.kt'
+source=repo/'modules/guardian-native-protection/android/src/main/java/expo/modules/guardiannativeprotection/voice/segmentation/GuardianSpeechSegmenter.kt'
 s=source.read_text();assert s.count('const val TAIL_MS = 800')==1
 p=out/'GuardianSpeechSegmenterStudy.kt';assert not p.exists()
 p.write_text(s.replace('const val TAIL_MS = 800',f'const val TAIL_MS = {tail}'))
