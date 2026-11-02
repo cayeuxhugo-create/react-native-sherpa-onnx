@@ -260,3 +260,5 @@ plugins/
 
 # Model structure collection (scripts/ci/collect_*; CI uses ephemeral dirs)
 tree-cache/
+# Generated CodeQL source-root marker (may point back to the checkout).
+/_codeql_detected_source_root
