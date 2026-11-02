@@ -36,3 +36,17 @@ Après succès, reconstruire avec la méthode Expo habituelle (`npx expo run:and
 ## Pour traiter le reste de l’application
 
 Envoyer une nouvelle archive des sources principales sans node_modules, .git, APK/AAB, ZIP d’installation, caches/build, modèles volumineux et secrets. Les configurations Expo/Android, package.json, lockfile, sources et références d’assets restent nécessaires. Les fichiers binaires exclus peuvent être listés avec leurs chemins et tailles. Si nécessaire, créer plusieurs ZIP indépendants de moins de 32 Mio chacun. modules.zip n’a pas besoin d’être renvoyé s’il n’a pas changé.
+
+## Export automatique des sources pour l’audit de l’application
+
+Le script `preparer-sources-guardian.ps1` prépare une copie des sources en ZIP indépendants de 24 Mio environ maximum par partie (contrôle final strictement sous 32 Mio). Il ne modifie et ne supprime aucun fichier du projet initial. Les fichiers exclus sont listés dans `MANIFESTE-AUDIT.json` afin de ne pas confondre une exclusion d’export avec un fichier inexistant.
+
+Il ignore node_modules, caches/sorties générées, archives/APK, bibliothèques et modèles volumineux, ainsi que les noms courants de fichiers de credentials/clés/configuration locale. Les valeurs de mots de passe/tokens/clés reconnues dans gradle.properties sont masquées dans la copie exportée. Les secrets directement écrits dans du code ne sont pas détectés automatiquement ; vérifier les archives avant envoi reste nécessaire.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\preparer-sources-guardian.ps1 -ProjectDirectory 'C:\Projets\guardian-voice'
+```
+
+Le dossier de sortie est créé à côté du projet et affiché à la fin. Envoyer uniquement les `guardian-sources-XX.zip` et `MANIFESTE-AUDIT.json`. Ne pas zipper de nouveau le dossier complet avec node_modules.
+
+Test d’intégration réellement exécuté avec PowerShell 7.4.6 sur Linux : découpage, CRC et empreintes, chemins Unicode, exclusion des dépendances/secrets/build, copie masquée des propriétés, fichiers originaux intacts, liens cycliques ignorés, rejet d’une sortie dans le projet ou déjà existante. Le script cible la syntaxe Windows PowerShell 5.1 ; son exécution sur Windows reste à confirmer sur le poste utilisateur.
