@@ -265,6 +265,36 @@ lastPtiStatus =
    * Charge la configuration native puis démarre
    * uniquement les moteurs activés.
    */
+  private val voiceEventJournal by lazy {
+    GuardianVoiceEventJournal(java.io.File(applicationContext.noBackupFilesDir, "guardian-voice-outbox"))
+  }
+
+  private fun replayVoiceEventJournal(config: GuardianNativeConfig, store: GuardianLocationStore) {
+    try {
+      var recovered = false
+      for (event in voiceEventJournal.readPending { _, error ->
+        lastServiceError = "VOICE_JOURNAL_CORRUPT_ENTRY"
+        Log.e(TAG, "Corrupt voice journal entry retained for recovery", error)
+      }) {
+        // Never replay another protected person's events under the current identity.
+        if (event.childId != config.childId || event.familyId != config.familyId ||
+            event.deviceId != config.deviceId || event.familyCode != config.familyCode) {
+          lastServiceError = "VOICE_JOURNAL_IDENTITY_MISMATCH"
+          continue
+        }
+        store.saveVoiceEvent(event)
+        voiceEventJournal.remove(event.eventId)
+        recovered = true
+      }
+      if (recovered && !GuardianUploadScheduler.forceUpload(applicationContext)) {
+        lastServiceError = "VOICE_UPLOAD_SCHEDULING_FAILED"
+      }
+    } catch (error: Exception) {
+      lastServiceError = "VOICE_JOURNAL_REPLAY_FAILED"
+      Log.e(TAG, "Voice journal replay failed; entries retained", error)
+    }
+  }
+
   private fun loadConfigurationAndStartEngines() {
     startupJob?.cancel()
 
@@ -345,6 +375,7 @@ lastPtiStatus =
                   createdStore
               }
 
+          replayVoiceEventJournal(config, store)
           if (config.gpsEnabled) {
             startLocationEngine(
               config
@@ -405,7 +436,7 @@ lastPtiStatus =
 healthJob =
   serviceScope.launch {
     while (!serviceDestroyed) {
-
+      replayVoiceEventJournal(config, store)
       val now =
   System.currentTimeMillis()
 
@@ -446,8 +477,8 @@ val event =
       GuardianLocationEngine.locationActive,
 
     voiceActive =
-      lastVoiceStatus?.running
-        ?: false,
+      (lastVoiceStatus?.running == true && lastVoiceStatus?.recognizerAvailable == true &&
+        lastVoiceStatus?.deliveryError == null),
 
     ptiActive =
       lastPtiStatus?.running
@@ -1477,9 +1508,16 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
              * L'événement vocal est rendu durable avant
              * toute tentative réseau.
              */
-            store.saveVoiceEvent(
-              event
-            )
+            try {
+              store.saveVoiceEvent(event)
+            } catch (storageError: Exception) {
+              // If SQLite is unavailable, retain the exact event across process death.
+              try { voiceEventJournal.save(event) } catch (journalError: Exception) {
+                storageError.addSuppressed(journalError)
+              }
+              throw storageError
+            }
+            voiceEventJournal.remove(event.eventId)
 
             Log.w(
               TAG,
@@ -1490,9 +1528,11 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
                 "confidence=${event.confidenceScore}"
             )
 
-            GuardianUploadScheduler.forceUpload(
-              applicationContext
-            )
+            // Persistence is already acknowledged. Network scheduling failure
+            // must not cause the same durable event to be recreated.
+            if (!GuardianUploadScheduler.forceUpload(applicationContext)) {
+              lastServiceError = "VOICE_UPLOAD_SCHEDULING_FAILED"
+            }
 
             Log.d(
               TAG,
@@ -1509,6 +1549,7 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
               "Échec du stockage SQLite Voice",
               error
             )
+            throw error // The engine retains this exact event ID for retry.
           }
         }
 
@@ -1545,8 +1586,8 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
               "listening=${status.listening}, " +
               "wakeArmed=${status.wakePhraseArmed}, " +
               "confidence=${status.lastConfidenceScore}, " +
-              "wakePhrase=${status.lastWakePhrase}, " +
-              "emergencyPhrase=${status.lastEmergencyPhrase}, " +
+              "pendingDelivery=${status.pendingDeliveryCount}, " +
+              "pipelineError=${status.pipelineError}, " +
               "error=${status.lastErrorCode}, " +
               "restarts=${status.restartCount}"
           )
@@ -1688,7 +1729,7 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
             "segmentId=${result.technicalSegmentId}, " +
             "originId=${result.originId ?: -1L}, " +
             "boundary=${result.boundaryReason}, " +
-            "text=\"${result.text}\""
+            "textChars=${result.text.length}"
     )
     }
 
@@ -1996,7 +2037,7 @@ private fun resolveDiagnosticMultiMic(): DiagnosticMultiMic {
                         "GuardianConversation",
                         "CONTEXTE FINAL : " +
                             "segments=$segmentCount, " +
-                            "text=\"$assembledText\""
+                            "textChars=${assembledText.length}"
                     )
 
                     lastVoiceConversationFinalText =
@@ -2075,7 +2116,7 @@ conversationEngine =
                                 "boundary=${unit.boundary}, " +
                                 "words=${unit.wordIds.size}, " +
                                 "confidence=${unit.confidence ?: -1f}, " +
-                                "text=\"${unit.text}\""
+                                "textChars=${unit.text.length}"
                         )
 
                         // CONTEXT_CHUNK est un bloc de continuité, pas une fin de phrase.
@@ -2132,7 +2173,7 @@ conversationEngine =
                             "GuardianWordTimeline",
                             "UNIT CORRECTED : " +
                                 "id=${unit.unitId}, " +
-                                "text=\"${unit.text}\""
+                                "textChars=${unit.text.length}"
                         )
 
                         // Les corrections tardives des CONTEXT_CHUNK suivent le même
@@ -2234,13 +2275,14 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
                         "reason=NO_NEURAL_VOICE_PROOF, chars=${hypothesis.text.length}")
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "QWEN ACOUSTIC SHADOW PARTIAL : " +
-                            "segment=${hypothesis.segmentId}, text=\"${hypothesis.text.take(160)}\"")
+                            "segment=${hypothesis.segmentId}, textChars=${hypothesis.text.take(160).length}")
                     }
                     return
                 }
                 asrListener.onPartialResult(qwenAsRecognitionResult(hypothesis))
             }
             override fun onFinal(hypothesis: GuardianQwenProgressiveDecoder.Hypothesis) {
+                if (isCurrentVoiceSession()) voiceEngine?.reportRecognizerRecovery()
                 if (!isCurrentVoiceSession()) return
                 if (hypothesis.acousticEvidence !=
                     GuardianQwenProgressiveDecoder.AcousticEvidence.NEURAL_CONFIRMED) {
@@ -2248,7 +2290,7 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
                         "reason=NO_NEURAL_VOICE_PROOF, chars=${hypothesis.text.length}")
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "QWEN ACOUSTIC SHADOW FINAL : " +
-                            "segment=${hypothesis.segmentId}, text=\"${hypothesis.text.take(160)}\"")
+                            "segment=${hypothesis.segmentId}, textChars=${hypothesis.text.take(160).length}")
                     }
                     return
                 }
@@ -2256,10 +2298,14 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
             }
             override fun onDecoderUnavailable(segmentId: Long, isFinal: Boolean) {
                 if (!isCurrentVoiceSession()) return
+                voiceEngine?.reportRecognizerFailure("QWEN_DECODE_UNAVAILABLE")
+                lastServiceError = "QWEN_DECODE_UNAVAILABLE"
                 Log.e(TAG, "Qwen decode indisponible: segment=$segmentId final=$isFinal")
             }
             override fun onBackpressure(segmentId: Long, pendingFinalCount: Int) {
                 if (!isCurrentVoiceSession()) return
+                voiceEngine?.reportRecognizerFailure("QWEN_FINAL_BACKPRESSURE")
+                lastServiceError = "QWEN_FINAL_BACKPRESSURE"
                 Log.e(TAG, "Qwen FINAL backpressure: segment=$segmentId pending=$pendingFinalCount")
             }
         },
@@ -2279,6 +2325,9 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
         adaptiveTranscription = adaptiveTranscription,
         temporalRescueEnabled = adaptiveTranscription,
         listener = object : GuardianQwenPrimaryAudioProcessor.Listener {
+            override fun onCaptureHeartbeat() {
+                if (isCurrentVoiceSession()) voiceEngine?.reportAudioCapture()
+            }
             override fun onSpeechStarted() {
                 if (isCurrentVoiceSession()) asrListener.onSpeechStarted()
             }
@@ -2286,7 +2335,11 @@ val qwenPrimary = qwenPrimaryRecognizer.let { qwen ->
                 if (isCurrentVoiceSession()) asrListener.onSpeechEnded()
             }
             override fun onWarning(message: String) {
-                if (isCurrentVoiceSession()) Log.w(TAG, message)
+                if (isCurrentVoiceSession()) {
+                    voiceEngine?.reportRecognizerFailure("VOICE_PIPELINE_WARNING")
+                    lastServiceError = "VOICE_PIPELINE_WARNING"
+                    Log.w(TAG, message)
+                }
             }
         },
     ).also { qwenPrimaryProcessor = it } } catch (error: Throwable) {

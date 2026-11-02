@@ -5,6 +5,8 @@ source_dir="$module_dir/android/src/main/java/expo/modules/guardiannativeprotect
 build_dir="$(mktemp -d)"
 trap 'rm -rf "$build_dir"' EXIT
 sources=(
+  "$source_dir/GuardianEventDelivery.kt"
+  "$module_dir/tests/host/ResilienceTest.kt"
   "$source_dir/GuardianAsrWindowPolicy.kt"
   "$source_dir/GuardianTemporalSpeechCore.kt"
   "$source_dir/GuardianTemporalConfirmationView.kt"
@@ -87,3 +89,5 @@ java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativepr
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.AdaptivePolicyTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.TemporalSpeechCoreTest
 java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.TemporalConfirmationViewTest
+
+java -cp "$build_dir/tests.jar:${KOTLIN_STDLIB:-}" expo.modules.guardiannativeprotection.ResilienceTest

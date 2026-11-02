@@ -35,6 +35,7 @@ class GuardianQwenProgressiveDecoder(
         val maxWindowMs: Long = 8_000L,
         val maxPendingFinals: Int = 3,
         val maxPartialWindowMs: Long = minOf(3_000L, maxWindowMs),
+        val decodeWarningMs: Long = 30_000L,
     ) {
         init {
             require(sampleRate == 16_000)
@@ -43,6 +44,7 @@ class GuardianQwenProgressiveDecoder(
             require(maxWindowMs in 2_000L..15_000L)
             require(maxPendingFinals in 1..8)
             require(maxPartialWindowMs in minPartialWindowMs..maxWindowMs)
+            require(decodeWarningMs in 50L..120_000L)
         }
     }
 
@@ -115,6 +117,9 @@ class GuardianQwenProgressiveDecoder(
             priority = Thread.NORM_PRIORITY - 1
         }
     }
+    private val watchdog = Executors.newSingleThreadScheduledExecutor { job ->
+        Thread(job, "Guardian-Qwen-Health").apply { isDaemon = true }
+    }
     private val pendingFinals = ArrayDeque<Job>()
     private var pendingPartial: Job? = null
     private val pendingDiagnostics = ArrayDeque<Job>()
@@ -136,7 +141,7 @@ class GuardianQwenProgressiveDecoder(
     fun offerPartial(
         segmentId: Long, ownedPcm: FloatArray, acousticEvidence: AcousticEvidence,
     ): Boolean {
-        if (closed.get() || segmentId <= 0L || !validLength(ownedPcm, false)) return false
+        if (closed.get() || segmentId <= 0L || !validLength(ownedPcm, false) || ownedPcm.any { !it.isFinite() }) return false
         synchronized(lock) {
             if (closed.get() || segmentId <= lastAcceptedFinalSegmentId) return false
             // Long offline partials repeat most of the final's work and cannot be
@@ -176,7 +181,7 @@ class GuardianQwenProgressiveDecoder(
         boundaryReason: String,
         acousticEvidence: AcousticEvidence,
     ): Boolean {
-        if (closed.get() || segmentId <= 0L || !validLength(ownedPcm, true)) return false
+        if (closed.get() || segmentId <= 0L || !validLength(ownedPcm, true) || ownedPcm.any { !it.isFinite() }) return false
         var backlog: Int? = null
         synchronized(lock) {
             if (closed.get() || segmentId <= lastAcceptedFinalSegmentId) return false
@@ -194,7 +199,7 @@ class GuardianQwenProgressiveDecoder(
         }
         if (backlog != null) {
             diagnostics?.event("QWEN_BACKPRESSURE", "segment" to segmentId, "pendingFinals" to backlog)
-            listener.onBackpressure(segmentId, backlog!!)
+            notifyListener(segmentId, true) { listener.onBackpressure(segmentId, backlog!!) }
             return false
         }
         return true
@@ -250,6 +255,23 @@ class GuardianQwenProgressiveDecoder(
                 "started" to false, "queueWaitMs" to (SystemClock.elapsedRealtime() - job.queuedAtMs).coerceAtLeast(0),
                 "decodeWallMs" to 0, "audioMs" to job.samples.size * 1000L / configuration.sampleRate,
                 "role" to "SHADOW_NO_ALERT")
+        }
+    }
+
+    // A consumer failure must not strand the single drain with pumping=true.
+    private fun notifyListener(segmentId: Long, final: Boolean, action: () -> Unit): Boolean {
+        try {
+            action()
+            return true
+        } catch (error: Exception) {
+            Log.e(TAG, "Qwen consumer failure: segment=$segmentId final=$final", error)
+            diagnostics?.event("QWEN_CONSUMER_ERROR", "segment" to segmentId, "final" to final,
+                "error" to error.javaClass.simpleName)
+            // Reporting failure is itself an external callback and may fail too.
+            try { listener.onDecoderUnavailable(segmentId, final) } catch (reportError: Exception) {
+                Log.e(TAG, "Qwen consumer failure reporting failed", reportError)
+            }
+            return false
         }
     }
 
@@ -327,11 +349,27 @@ class GuardianQwenProgressiveDecoder(
                 "final" to job.isFinal, "generation" to job.generation,
                 "audioMs" to job.samples.size.toLong() * 1000 / configuration.sampleRate,
                 "queueWaitMs" to (decodeStartedAtMs - job.queuedAtMs).coerceAtLeast(0))
+            val decoding = AtomicBoolean(true)
+            val overdue = synchronized(lock) {
+                if (closed.get()) null else watchdog.schedule({
+                synchronized(lock) {
+                    if (decoding.get() && !closed.get() && job.generation == generation) {
+                        diagnostics?.event("QWEN_DECODE_OVERDUE", "segment" to job.segmentId,
+                            "warningMs" to configuration.decodeWarningMs)
+                        notifyListener(job.segmentId, job.isFinal) {
+                            listener.onDecoderUnavailable(job.segmentId, job.isFinal)
+                        }
+                    }
+                }
+                }, configuration.decodeWarningMs, java.util.concurrent.TimeUnit.MILLISECONDS)
+            }
             val decoded = try {
                 qwen.decode(job.samples)
             } catch (error: Throwable) {
                 Log.e(TAG, "Erreur Qwen progressif segment=${job.segmentId}", error)
                 null
+            } finally {
+                synchronized(lock) { decoding.set(false); overdue?.cancel(false) }
             }
 
             // A newer pending window must NOT suppress an otherwise useful
@@ -370,7 +408,7 @@ class GuardianQwenProgressiveDecoder(
             if (decoded == null) {
                 synchronized(lock) {
                     if (!closed.get() && job.generation == generation) {
-                        listener.onDecoderUnavailable(job.segmentId, job.isFinal)
+                        notifyListener(job.segmentId, job.isFinal) { listener.onDecoderUnavailable(job.segmentId, job.isFinal) }
                     }
                 }
                 continue
@@ -399,8 +437,8 @@ class GuardianQwenProgressiveDecoder(
                 }
                 synchronized(lock) {
                     if (!closed.get() && job.generation == generation) {
-                        listener.onFinal(hypothesis)
-                        diagnostics?.event("QWEN_PUBLISH", "segment" to job.segmentId,
+                        val delivered = notifyListener(job.segmentId, true) { listener.onFinal(hypothesis) }
+                        if (delivered) diagnostics?.event("QWEN_PUBLISH", "segment" to job.segmentId,
                             "revision" to job.revision, "final" to true, "text" to hypothesis.text)
                     }
                 }
@@ -419,8 +457,8 @@ class GuardianQwenProgressiveDecoder(
                     if (changed && !closed.get() && job.generation == generation &&
                         job.segmentId == activeSegmentId &&
                         job.segmentId > lastAcceptedFinalSegmentId) {
-                        listener.onPartial(hypothesis)
-                        diagnostics?.event("QWEN_PUBLISH", "segment" to job.segmentId,
+                        val delivered = notifyListener(job.segmentId, false) { listener.onPartial(hypothesis) }
+                        if (delivered) diagnostics?.event("QWEN_PUBLISH", "segment" to job.segmentId,
                             "revision" to job.revision, "final" to false, "text" to hypothesis.text)
                     }
                 }
@@ -462,6 +500,7 @@ class GuardianQwenProgressiveDecoder(
             // Si l'executor est déjà arrêté, la couche propriétaire doit
             // s'assurer que Qwen est libéré après la fin des décodages.
         }
+        watchdog.shutdownNow() // Signal only; never interrupt/free a live native decode.
         worker.shutdown()
     }
 

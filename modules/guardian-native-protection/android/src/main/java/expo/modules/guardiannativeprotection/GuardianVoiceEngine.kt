@@ -19,6 +19,8 @@ class GuardianVoiceEngine(
 ) {
 
     interface Listener {
+        /** Return only after durable local acceptance; throw on persistence failure.
+         * Retries reuse eventId, so implementations must accept duplicates idempotently. */
         fun onVoiceEvent(event: GuardianVoiceEvent)
         fun onVoiceStatusChanged(status: Status) = Unit
         fun getLastKnownLocation(): LastKnownLocation? = null
@@ -99,6 +101,9 @@ class GuardianVoiceEngine(
         val lastEmergencyPhrase: String?,
         val lastErrorCode: Int?,
         val restartCount: Int,
+        val pipelineError: String? = null,
+        val deliveryError: String? = null,
+        val pendingDeliveryCount: Int = 0,
     )
 
     enum class Phase {
@@ -208,6 +213,10 @@ class GuardianVoiceEngine(
     @Volatile
     private var phase = Phase.STOPPED
 
+    @Volatile private var recognizerHealthy = false
+    @Volatile private var pipelineError: String? = null
+    private val eventDelivery = GuardianEventDelivery<GuardianVoiceEvent>()
+    private var deliveryRetry: Runnable? = null
     private var destroyed = false
     private var wakePhraseArmedAtElapsed: Long? = null
     private var lastEventCreatedAtElapsed = 0L
@@ -254,7 +263,7 @@ class GuardianVoiceEngine(
         if (!hasMicrophonePermission()) {
             Log.e(TAG, "Permission RECORD_AUDIO absente")
             phase = Phase.ERROR
-            publishStatus(recognizerAvailable = true)
+            publishStatus(recognizerAvailable = false)
             return
         }
 
@@ -270,7 +279,10 @@ class GuardianVoiceEngine(
         phase = Phase.LISTENING
 
         Log.d(TAG, "Logique Voice prête à recevoir les résultats Sherpa")
-        publishStatus(recognizerAvailable = true)
+        recognizerHealthy = true // Service initialized Qwen before starting this engine.
+        pipelineError = null
+        retryEventDelivery()
+        publishStatus()
     }
 
     @Synchronized
@@ -286,7 +298,8 @@ class GuardianVoiceEngine(
         resetSessionState(keepDiagnostics = true)
 
         Log.d(TAG, "Moteur Voice arrêté")
-        publishStatus(recognizerAvailable = true)
+        recognizerHealthy = false
+        publishStatus()
     }
 
     @Synchronized
@@ -315,7 +328,7 @@ class GuardianVoiceEngine(
 
     fun getStatus(): Status =
         buildStatus(
-            recognizerAvailable = !destroyed
+            recognizerAvailable = running && recognizerHealthy && !destroyed
         )
 
      fun getUnderstandingDiagnostics():
@@ -348,6 +361,31 @@ class GuardianVoiceEngine(
                 emergencyPhrase = null,
             )
         }
+    }
+
+    fun reportRecognizerFailure(reason: String) {
+        recognizerHealthy = false
+        pipelineError = reason
+        handler?.post {
+            if (!destroyed) { recognizerHealthy = false; pipelineError = reason; publishStatus() }
+        }
+    }
+
+    fun reportAudioCapture() {
+        handler?.post {
+            if (running && !destroyed) { lastAudioAt = System.currentTimeMillis(); publishStatus() }
+        }
+    }
+
+    fun reportRecognizerRecovery() {
+        handler?.post {
+            if (running && !destroyed) { recognizerSucceeded(); publishStatus() }
+        }
+    }
+
+    private fun recognizerSucceeded() {
+        recognizerHealthy = true
+        pipelineError = null
     }
 
     fun onSherpaPartialResult(
@@ -523,7 +561,7 @@ class GuardianVoiceEngine(
             "Contexte conversationnel traité : " +
                 "segments=$segmentCount, " +
                 "decision=$decisionProduced, " +
-                "text=$rawText"
+                "textChars=${rawText.length}"
         )
 
         if (phase != Phase.COOLDOWN) {
@@ -567,7 +605,7 @@ class GuardianVoiceEngine(
                 return@post
             }
 
-            lastAudioAt = result.timestampMs
+            recognizerSucceeded()
             phase = Phase.PROCESSING
 
             /*
@@ -619,7 +657,7 @@ class GuardianVoiceEngine(
                     "partial=$partial, " +
                     "decision=$decisionProduced, " +
                     "confidence=$recognizerConfidence, " +
-                    "text=$rawText"
+                    "textChars=${rawText.length}"
             )
 
             if (!partial && phase != Phase.COOLDOWN) {
@@ -791,7 +829,7 @@ class GuardianVoiceEngine(
                 "primaryConfirmed=$primaryAlreadyConfirmed, " +
                 "latest=$isLatestPrimary, " +
                 "strongest=${fusion.strongestIntent}, " +
-                "text=\"$rawText\""
+                "textChars=${rawText.length}"
         )
 
         if (
@@ -994,7 +1032,7 @@ class GuardianVoiceEngine(
                 "score=$confidenceScore, " +
                 "minimum=${settings.minimumConfidenceScore}, " +
                 "level=${fusion.level}, " +
-                "text=$rawText"
+                "textChars=${rawText.length}"
         )
 
         return false
@@ -1236,7 +1274,7 @@ class GuardianVoiceEngine(
                 "Emergency Latch rafraîchi : " +
                     "score=${existing.confidenceScore}, " +
                     "cause=${existing.cause}, " +
-                    "text=\"${existing.recognizedText}\""
+                    "textChars=${existing.recognizedText.length}"
             )
 
             return true
@@ -1275,13 +1313,13 @@ class GuardianVoiceEngine(
                 "EMERGENCY LATCH DETECTED : " +
                     "score=$confidenceScore, " +
                     "cause=$cause, " +
-                    "text=\"$rawText\""
+                    "textChars=${rawText.length}"
             )
         } else {
             Log.i(
                 TAG,
                 "Emergency Latch créé pendant cooldown : " +
-                    "DETECTED non dupliqué, text=\"$rawText\""
+                    "DETECTED non dupliqué, textChars=${rawText.length}"
             )
         }
 
@@ -1308,7 +1346,7 @@ class GuardianVoiceEngine(
             TAG,
             "Emergency Latch expiré : " +
                 "age=${nowElapsed - current.lastSeenAtElapsed}ms, " +
-                "text=\"${current.recognizedText}\""
+                "textChars=${current.recognizedText.length}"
         )
 
         emergencyLatch =
@@ -1326,7 +1364,7 @@ class GuardianVoiceEngine(
             TAG,
             "Emergency Latch confirmé/libéré : " +
                 "reason=$reason, " +
-                "text=\"${current.recognizedText}\""
+                "textChars=${current.recognizedText.length}"
         )
 
         emergencyLatch =
@@ -1385,9 +1423,6 @@ class GuardianVoiceEngine(
                 accuracy = location?.accuracy,
             )
 
-        if (state == GuardianVoiceState.CONFIRMED) {
-            lastEventCreatedAtElapsed = SystemClock.elapsedRealtime()
-        }
 
         Log.w(
             TAG,
@@ -1398,15 +1433,33 @@ class GuardianVoiceEngine(
                 "score=${event.confidenceScore}"
         )
 
-        runCatching {
-            listener.onVoiceEvent(event)
-        }.onFailure { error ->
-            Log.e(
-                TAG,
-                "Échec de transmission locale de l’événement Voice",
-                error
-            )
+        if (!eventDelivery.offer(event.eventId, event)) {
+            Log.e(TAG, "Voice event could not enter retry queue; storage degraded")
+            runCatching { listener.onVoiceEvent(event) }.onSuccess {
+                if (event.state == GuardianVoiceState.CONFIRMED) {
+                    lastEventCreatedAtElapsed = SystemClock.elapsedRealtime()
+                }
+            }.onFailure { Log.e(TAG, "Voice event emergency persistence failed", it) }
+            publishStatus()
+            return
         }
+        retryEventDelivery()
+    }
+
+    private fun retryEventDelivery() {
+        deliveryRetry?.let { handler?.removeCallbacks(it) }
+        deliveryRetry = null
+        val accepted = eventDelivery.drain { listener.onVoiceEvent(it) }
+        if (accepted.any { it.state == GuardianVoiceState.CONFIRMED }) {
+            lastEventCreatedAtElapsed = SystemClock.elapsedRealtime()
+        }
+        if (eventDelivery.size > 0 && !destroyed) {
+            Log.e(TAG, "Voice persistence unavailable; pending=${eventDelivery.size}")
+            val retry = Runnable { retryEventDelivery(); publishStatus() }
+            deliveryRetry = retry
+            handler?.postDelayed(retry, 5_000L)
+        }
+        publishStatus()
     }
 
     private fun enterCooldown() {
@@ -1480,6 +1533,7 @@ class GuardianVoiceEngine(
     }
 
     private fun isInEventCooldown(): Boolean {
+        if (eventDelivery.any { it.state == GuardianVoiceState.CONFIRMED }) return true
         if (settings.eventCooldownSeconds <= 0) {
             return false
         }
@@ -1510,6 +1564,8 @@ class GuardianVoiceEngine(
         }
 
         cooldownRunnable = null
+        deliveryRetry?.let { handler?.removeCallbacks(it) }
+        deliveryRetry = null
     }
 
     private fun resetSessionState(
@@ -1534,7 +1590,7 @@ class GuardianVoiceEngine(
     }
 
     private fun publishStatus(
-        recognizerAvailable: Boolean = !destroyed,
+        recognizerAvailable: Boolean = running && recognizerHealthy && !destroyed,
     ) {
         runCatching {
             listener.onVoiceStatusChanged(
@@ -1568,5 +1624,8 @@ class GuardianVoiceEngine(
             lastEmergencyPhrase = lastEmergencyPhrase,
             lastErrorCode = lastErrorCode,
             restartCount = restartCount,
+            pipelineError = pipelineError,
+            deliveryError = eventDelivery.lastError,
+            pendingDeliveryCount = eventDelivery.size,
         )
 }

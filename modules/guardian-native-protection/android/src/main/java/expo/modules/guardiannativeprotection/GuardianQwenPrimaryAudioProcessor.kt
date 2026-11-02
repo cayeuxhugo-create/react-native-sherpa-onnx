@@ -31,6 +31,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
         fun onSpeechStarted()
         fun onSpeechEnded()
         fun onWarning(message: String)
+        fun onCaptureHeartbeat() = Unit
     }
 
     // Load before capture. Missing/incompatible VAD must fail explicitly, never
@@ -84,6 +85,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
     private val earlyStudyCalibrationGuard = studyModel == "WIENER_DD_ADAPTIVE" || referenceNoiseStudy
     private val closed = AtomicBoolean(false)
     private val discontinuity = AtomicBoolean(false)
+    private var lastCaptureHeartbeatMs = Long.MIN_VALUE
     private val pendingTasks = AtomicInteger(0)
     private val worker = Executors.newSingleThreadExecutor { task ->
         Thread(task, "Guardian-Speech-Input").apply { isDaemon = true }
@@ -320,6 +322,11 @@ internal class GuardianQwenPrimaryAudioProcessor(
                 warn("Discontinuité audio : segment abandonné, VAD réinitialisée")
             }
             previousKey = frame.key
+            val captureNow = SystemClock.elapsedRealtime()
+            if (lastCaptureHeartbeatMs == Long.MIN_VALUE || captureNow - lastCaptureHeartbeatMs >= 1_000L) {
+                lastCaptureHeartbeatMs = captureNow
+                listener.onCaptureHeartbeat()
+            }
             truthFrames++
             if (enhanced) enhancedFrames++
             // Qwen is more robust on the original noisy consonants than on
@@ -490,6 +497,8 @@ internal class GuardianQwenPrimaryAudioProcessor(
             pendingTasks.decrementAndGet()
             droppedInputTasks.incrementAndGet()
             discontinuity.set(true)
+            // Report on the producer too: a blocked native input worker cannot report itself.
+            warn("Saturation entrée audio : trame perdue")
             return
         }
         try {
@@ -501,8 +510,14 @@ internal class GuardianQwenPrimaryAudioProcessor(
         }
     }
 
+    private var measuredInputActions = 0L
+    private var measuredInputCpuMs = 0L
+    private var measuredInputWallMs = 0L
     private fun guarded(action: () -> Unit) {
         if (closed.get()) return
+        val measure = diagnostics?.enabled == true
+        val cpuStarted = if (measure) SystemClock.currentThreadTimeMillis() else 0L
+        val wallStarted = if (measure) SystemClock.elapsedRealtime() else 0L
         try {
             if (discontinuity.getAndSet(false)) {
                 router.reset()
@@ -515,6 +530,16 @@ internal class GuardianQwenPrimaryAudioProcessor(
             Log.e(TAG, "Erreur du cœur vocal, aucune hypothèse publiée pour cette frame", error)
             discontinuity.set(true)
             warn("Erreur validation vocale : ${error.javaClass.simpleName}")
+        } finally {
+            if (measure) {
+                measuredInputActions++
+                measuredInputCpuMs += SystemClock.currentThreadTimeMillis() - cpuStarted
+                measuredInputWallMs += SystemClock.elapsedRealtime() - wallStarted
+                if (measuredInputActions % 100L == 0L) diagnostics?.event("INPUT_CPU_METRIC",
+                    "actions" to measuredInputActions, "threadCpuMs" to measuredInputCpuMs,
+                    "processingWallMs" to measuredInputWallMs, "pendingInputTasks" to pendingTasks.get(),
+                    "droppedInputTasks" to droppedInputTasks.get(), "scope" to "INPUT_WORKER_ONLY_EXCLUDES_QWEN")
+            }
         }
     }
 
@@ -683,7 +708,7 @@ internal class GuardianQwenPrimaryAudioProcessor(
         return FsmnAdmission(result.decision.accepted, result.confirmationMs)
     }
 
-    private fun warn(message: String) {
+    @Synchronized private fun warn(message: String) {
         val now = SystemClock.elapsedRealtime()
         if (warningAtMs == Long.MIN_VALUE || now - warningAtMs >= 5_000L) {
             warningAtMs = now

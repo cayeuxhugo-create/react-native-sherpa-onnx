@@ -11,19 +11,18 @@ export type GuardianVoicePhase =
   | string;
 
 export type GuardianProtectionStatus = {
-
   statusReadAt: number;
 
-nativeCoreVersion: string;
+  nativeCoreVersion: string;
 
-serviceStatusAvailable: boolean;
+  serviceStatusAvailable: boolean;
 
-locationStatusAvailable: boolean;
-locationDataAvailable: boolean;
+  locationStatusAvailable: boolean;
+  locationDataAvailable: boolean;
 
-ptiStatusAvailable: boolean;
+  ptiStatusAvailable: boolean;
 
-voiceStatusAvailable: boolean;
+  voiceStatusAvailable: boolean;
   serviceRunning: boolean;
 
   locationActive: boolean;
@@ -34,15 +33,18 @@ voiceStatusAvailable: boolean;
   voicePhase: GuardianVoicePhase | null;
 
   voiceRecognizerAvailable: boolean | null;
-voiceMicrophonePermission: boolean | null;
-voiceWakePhraseArmed: boolean | null;
+  voicePipelineError?: string | null;
+  voiceDeliveryError?: string | null;
+  voicePendingDeliveryCount?: number | null;
+  voiceMicrophonePermission: boolean | null;
+  voiceWakePhraseArmed: boolean | null;
 
   voiceConfidence: number | null;
   voiceWakePhrase: string | null;
   voiceEmergencyPhrase: string | null;
   voiceRestartCount: number | null;
 
-    // ============================
+  // ============================
   // Diagnostic Audio Guardian
   // ============================
 
@@ -59,7 +61,7 @@ voiceWakePhraseArmed: boolean | null;
   voiceAudioClippedSampleCount: number | null;
   voiceAudioDroppedFrameCount: number | null;
 
-    // ============================
+  // ============================
   // Capacités audio du téléphone
   // ============================
 
@@ -126,7 +128,7 @@ voiceWakePhraseArmed: boolean | null;
   voiceSherpaLastConfidence: number | null;
   voiceSherpaFinalizedUtteranceCount: number | null;
 
-    // ============================
+  // ============================
   // Diagnostic Conversation
   // ============================
 
@@ -165,12 +167,12 @@ voiceWakePhraseArmed: boolean | null;
   voiceFusionReasons: string[] | null;
 
   ptiSensorAvailable: boolean | null;
-ptiPhase: string | null;
-ptiCurrentForceG: number | null;
-ptiPeakImpactG: number | null;
-ptiHorizontal: boolean | null;
-ptiStillDurationSeconds: number | null;
-ptiLastScore: number | null;
+  ptiPhase: string | null;
+  ptiCurrentForceG: number | null;
+  ptiPeakImpactG: number | null;
+  ptiHorizontal: boolean | null;
+  ptiStillDurationSeconds: number | null;
+  ptiLastScore: number | null;
 
   startedAt: number | null;
 
@@ -192,10 +194,7 @@ export type GuardianNativeLocationEvent = {
 
   eventType: 'LOCATION';
 
-  priority:
-    | 'normal'
-    | 'high'
-    | 'critical';
+  priority: 'normal' | 'high' | 'critical';
 
   createdAt: number;
   recordedAt: number;
@@ -244,44 +243,32 @@ export type GuardianManualSosResult = {
 
 export type GuardianNativeProtectionModuleType = {
   configureProtection(
-    config: Omit<
-      GuardianNativeConfig,
-      'version' | 'lastUpdated'
-    >
+    config: Omit<GuardianNativeConfig, 'version' | 'lastUpdated'>
   ): Promise<boolean>;
 
-  getNativeConfig():
-    Promise<GuardianNativeConfig | null>;
+  getNativeConfig(): Promise<GuardianNativeConfig | null>;
 
-  clearNativeConfig():
-    Promise<boolean>;
+  clearNativeConfig(): Promise<boolean>;
 
-  startProtection():
-    Promise<boolean>;
+  startProtection(): Promise<boolean>;
 
   stopProtection(): boolean;
 
-  triggerManualSos():
-    Promise<GuardianManualSosResult>;
+  triggerManualSos(): Promise<GuardianManualSosResult>;
 
   getNativeCoreVersion(): string;
 
-  getNativeFirebaseUid():
-    Promise<string>;
+  getNativeFirebaseUid(): Promise<string>;
 
-  getProtectionStatus():
-    Promise<GuardianProtectionStatus>;
+  getProtectionStatus(): Promise<GuardianProtectionStatus>;
 
   getPendingLocationEvents(
     limit: number
   ): Promise<GuardianNativeLocationEvent[]>;
 
-  markEventsUploaded(
-    eventIds: string[]
-  ): Promise<boolean>;
+  markEventsUploaded(eventIds: string[]): Promise<boolean>;
 
-  triggerUpload():
-    Promise<boolean>;
+  triggerUpload(): Promise<boolean>;
 };
 
 const GuardianNativeProtection =

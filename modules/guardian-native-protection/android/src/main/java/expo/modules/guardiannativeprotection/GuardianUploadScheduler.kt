@@ -66,15 +66,10 @@ object GuardianUploadScheduler {
   }
 
   /**
- * Planification prioritaire, utilisée pour SOS/PTI/Voice et les demandes
- * manuelles de synchronisation.
- *
- * REPLACE annule le travail unique précédent, y compris lorsqu'il attend
- * dans un backoff, puis programme immédiatement un nouveau passage.
- *
- * Aucun événement n'est perdu : les événements restent dans SQLite jusqu'à
- * leur confirmation explicite par la Cloud API.
- */
+   * Preserve a running upload and its acknowledgements. A failed/cancelled
+   * prerequisite must not permanently poison the follow-up chain.
+   * Pending events remain in SQLite until explicit server acknowledgement.
+   */
   fun forceUpload(
   context: Context
 ): Boolean {
@@ -86,7 +81,7 @@ object GuardianUploadScheduler {
   return enqueue(
     context = context,
     request = request,
-    policy = ExistingWorkPolicy.REPLACE,
+    policy = ExistingWorkPolicy.APPEND_OR_REPLACE,
     reason = "prioritaire"
   )
 }

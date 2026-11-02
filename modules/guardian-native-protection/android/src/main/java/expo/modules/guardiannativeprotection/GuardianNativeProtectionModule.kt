@@ -578,6 +578,9 @@ val voiceConversationLastFinalizedAt =
 
     "voiceRecognizerAvailable" to
       voiceStatus?.recognizerAvailable,
+    "voicePipelineError" to voiceStatus?.pipelineError,
+    "voiceDeliveryError" to voiceStatus?.deliveryError,
+    "voicePendingDeliveryCount" to voiceStatus?.pendingDeliveryCount,
 
     "voiceMicrophonePermission" to
       voiceStatus
