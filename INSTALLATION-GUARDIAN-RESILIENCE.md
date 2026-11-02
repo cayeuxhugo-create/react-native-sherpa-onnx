@@ -53,4 +53,4 @@ Il conserve également le module corrigé dans un nouveau dossier voisin du proj
 
 ## Identité du paquet
 
-Paquet `guardian-voice-v3.5.4-resilience-cpu-r1`, basé sur le commit `a39e884311f5b7a5aff955309e89d286ca215dfd`, avec le correctif local de résilience/CPU. Ce n’est pas une version publiée sur le dépôt distant. Le libellé de diagnostic interne v3.5.4 antérieur reste présent : le manifeste et les empreintes des fichiers identifient précisément cette livraison.
+Paquet `guardian-voice-v3.5.4-resilience-cpu-r1`, basé sur le commit `a39e884311f5b7a5aff955309e89d286ca215dfd`, avec le correctif local de résilience/CPU. Cette livraison de test est disponible sur la branche distante `codex/guardian-resilience-cpu` ; ce n’est pas une release de production. Le libellé de diagnostic interne v3.5.4 antérieur reste présent : le manifeste et les empreintes des fichiers identifient précisément cette livraison.
